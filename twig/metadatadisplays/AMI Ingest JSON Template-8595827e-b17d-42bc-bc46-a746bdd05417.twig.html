@@ -1,0 +1,99 @@
+{
+{#- Updated for 1.6.0 to handle DOI events from CSV 
+- Requires DataCite subscription and most importantly the Fragaria module to be enabled
+which is the one that provides the sbf_datacite twig extension doing all validation
+For an AMI set, a CSV column "doi_datacite_action" can contain one of: draft, register, publish or delete
+doi_event and dataOriginal (original data of an ADO being updated,
+only present if this template is used to update existing ones) is
+passed to the `sbf_datacite` twig extension, wich will return only an entry for the active API
+if all is valid based on previously known state #}
+{# Data Cite Setup: If all previos conditions apply, please remove lines 12 and 25 #}
+{% set ap_tasks = null %}
+{#-
+{%- if datacite_enabled %}
+  {% set doi_event = data.doi_datacite_action|default(null) %} 
+  {% set doi_ap_tasks = sbf_datacite(dataOriginal|default([]), doi_event) %}
+  {% set ap_tasks = doi_ap_tasks["ap:tasks"]|default([]) %}
+  {% if dataOriginal["ap:tasks"] is defined and dataOriginal["ap:tasks"] is not empty %}
+    {% if dataOriginal["ap:tasks"]["ap:fragaria"] is defined and ap_tasks["ap:fragaria"] is defined %}
+       {% set ap_fragaria = dataOriginal["ap:tasks"]["ap:fragaria"]|merge(ap_tasks["ap:fragaria"]) %}
+       {% set ap_tasks = {"ap:fragaria": ap_fragaria } %}
+    {% endif %}
+	{% set ap_tasks = dataOriginal["ap:tasks"]|merge(ap_tasks) %} 
+  {% endif %}
+{% endif -%}
+-#}
+{# ap_tasks is used at the end of this template #}
+    "type": {{ data.type|json_encode|raw }},
+    "label": {{ data.label|json_encode|raw }},
+    "issue_number": {{ data.issue_number|json_encode|raw }},
+    "interviewee": {{ data.interviewee|json_encode|raw }},
+    "interviewer": {{ data.interviewer|json_encode|raw }},
+    "duration": {{ data.duration|json_encode|raw }},
+    "website_url": {{ data.website_url|json_encode|raw }},
+    "description": {{ data.description|json_encode|raw }},
+    "date_created": {{ data.date_created|json_encode|raw }},
+    "date_created_edtf": {{ data.date_created_edtf|json_encode|raw }},
+    "date_created_free": {{ data.date_created_free|json_encode|raw }},
+    "creator": {{ data.creator|json_encode|raw }},
+    "creator_lod": {{ data.creator_lod|json_encode|raw }},
+    "publisher": {{ data.publisher|json_encode|raw }},
+    "language": {{ data.language|json_encode|raw }},
+    "ismemberof": [],
+    "ispartof": [],
+    "sequence_id": {{ data.sequence_id|json_encode|raw }},  
+    "owner": {{ data.owner|json_encode|raw }},
+    "local_identifier": {{ data.local_identifier|json_encode|raw }},
+    "related_item_host_title_info_title": {{ data.related_item_host_title_info_title|json_encode|raw }},
+    "related_item_host_display_label": {{ data.related_item_host_display_label|json_encode|raw }},
+    "related_item_host_type_of_resource": {{ data.related_item_host_type_of_resource|json_encode|raw }},
+    "related_item_host_local_identifier": {{ data.related_item_host_local_identifier|json_encode|raw }},
+    "related_item_note": {{ data.related_item_note|json_encode|raw }},
+    "related_item_host_location_url": {{ data.related_item_host_location_url|json_encode|raw }},
+    "note": {{ data.note|json_encode|raw }},
+    "physical_description_note_condition": {{ data.physical_description_note_condition|json_encode|raw }},
+    "note_publishinginfo": {{ data.note_publishinginfo|json_encode|raw }},
+    "physical_location": {{ data.physical_location|json_encode|raw }},
+    "physical_description_extent": {{ data.physical_description_extent|json_encode|raw }},
+    "date_published": {{ data.date_published|json_encode|raw }},
+    "date_embargo_lift": {{ data.date_embargo_lift|json_encode|raw }},
+    "rights_statements": {{ data.rights_statements|json_encode|raw }},
+    "rights": {{ data.rights|json_encode|raw }},
+    "subject_loc": {{ data.subject_loc|json_encode|raw }},
+    "subject_lcnaf_personal_names": {{ data.subject_lcnaf_personal_names|json_encode|raw }},
+    "subject_lcnaf_corporate_names": {{ data.subject_lcnaf_corporate_names|json_encode|raw }},
+    "subject_lcnaf_geographic_names": {{ data.subject_lcnaf_geographic_names|json_encode|raw }},
+    "subject_lcgft_terms": {{ data.subject_lcgft_terms|json_encode|raw }},
+    "subject_wikidata": {{ data.subject_wikidata|json_encode|raw }},
+    "edm_agent": {{ data.edm_agent|json_encode|raw }},
+    "term_aat_getty": {{ data.term_aat_getty|json_encode|raw }},
+    "viaf": {{ data.viaf|json_encode|raw }},
+    "pubmed_mesh": {{ data.pubmed_mesh|json_encode|raw }},
+    "europeana_concepts": {{ data.europeana_concepts|json_encode|raw }},
+    "europeana_agents": {{ data.europeana_agents|json_encode|raw }},
+    "europeana_places": {{ data.europeana_places|json_encode|raw }},
+    "geographic_location": {{ data.geographic_location|json_encode|raw }},
+    "subjects_local_personal_names": {{ data.subjects_local_personal_names|json_encode|raw }},
+    "subjects_local": {{ data.subjects_locals|json_encode|raw }},
+    "audios": [],
+    "images": [],
+    "models": [],
+    "videos": [],
+    "documents": [],
+    "as:generator": {
+        "type": "Create",
+        "actor": {
+            "url": {{ setURL|json_encode|raw }},
+            "name": "ami",
+            "type": "Service"
+        },
+        "endTime": "{{"now"|date("c")}}",
+        "summary": "Generator",
+        "@context": "https:\/\/www.w3.org\/ns\/activitystreams"
+    },
+    {%- if ap_tasks is defined and ap_tasks is iterable and ap_tasks is not empty -%},
+    "ap:tasks": {{ ap_tasks|json_encode|raw }},
+    {% endif %}
+    "upload_associated_warcs": []
+   
+}
