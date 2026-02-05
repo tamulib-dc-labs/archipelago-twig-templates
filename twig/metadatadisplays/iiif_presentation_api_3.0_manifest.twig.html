@@ -394,52 +394,15 @@ Without Double quotes.
         } 
       ] 
  #}   
-{#- starts Pure Text annotation, transcriptions, and direct Image annotations-#}
-{% set texts = [] %}
-
-{%- for text_uuid, text_file in data["as:text"] %}
-    {# only generate an annotation if text and image have the same sequence OR
-    there is exactly a single Image #}
-    {% if (text_file.sequence == page.sequence or data["as:image"]|length == 1) and text_file["dr:mimetype"] == "text\/plain" %}
-        {% set texts = texts|merge([{'dr:uuid': text_file['dr:uuid'], 'name': text_file['name']}]) %}
-    {% endif %}
-{%- endfor %}
-
+{#- starts Transcription and direct Image annotations-#}
 {% set transcription = null %}
 {% if data.annotations[0].transcribing[loop.index0] is defined %}
   {% set transcription = data.annotations[0].transcribing[loop.index0] %}
 {% endif %}
-{% if texts|length > 0 or transcription or data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
-       , 
+{% if transcription or data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
+       ,
        "annotations": [
-  {%- if texts|length > 0 -%}
-           {
-           "id": "{{ nodeurl }}/iiif/subtitles/s{{ itemCount }}",
-           "type": "AnnotationPage",
-           "items": [
-    {%- for text_file in texts %}
-            {
-              "id": "{{ nodeurl }}/iiif/text/p{{ itemCount }}/{{ text_file['dr:uuid'] }}",
-              "type": "Annotation",
-              "motivation": "supplementing",
-              "body": {
-                "id": "{{ Webserverurl }}do/{{ node.uuid.value }}/file/{{ text_file['dr:uuid'] }}/download/{{  text_file["name"] }}",
-                "type": "TextualBody",
-                "format": "text/html",
-                "value": "",
-                "label": {
-                  "en": [
-                    "{{ text_file.name  }}"
-                  ]
-                },
-                "language": "en"
-              },
-              "target": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}"
-            }{{ not loop.last ? ',' : '' }}
-    {% endfor -%}
-  {%- endif -%}
   {% if transcription %}
-    {%- if texts|length > 0 -%},{% endif %}
             {
               "id": "{{ nodeurl }}/iiif/transcription/p{{ itemCount }}",
               "type": "AnnotationPage",
@@ -447,7 +410,7 @@ Without Double quotes.
                 {
                   "id": "{{ nodeurl }}/iiif/transcription/p{{ itemCount }}/1",
                   "type": "Annotation",
-                  "motivation": "supplementing",
+                  "motivation": "commenting",
                   "body": {
                     "type": "TextualBody",
                     "value": {{ transcription.value|json_encode|raw }},
@@ -460,7 +423,7 @@ Without Double quotes.
             }
   {% endif %}
   {% if data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
-    {%- if texts|length > 0 or transcription -%},{% endif %}
+    {%- if transcription -%},{% endif %}
             {
               "id": "{{ nodeurl }}/iiif/comments/p{{ itemCount }}",
               "type": "AnnotationPage", 
@@ -503,13 +466,14 @@ Without Double quotes.
               ,"target": {{ target|json_encode|raw }} 
               {% endif %}
             {% endif %}
-       }{{ not loop.last ? ',' : '' }}       
+       }{{ not loop.last ? ',' : '' }}
        {% endfor -%}
-       {% endif %}   
+              ]
+            }
+       {% endif %}
        ]
-    }]
-      {% endif %} 
-{#- ends Pure text and Direct Image annotation -#}  
+      {% endif %}
+{#- ends Transcription and Direct Image annotation -#}  
     }{{ not loop.last ? ',' : '' }} 
 {% endfor %} 
 {#- Video Manifest -#} 
