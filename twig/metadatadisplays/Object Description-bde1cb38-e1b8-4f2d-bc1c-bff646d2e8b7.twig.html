@@ -278,14 +278,18 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 <h3>Creators/Contributors</h3> 
 <div class="field-content"> 
 <ul> 
-	{% if data.creator %} 
-	{% if data.creator is iterable %} 
-		{% for creator in data.creator %} 
-  	<li class="nav-item" style="padding:3px;margin-top:4px;"><a href="/search?search_api_fulltext=&sort_by=changed&sort_order=DESC&items_per_page=25&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator|url_encode }}" target="_blank" >{{ creator }}</a> 
-		{% endfor %} 
-	{% else %} 
-  	<li class="nav-item" style="padding:3px;margin-top:4px;"><a href="/search?search_api_fulltext=&sort_by=changed&sort_order=DESC&items_per_page=25&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator|url_encode }}" target="_blank" >{{ creator }}</a> 
-    {% endif %} 
+	{% if data.creator %}
+	{% if data.creator is iterable %}
+		{% for creator in data.creator %}
+		  {% if creator.name_label is defined %}
+  	<li class="nav-item" style="padding:3px;margin-top:4px;">{{ creator.role_label }}: <a href="/search?search_api_fulltext=&sort_by=changed&sort_order=DESC&items_per_page=25&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator.name_label|url_encode }}" target="_blank" >{{ creator.name_label }}</a></li>
+		  {% else %}
+  	<li class="nav-item" style="padding:3px;margin-top:4px;"><a href="/search?search_api_fulltext=&sort_by=changed&sort_order=DESC&items_per_page=25&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator|url_encode }}" target="_blank" >{{ creator }}</a></li>
+		  {% endif %}
+		{% endfor %}
+	{% else %}
+  	<li class="nav-item" style="padding:3px;margin-top:4px;"><a href="/search?search_api_fulltext=&sort_by=changed&sort_order=DESC&items_per_page=25&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ data.creator|url_encode }}" target="_blank" >{{ data.creator }}</a></li>
+    {% endif %}
 	{% endif %} 
 	{% for creator_lod in data.creator_lod %} 
   	<li class="nav-item" style="padding:3px;margin-top:4px;">{{ creator_lod.role_label }}: <a href="/search?search_api_fulltext=&sort_by=changed&sort_order=DESC&items_per_page=25&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator_lod.name_label|url_encode }}" target="_blank" >{{ creator_lod.name_label }}</a> 
