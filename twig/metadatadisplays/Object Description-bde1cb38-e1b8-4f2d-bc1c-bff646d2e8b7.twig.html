@@ -301,8 +301,14 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 	</ul> 
 </div> 
 {% endif %} 
-{{ _self.html_output('Description', data.description, '', true) }} 
-{% set all_date_created = [] %} 
+{{ _self.html_output('Description', data.description, '', true) }}
+
+{% if data.date_published %}
+    <h3>Date Published</h3>
+    <p>{{ data.date_published }}</p>
+{% endif %}
+
+{% set all_date_created = [] %}
 {% if data.date_created_edtf.date_free|length > 0  %} 
   {% set all_date_created = all_date_created|merge([data.date_created_edtf.date_free|trim|edtf_2_human_date('en')]) %} 
 {% endif %} 
@@ -311,8 +317,8 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endif %} 
 {% if ((data.date_created_free is defined and not empty) and (data.date_created_free is not iterable and data.date_created_free|trim|length > 0))  %} 
     {% set all_date_created = all_date_created|merge([data.date_created_free]) %} 
-{% endif %} 
-{% if all_date_created|length > 0 %} 
+{% endif %}
+{% if all_date_created|length > 0 %}
 <h3>Date Created</h3> 
   {% for date_created in all_date_created  %} 
 <p>{{ date_created|edtf_2_human_date }}</p> 
