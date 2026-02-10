@@ -1,0 +1,24 @@
+{
+  "theme": {
+    "palette": {
+      "primary": {
+        "main": "#800000"
+      }
+    }
+  },
+  "window": {
+    "allowClose": false,
+    "sideBarOpen": false,
+    "allowFullscreen": true,
+    "defaultSideBarPanel": "annotations",
+    "workspaceControlPanel": {
+      "enabled": false
+    }
+  },
+  "workspace": {
+    "type": "mosaic",
+    "showAddMessages": false
+  },
+  "workspaceControlPanel": {
+    "enabled": false
+  }}
