@@ -308,7 +308,71 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     <p>{{ data.date_published }}</p>
 {% endif %}
 
-{% set all_date_created = [] %}
+{% if data.rights_statements|length > 0 %}
+    <h3>Rights</h3>
+    {% if data.rights_statements in ['In Copyright'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/InC/1.0/"><img src="https://rightsstatements.org/files/buttons/InC.white.svg" title="In Copyright" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['In Copyright - EU Orphan Work'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/InC-OW-EU/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-OW-EU.white.svg" title="In Copyright - EU Orphan Work" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['In Copyright - Educational Use Permitted'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/InC-EDU/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-EDU.white.svg" title="In Copyright - Educational Use Permitted" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['In Copyright - Non-Commercial Use Permitted'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/InC-NC/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-NC.white.svg" title="In Copyright - Non-Commercial Use Permitted" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['In Copyright - Rights-holder(s) Unlocatable or Unidentifiable'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/InC-RUU/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-RUU.white.svg" title="In Copyright - Rights-holder(s) Unlocatable or Unidentifiable" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['No Copyright - Contractual Restrictions'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/NoC-CR/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-CR.white.svg" title="No Copyright - Contractual Restrictions" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['No Copyright - Non-Commercial Use Only'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/NoC-NC/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-NC.white.svg" title="No Copyright - Non-Commercial Use Only" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['No Copyright - Other Known Legal Restrictions'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/NoC-OKLR/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-OKLR.white.svg" title="No Copyright - Other Known Legal Restrictions" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['No Copyright - United States'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/NoC-US/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-US.white.svg" title="No Copyright - United States" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['Copyright Not Evaluated'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/CNE/1.0/"><img src="https://rightsstatements.org/files/buttons/CNE.white.svg" title="Copyright Not Evaluated" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['Copyright Undetermined'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/UND/1.0/"><img src="https://rightsstatements.org/files/buttons/UND.white.svg" title="Copyright Undetermined" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+    {% if data.rights_statements in ['No Known Copyright'] %}
+    <p>
+        <a href="http://rightsstatements.org/vocab/NKC/1.0/"><img src="https://rightsstatements.org/files/buttons/NKC.white.svg" title="No Known Copyright" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
+    </p>
+    {% endif %}
+{% endif %}
+
+    {% set all_date_created = [] %}
 {% if data.date_created_edtf.date_free|length > 0  %} 
   {% set all_date_created = all_date_created|merge([data.date_created_edtf.date_free|trim|edtf_2_human_date('en')]) %} 
 {% endif %} 
