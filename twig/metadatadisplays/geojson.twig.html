@@ -1,46 +1,39 @@
-{# This Template generates GeoJSON from a Strawberry Field
-JSON.
+{# 2026-02-12: Full rewrite of template to handle complex types. #}
+{% set feature = null %}
 
-Structures passed from Archipelago are
-- node
-  The full Node entity
-- data
-  The Full JSON Structure converted in an Array
-- iiif_server
-  The publicly available IIIF Server (Global Setting)
-
-Since JSON was decoded into the 'data' values are valid PHP but could not
-be valid JSON when outputting. So We use data.description|json_encode|raw
-Without Double quotes.
-
-#}
-{
-  "type": "FeatureCollection",
-  "features": [
-    {
 {% if data.geographic_location %}
   {% if data.geographic_location.type == 'Polygon' and data.geographic_location.coordinates %}
-    "type": "Feature",
-    "geometry": {
-      "type": "Polygon",
-      "coordinates": {{ data.geographic_location.coordinates|json_encode|raw }}
-     },
-    "properties": {
-      "id": "{{ node.uuid.value }}",
-      "name": {{ data.geographic_location.display_name|default('Polygon')|json_encode|raw }}
-    }
+    {% set feature = {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": data.geographic_location.coordinates
+      },
+      "properties": {
+        "id": node.uuid.value,
+        "name": data.geographic_location.display_name|default('Polygon')
+      }
+    } %}
   {% elseif data.geographic_location.lng and data.geographic_location.lat %}
-    "type": "Feature",
-    "geometry": {
-      "type": "Point",
-      "coordinates": [{{ data.geographic_location.lng }},{{ data.geographic_location.lat }} ]
-     },
-    "properties": {
-      "id": "{{ node.uuid.value }}",
-      "name": {{ data.geographic_location.display_name|json_encode|raw }}
-    }
+    {% set feature = {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [data.geographic_location.lng|number_format(6), data.geographic_location.lat|number_format(6)]
+      },
+      "properties": {
+        "id": node.uuid.value,
+        "name": data.geographic_location.display_name
+      }
+    } %}
   {% endif %}
 {% endif %}
-    }
-  ]
-}
+
+{# 2. Construct the final Collection #}
+{% set collection = {
+  "type": "FeatureCollection",
+  "features": feature ? [feature] : []
+} %}
+
+{# 3. Output as clean JSON #}
+{{ (data.geojson ? data.geojson : collection) | json_encode | raw }}
