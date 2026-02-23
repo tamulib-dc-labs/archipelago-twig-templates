@@ -321,40 +321,40 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% if data.rights_statements|length > 0 %}
     <dt>Rights</dt>
     <dd>
-    {% if data.rights_statements in ['In Copyright'] %}
+    {% if data.rights_statements in ['In Copyright'] or data.rights in ['http://rightsstatements.org/vocab/InC/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/InC/1.0/"><img src="https://rightsstatements.org/files/buttons/InC.white.svg" title="In Copyright" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['In Copyright - EU Orphan Work'] %}
+    {% if data.rights_statements in ['In Copyright - EU Orphan Work'] or data.rights in ['http://rightsstatements.org/vocab/InC-OW-EU/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/InC-OW-EU/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-OW-EU.white.svg" title="In Copyright - EU Orphan Work" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['In Copyright - Educational Use Permitted'] %}
+    {% if data.rights_statements in ['In Copyright - Educational Use Permitted'] or data.rights in ['http://rightsstatements.org/vocab/InC-EDU/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/InC-EDU/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-EDU.white.svg" title="In Copyright - Educational Use Permitted" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['In Copyright - Non-Commercial Use Permitted'] %}
+    {% if data.rights_statements in ['In Copyright - Non-Commercial Use Permitted'] or data.rights in ['http://rightsstatements.org/vocab/InC-NC/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/InC-NC/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-NC.white.svg" title="In Copyright - Non-Commercial Use Permitted" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['In Copyright - Rights-holder(s) Unlocatable or Unidentifiable'] %}
+    {% if data.rights_statements in ['In Copyright - Rights-holder(s) Unlocatable or Unidentifiable'] or data.rights in ['http://rightsstatements.org/vocab/InC-RUU/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/InC-RUU/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-RUU.white.svg" title="In Copyright - Rights-holder(s) Unlocatable or Unidentifiable" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['No Copyright - Contractual Restrictions'] %}
+    {% if data.rights_statements in ['No Copyright - Contractual Restrictions'] or data.rights in ['http://rightsstatements.org/vocab/NoC-CR/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/NoC-CR/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-CR.white.svg" title="No Copyright - Contractual Restrictions" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['No Copyright - Non-Commercial Use Only'] %}
+    {% if data.rights_statements in ['No Copyright - Non-Commercial Use Only'] or data.rights in ['http://rightsstatements.org/vocab/NoC-NC/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/NoC-NC/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-NC.white.svg" title="No Copyright - Non-Commercial Use Only" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['No Copyright - Other Known Legal Restrictions'] %}
+    {% if data.rights_statements in ['No Copyright - Other Known Legal Restrictions'] or data.rights in ['http://rightsstatements.org/vocab/NoC-OKLR/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/NoC-OKLR/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-OKLR.white.svg" title="No Copyright - Other Known Legal Restrictions" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['No Copyright - United States'] %}
+    {% if data.rights_statements in ['No Copyright - United States'] or data.rights in ['http://rightsstatements.org/vocab/NoC-US/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/NoC-US/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-US.white.svg" title="No Copyright - United States" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['Copyright Not Evaluated'] %}
+    {% if data.rights_statements in ['Copyright Not Evaluated'] or data.rights in ['http://rightsstatements.org/vocab/CNE/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/CNE/1.0/"><img src="https://rightsstatements.org/files/buttons/CNE.white.svg" title="Copyright Not Evaluated" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['Copyright Undetermined'] %}
+    {% if data.rights_statements in ['Copyright Undetermined'] or data.rights in ['http://rightsstatements.org/vocab/UND/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/UND/1.0/"><img src="https://rightsstatements.org/files/buttons/UND.white.svg" title="Copyright Undetermined" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
-    {% if data.rights_statements in ['No Known Copyright'] %}
+    {% if data.rights_statements in ['No Known Copyright'] or data.rights in ['http://rightsstatements.org/vocab/NKC/1.0/'] %}
         <a href="http://rightsstatements.org/vocab/NKC/1.0/"><img src="https://rightsstatements.org/files/buttons/NKC.white.svg" title="No Known Copyright" style="max-width:120px;height:auto;background-color:#800000 ;padding:1em"></a>
     {% endif %}
     </dd>
