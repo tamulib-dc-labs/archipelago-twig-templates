@@ -282,10 +282,9 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {%- endif -%}
 {# -- END Custom Viewers and Controllers 1.6.0 -#}
 <dl>
-{{ _self.html_output("Title", data.label) }}
-    {{ _self.html_output(
+{{ _self.html_output(
     "URL of Original Website",
-    '<a href="' ~ data.website_url|e('html_attr') ~ '" target="_blank" rel="noopener">Visit Website</a>',
+    "[Visit Website](" ~ data.website_url ~ ")",
     true
 ) }}
 {% if data.creator|length > 0 or data.creator_lod|length > 0 %}
