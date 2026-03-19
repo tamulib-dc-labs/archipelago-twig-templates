@@ -299,22 +299,41 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {# Description #}
   {{ _self.html_output('Description', data.description, true) }}
 
-{# Creator (str, pipe-separated) #}
-  {{ _self.html_output_search('Creator', data.creator, 'descriptive_metadata_creator') }}
-
-{# Contributor (str, pipe-separated) #}
-  {{ _self.html_output_search('Contributor', data.contributor, 'descriptive_metadata_contributor') }}
-
-{# Agent (object: value + role) #}
-{% if data.agent|length > 0 %}
-<dt>Agent</dt>
+{# Creators and Contributors (creator str, contributor str, agent objects) #}
+{% if data.creator|length > 0 or data.contributor|length > 0 or data.agent|length > 0 %}
+<dt>Creators and Contributors</dt>
 <dd><ul>
-  {% if data.agent is iterable %}
-    {% for agent_item in data.agent %}
-      <li>{% if agent_item.role is defined and agent_item.role|length > 0 %}{{ agent_item.role }}: {% endif %}{{ agent_item.value }}</li>
-    {% endfor %}
-  {% else %}
-    <li>{{ data.agent }}</li>
+  {% if data.creator|length > 0 %}
+    {% if data.creator is iterable %}
+      {% for creator_item in data.creator %}
+        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator_item|url_encode }}" target="_blank">{{ creator_item }}</a> (Creator)</li>
+      {% endfor %}
+    {% else %}
+      {% for creator_item in data.creator|split('|') %}
+        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator_item|trim|url_encode }}" target="_blank">{{ creator_item|trim }}</a> (Contributor)</li>
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+  {% if data.contributor|length > 0 %}
+    {% if data.contributor is iterable %}
+      {% for contributor_item in data.contributor %}
+        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ contributor_item|url_encode }}" target="_blank">{{ contributor_item }}</a> (Contributor)</li>
+      {% endfor %}
+    {% else %}
+      {% for contributor_item in data.contributor|split('|') %}
+        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ contributor_item|trim|url_encode }}" target="_blank">{{ contributor_item|trim }}</a> (Contributor)</li>
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+  {% if data.agent|length > 0 %}
+    {% if data.agent is iterable %}
+      {% for agent_item in data.agent %}
+    {# Todo: Fix role term logic #}
+        <li>{% if agent_item.role is defined and agent_item.role|length > 0 %}{{ agent_item.role }}: {% endif %}<a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ agent_item.value|url_encode }}" target="_blank">{{ agent_item.value }}</a></li>
+      {% endfor %}
+    {% else %}
+      <li>{{ data.agent }}</li>
+    {% endif %}
   {% endif %}
 </ul></dd>
 {% endif %}
