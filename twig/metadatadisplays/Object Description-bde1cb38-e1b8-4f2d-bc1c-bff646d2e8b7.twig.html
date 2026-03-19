@@ -282,11 +282,13 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {%- endif -%}
 {# -- END Custom Viewers and Controllers 1.6.0 -#}
 <dl>
-{{ _self.html_output(
+{% if data.website_url|length > 0 %}
+    {{ _self.html_output(
     "URL of Original Website",
     "[Visit Website](" ~ data.website_url ~ ")",
     true
-) }}
+    ) }}
+{% endif %}
 {% if data.creator|length > 0 or data.creator_lod|length > 0 %}
 <dt>Creators/Contributors</dt>
 <dd>
