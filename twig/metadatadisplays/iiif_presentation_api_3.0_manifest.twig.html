@@ -195,8 +195,9 @@ Without Double quotes.
         }, 
         { 
             "@id": "{{ baseurl }}iiifcontentsearch/v1/do/{{ node.uuid.value }}/metadatadisplayexposed/iiifmanifest/mode/advanced/page/0", 
-            "@context": "http://iiif.io/api/search/0/context.json", 
-            "profile": "http://iiif.io/api/search/0/search" 
+            "@context": "http://iiif.io/api/search/0/context.json",
+            "type": "SearchService1",
+            "profile": "http://iiif.io/api/search/0/search"
         } 
     ], 
 {%- endif -%}
