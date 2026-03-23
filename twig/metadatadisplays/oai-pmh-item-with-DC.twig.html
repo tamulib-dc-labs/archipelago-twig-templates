@@ -34,7 +34,7 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ 
          http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
-<dc:title>{{ data.label|escape('html') }}</dc:title>
+<dc:title>{{ data.label|escape('html_attr') }}</dc:title>
 {# Creator #}
 {% if data.creator|length > 0  %}
 	{% if data.creator is iterable %}
@@ -50,12 +50,30 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
      	<dc:creator>{{ creator_lod.name_label }}</dc:creator>
 	{% endfor %}
 {% endif %}
-{# Contributor
-<dc:contributor></dc:contributor>
-#}
-{# Coverage 
-<dc:coverage></dc:coverage>
-#}
+{# Contributor #}
+{% if data.contributor|length > 0 %}
+  {% if data.contributor is iterable %}
+    {% for contributor in data.contributor %}
+      <dc:contributor>{{ contributor }}</dc:contributor>
+    {% endfor %}
+  {% else %}
+    <dc:contributor>{{ data.contributor }}</dc:contributor>
+  {% endif %}
+{% endif %}
+{# Coverage (coordinates) #}
+{% if data.coordinates %}
+  <dc:coverage>{{ data.coordinates|escape('html_attr') }}</dc:coverage>
+{% endif %}
+{# Coverage (geographic_subject_lcnaf) #}
+{% if data.geographic_subject_lcnaf %}
+  {% if data.geographic_subject_lcnaf is iterable %}
+    {% for geo in data.geographic_subject_lcnaf %}
+      <dc:coverage>{{ geo.value|escape('html_attr') }}</dc:coverage>
+    {% endfor %}
+  {% else %}
+    <dc:coverage>{{ data.geographic_subject_lcnaf.value|escape('html_attr') }}</dc:coverage>
+  {% endif %}
+{% endif %}
 {# Date #}
 {% if data.date_created|length > 0 %}
 	<dc:date>{{ data.date_created }}</dc:date>
@@ -66,15 +84,17 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 	{% if data.date_issued_edtf.date_free is defined and not empty %}	
 		<dc:date>{{ data.date_issued_edtf.date_free }}</dc:date>
 	{% endif %}	
-{# Description #}
+{# Description + Abstract #}
 {% if data.description|length > 0 %}
-	{% if data.description is iterable %}
-		{% for description in data.description %}
-			<dc:description>{{ description|escape('html_attr') }}</dc:description>
-		{% endfor %}
-     {% else %}
-	<dc:description>{{ data.description|escape('html_attr') }}</dc:description>
-	{% endif %} 
+    {% if data.description is iterable %}
+        {% for description in data.description %}
+            <dc:description>{{ description|escape('html_attr') }}</dc:description>
+        {% endfor %}
+    {% else %}
+        <dc:description>{{ data.description|escape('html_attr') }}</dc:description>
+    {% endif %}
+{% elseif data.abstract %}
+    <dc:description>{{ data.abstract|escape('html_attr') }}</dc:description>
 {% endif %}
 {# Subject #}
 {# LoD Subjects #}
@@ -106,20 +126,26 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% if data.type|length > 0 %}
 	<dc:type>{{ data.type }}</dc:type>
 {% endif %}    
-{# Format 
-<dc:format></dc:format>
-#}
-{# Identifier #}
-{% if data.local_identifier|length > 0 %}
- 	{% if data.local_identifier is iterable %}
-     	{% for local_identifier in data.local_identifier %}
-			<dc:identifier>{{ local_identifier|escape('html_attr') }}</dc:identifier>
-        {% endfor %}
-       {% else %}
-     		<dc:identifier>{{ data.local_identifier|escape('html_attr') }}</dc:identifier>
-    {% endif %}    
+{# Format (extent) #}
+{% if data.extent %}
+  {% if data.extent is iterable %}
+    {% for extent in data.extent %}
+      <dc:format>{{ extent|escape('html_attr') }}</dc:format>
+    {% endfor %}
+  {% else %}
+    <dc:format>{{ data.extent|escape('html_attr') }}</dc:format>
+  {% endif %}
 {% endif %}
-{# Source #}
+{# Identifier (UPDATED) #}
+{% if data.identifier %}
+  {% if data.identifier is iterable %}
+    {% for id in data.identifier %}
+      <dc:identifier>{{ id.value|escape('html_attr') }}</dc:identifier>
+    {% endfor %}
+  {% else %}
+    <dc:identifier>{{ data.identifier.value|escape('html_attr') }}</dc:identifier>
+  {% endif %}
+{% endif %}
 {# Source #}
 {% if data.owner|length > 0 %}
 	<dc:source>{{ data.owner }}</dc:source>
@@ -130,6 +156,10 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% else %}
     {% set nodeurl = '<current>' ~ '/iiif/manifest' %}
 {% endif%}
+{# Relation (collecting_area) #}
+{% if data.collecting_area %}
+  <dc:relation>{{ data.collecting_area|escape('html_attr') }}</dc:relation>
+{% endif %}
  {% if attribute(data, 'ismemberof') %}
  {% if attribute(data, 'ismemberof') is iterable %}
  {% for collection in attribute(data, 'ismemberof')%}

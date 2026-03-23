@@ -4,6 +4,15 @@
 <titleInfo>
 	<title>{{ data.label|escape('html_attr') }}</title>
 </titleInfo>
+{% if data.audience %}
+    {% if data.audience is iterable %}
+        {% for audience in data.audience %}
+            <targetAudience>{{ audience }}</targetAudience>
+        {% endfor %}
+    {% else %}
+        <targetAudience>{{ data.audience }}</targetAudience>
+    {% endif %}
+{% endif %}
 {# Unmapped/Free-Text Creator #}
 {% if data.creator|length > 0  %}
 <name>
@@ -15,6 +24,21 @@
      	<namePart>{{ data.creator }}</namePart>
 	{% endif %} 
 </name>	
+{% endif %}
+{% if data.agent %}
+    {% for agent in data.agent %}
+    <name>
+        <namePart>{{ agent.value }}</namePart>
+        <role>
+            <roleTerm type="text">{{ agent.role }}</roleTerm>
+        </role>
+    </name>
+    {% endfor %}
+{% endif %}
+{% if data.classification %}
+<classification authority="{{ data.classification.authority }}">
+    {{ data.classification.value }}
+</classification>
 {% endif %}
 {# LoD Creator #}
 {% if data.creator_lod|length > 0 %}
@@ -33,6 +57,13 @@
 		<genre authority="lcgft" valueURI="{{ subjects.uri }}">{{ subjects.label }}</genre>
 	{% endfor %}
 {% endif %}
+{% if data.coordinates %}
+<subject>
+    <cartographics>
+        <cartographicExtension>{{ data.coordinates|escape('html_attr') }}</cartographicExtension>
+    </cartographics>
+</subject>
+{% endif %}
 <originInfo>
 	{% if data.publisher|length > 0 %}
 		<publisher>{{ data.publisher }}</publisher>
@@ -43,6 +74,9 @@
 	{% if data.date_published|length > 0 %}	
 		<dateIssued>{{ data.date_published|date("Y-m-d") }}</dateIssued>
 	{% endif %}	
+	{% if data.provenance %}
+    	<dateCaptured>{{ data.provenance }}</dateCaptured>
+	{% endif %}
 </originInfo>
 {% if data.language|length > 0 %}
 	{% if data.language is iterable %}
@@ -57,9 +91,15 @@
 		</language>
 	{% endif %}
 {% endif %}	
+{% if data.abstract and (data.description|length == 0) %}
 <abstract type="Summary">
-	{{ data.description|escape('html_attr') }}
+    {{ data.abstract|escape('html_attr') }}
 </abstract>
+{% elseif data.description %}
+<abstract type="Summary">
+    {{ data.description|escape('html_attr') }}
+</abstract>
+{% endif %}
 {# Begin Subjects & Names #}
 {# Local Subjects & Names #}
 {% if data.subjects_local|length > 0 %}
@@ -143,6 +183,15 @@
 <physicalDescription>
 <form authority="marcform">electronic</form>
 <form authority="gmd">electronic resource</form>
+{% if data.extent %}
+    {% if data.extent is iterable %}
+        {% for extent in data.extent %}
+            <extent>{{ extent }}</extent>
+        {% endfor %}
+    {% else %}
+        <extent>{{ data.extent }}</extent>
+    {% endif %}
+{% endif %}
 </physicalDescription>
 <location>
     {% if node.id %}
@@ -197,6 +246,11 @@
 	{% if data.rights_statements in ['No Known Copyright'] %}
 		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/NKC/1.0/</accessCondition>
   	{% endif %}
+{% endif %}
+{% if data.access_rights %}
+<accessCondition type="restriction on access">
+    {{ data.access_rights }}
+</accessCondition>
 {% endif %}
 {% if data.owner|length > 0 %}
 	<note type="ownership">{{ data.owner }}</note>
