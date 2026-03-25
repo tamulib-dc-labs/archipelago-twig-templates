@@ -3,16 +3,20 @@ Updated 09/02/2026 for Corina based on this ticket: https://www.notion.so/277cf3
 Updated 31/10/2023 for 1.3.0
 -  Previously updated November 2021: trim output of data.description, add Rights Statement mapping, and show trimmed output for data.rights (local rights statement) #}
 
-{% if data.description is not empty %}
-<h4>Description</h4>
-{% set descriptions = data.description is iterable ? data.description : [data.description] %}
-{% for description in descriptions %}
-<p>{{ description }}</p>
-{% endfor %}
+{% if data.abstract or data.description | length > 0 %}
+<h4>Abstract</h4>
+
+    {% if data.abstract %}
+        <p>{{ data.abstract }}</p>
+    {% elseif data.description | length> 0 %}
+        {% set desc = data.description is iterable ? data.description[0] : data.description %}
+        <p>{{ desc }}</p>
+    {% endif %}
+
 {% endif %}
 
-  {% if data.creator|length > 0 or data.creator_lod|length > 0 %}
-  <h4>Creators and Contributors</h4>
+  {% if data.creator or data.creator_lod or data.contributor or data.agent or data.agent_linked_data %}
+  <h4>Creators and contributors</h4>
   <div class="field-content">
     <ul>
       {% if data.creator %}
@@ -35,13 +39,41 @@ Updated 31/10/2023 for 1.3.0
           {% endif %}
         </li>
       {% endfor %}
+      {# contributor #}
+      {% if data.contributor %}
+        {% if data.contributor is iterable %}
+          {% for contributor in data.contributor %}
+            <li>{{ contributor }}</li>
+          {% endfor %}
+        {% else %}
+          <li>{{ data.contributor }}</li>
+        {% endif %}
+      {% endif %}
+
+      {# agent #}
+      {% if data.agent %}
+        {% for agent in data.agent %}
+          <li>{{ agent.value }}</li>
+        {% endfor %}
+      {% endif %}
+
+      {# agent_linked_data #}
+      {% if data.agent_linked_data %}
+        {% for agent_ld in data.agent_linked_data %}
+          <li>{{ agent_ld.value }}</li>
+        {% endfor %}
+      {% endif %}
     </ul>
   </div>
   {% endif %}
 
-  {% if all_date_created|length > 0 %}
-    <h4>Date Created</h4>
-    {% for date_created in all_date_created  %}
-      <p>{{ date_created|edtf_2_human_date }}</p>
-    {% endfor %}
-  {% endif %}
+{% if data.date_created or data.date_issued %}
+<h4>Date</h4>
+
+    {% if data.date_created %}
+        <p>{{ data.date_created|edtf_2_human_date }}</p>
+    {% elseif data.date_issued %}
+        <p>{{ data.date_issued|edtf_2_human_date }}</p>
+    {% endif %}
+
+{% endif %}
