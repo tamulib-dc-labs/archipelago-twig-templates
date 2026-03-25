@@ -252,30 +252,26 @@ Without Double quotes.
       "value": { "{{ len }}": [{{ data.format|json_encode|raw }}] }
     },
     {% endif %}
-    {% if data.genre_form %}
-    {
-      "label": { "{{ len }}": ["Genre"] },
-      "value": { "{{ len }}": {{ data.genre_form|json_encode|raw }} }
-    },
-    {% endif %}
+    {% set genre_values = data.genre_form ? data.genre_form : [] %}
     {% for item in attribute(data, 'genre_form_linked_data') %}
+      {% set genre_values = genre_values|merge([item.title]) %}
+    {% endfor %}
+    {% if genre_values %}
     {
       "label": { "{{ len }}": ["Genre"] },
-      "value": { "{{ len }}": [{{ item.title|json_encode|raw }}] }
-    },
-    {% endfor %}
-    {% if data.geographic_subject %}
-    {
-      "label": { "{{ len }}": ["Geographic Subject"] },
-      "value": { "{{ len }}": {{ data.geographic_subject|json_encode|raw }} }
+      "value": { "{{ len }}": {{ genre_values|json_encode|raw }} }
     },
     {% endif %}
+    {% set geo_subject_values = data.geographic_subject ? data.geographic_subject : [] %}
     {% for item in attribute(data, 'geographic_subject_linked_data') %}
+      {% set geo_subject_values = geo_subject_values|merge([item.title]) %}
+    {% endfor %}
+    {% if geo_subject_values %}
     {
       "label": { "{{ len }}": ["Geographic Subject"] },
-      "value": { "{{ len }}": [{{ item.title|json_encode|raw }}] }
+      "value": { "{{ len }}": {{ geo_subject_values|json_encode|raw }} }
     },
-    {% endfor %}
+    {% endif %}
     {% for item in attribute(data, 'identifier') %}
     {
       "label": { "{{ len }}": ["Identifier"] },
@@ -384,36 +380,32 @@ Without Double quotes.
       "value": { "{{ len }}": {{ data.state_edition|json_encode|raw }} }
     },
     {% endif %}
-    {% if data.subject %}
+    {% set subject_values = data.subject ? data.subject : [] %}
+    {% for item in attribute(data, 'subject_linked_data') %}
+      {% set subject_values = subject_values|merge([item.title]) %}
+    {% endfor %}
+    {% if subject_values %}
     {
       "label": { "{{ len }}": ["Subject"] },
-      "value": { "{{ len }}": {{ data.subject|json_encode|raw }} }
+      "value": { "{{ len }}": {{ subject_values|json_encode|raw }} }
     },
     {% endif %}
-    {% for item in attribute(data, 'subject_linked_data') %}
-    {
-      "label": { "{{ len }}": ["Subject"] },
-      "value": { "{{ len }}": [{{ item.title|json_encode|raw }}] }
-    },
-    {% endfor %}
     {% if data.table_of_contents %}
     {
       "label": { "{{ len }}": ["Table of Contents"] },
       "value": { "{{ len }}": [{{ data.table_of_contents|json_encode|raw }}] }
     },
     {% endif %}
-    {% if data.temporal_subject %}
+    {% set temporal_values = data.temporal_subject ? data.temporal_subject : [] %}
+    {% for item in attribute(data, 'temporal_subject_linked_data') %}
+      {% set temporal_values = temporal_values|merge([item.title]) %}
+    {% endfor %}
+    {% if temporal_values %}
     {
       "label": { "{{ len }}": ["Temporal Subject"] },
-      "value": { "{{ len }}": {{ data.temporal_subject|json_encode|raw }} }
+      "value": { "{{ len }}": {{ temporal_values|json_encode|raw }} }
     },
     {% endif %}
-    {% for item in attribute(data, 'temporal_subject_linked_data') %}
-    {
-      "label": { "{{ len }}": ["Temporal Subject"] },
-      "value": { "{{ len }}": [{{ item.title|json_encode|raw }}] }
-    },
-    {% endfor %}
     {% if data.title_alternative %}
     {
       "label": { "{{ len }}": ["Alternative Title"] },
