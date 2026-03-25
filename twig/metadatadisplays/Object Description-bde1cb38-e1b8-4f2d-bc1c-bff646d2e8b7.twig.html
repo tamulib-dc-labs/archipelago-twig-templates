@@ -398,7 +398,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endif %}
 
 {# Subject - Local (str, pipe-separated) #}
-{{ _self.html_output_search('Subject', data.subject_local, 'descriptive_metadata_subjects') }}
+{{ _self.html_output_search('Subject', data.subject, 'descriptive_metadata_subjects') }}
 
 {# Genre/Form - Linked Data (object: value + uri) #}
 {% if data.genre_form_linked_data|length > 0 %}
