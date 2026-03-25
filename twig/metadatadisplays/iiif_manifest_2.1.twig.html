@@ -354,19 +354,21 @@ Updated Dec 14th 2020
 "viewingHint": "paged",
 "canvases": [
 {% if attribute(data, 'as:document')|length > 0 %}  
-  {% for document in attribute(data, 'as:document') if document['flv:exif'].PageCount %}
-    {% set cantaloupeid  = IIIFserverurl ~ document['url']|replace({'s3://':''})|replace({'private://':''})|url_encode %}
-{# Only Fetch the first Document #}
-    {% if loop.index == 1 %} 
+  {% set first_doc_processed = false %}
+  {% for document in attribute(data, 'as:document') %}
+    {% if document['flv:exif'].PageCount and not first_doc_processed %}
+      {% set first_doc_processed = true %}
+      {% set cantaloupeid  = IIIFserverurl ~ document['url']|replace({'s3://':''})|replace({'private://':''})|url_encode %}
+      {# Only Fetch the first Document #}
       {% set pageCount =  document['flv:exif'].PageCount %}
       {% for pagenumber in 1..pageCount %}
          {% if attribute(document["flv:pdfinfo"], pagenumber) %}
             {% set width = attribute(document["flv:pdfinfo"], pagenumber).width ? (attribute(document["flv:pdfinfo"], pagenumber).width * 1.333)|round : 600 %}
-            {% set height = attribute(document["flv:pdfinfo"], pagenumber).height ? (attribute(document["flv:pdfinfo"], pagenumber).height * 1.333)|round : 450 %} 
+            {% set height = attribute(document["flv:pdfinfo"], pagenumber).height ? (attribute(document["flv:pdfinfo"], pagenumber).height * 1.333)|round : 450 %}
          {% else  %}
             {% if attribute(document["flv:identify"], pagenumber) %}
                {% set width = attribute(document["flv:identify"], pagenumber).width ? (attribute(document["flv:identify"], pagenumber).width * 1.333)|round : 600 %}
-               {% set height = attribute(document["flv:identify"], pagenumber).height ? (attribute(document["flv:identify"], pagenumber).height * 1.333)|round : 450 %} 
+               {% set height = attribute(document["flv:identify"], pagenumber).height ? (attribute(document["flv:identify"], pagenumber).height * 1.333)|round : 450 %}
             {% else  %}
                {% set width = 600 %}
                {% set height = 450 %}
@@ -383,12 +385,10 @@ Updated Dec 14th 2020
   "height": {{ thumb_height }}
 }],
          {% endset %}
-         
-         
     {
-    "@id": "{{ nodeurl }}/iiif/{{ document['dr:uuid'] }}/canvas/p{{ loop.index }}",
+    "@id": "{{ nodeurl }}/iiif/{{ document['dr:uuid'] }}/canvas/p{{ pagenumber }}",
     "@type": "sc:Canvas",
-    "label": "p. {{ loop.index }}",
+    "label": "p. {{ pagenumber }}",
     "width": {{ width }},
     "height": {{ height }},
     {{ thumbnail }}
@@ -396,7 +396,7 @@ Updated Dec 14th 2020
     "@type": "oa:Annotation",
     "motivation": "sc:painting",
     {{ thumbnail }}
-    "@id": "{{ nodeurl }}/annotation/p{{ loop.index }}",
+    "@id": "{{ nodeurl }}/annotation/p{{ pagenumber }}",
     "resource":{
       "@id": "{{ cantaloupeid }}/full/full/0/default.jpg?page={{ pagenumber }}",
       "@type": "dctypes:Image",
@@ -404,7 +404,7 @@ Updated Dec 14th 2020
       "width": {{ width }},
       "height": {{ height }}
     },
-    "on": "{{ nodeurl }}/iiif/{{ document['dr:uuid'] }}/canvas/p{{ loop.index }}"
+    "on": "{{ nodeurl }}/iiif/{{ document['dr:uuid'] }}/canvas/p{{ pagenumber }}"
     }]
     }{{ not loop.last ? ',' : '' }}
       {% endfor %}
@@ -462,14 +462,16 @@ Updated Dec 14th 2020
 "label": "Introduction",
 "canvases": [
 {% if attribute(data, 'as:document')|length > 0 %}    
-  {% for document in attribute(data, 'as:document') if document['flv:exif'].PageCount %}
-    {% if loop.index == 1 %} 
+  {% set first_doc_processed = false %}
+  {% for document in attribute(data, 'as:document') %}
+    {% if document['flv:exif'].PageCount and not first_doc_processed %}
+      {% set first_doc_processed = true %}
       {% set pageCount =  document['flv:exif'].PageCount %}
       {% for pagenumber in 1..pageCount %}
-    "{{ nodeurl }}/canvas/p{{ loop.index }}"{{ not loop.last ? ',' : '' }}
+    "{{ nodeurl }}/iiif/{{ document['dr:uuid'] }}/canvas/p{{ pagenumber }}"{{ not loop.last ? ',' : '' }}
       {% endfor %}
     {% endif %}
- {% endfor %}
+  {% endfor %}
 {% endif %}
 {% if (attribute(data, 'as:image')|length > 0 and pageCount == 0) or (attribute(data, 'as:image')|length > 0 and data.type == 'Conversation') %}
   {% if pageCount > 0 %}
@@ -482,4 +484,3 @@ Updated Dec 14th 2020
 ]
 }]
 }
-
