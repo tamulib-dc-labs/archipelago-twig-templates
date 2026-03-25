@@ -37,33 +37,307 @@ Updated Dec 14th 2020
 "label": "{{ node.label }}",
 "description": {{ data.description|json_encode|raw }},
 "metadata": [
-{% for agent in attribute(data, 'edm_agent') %}
+    {% if data.abstract %}
     {
-    "label": {{ agent.role_label|json_encode|raw }},
-    "value": {{ agent.name_label|json_encode|raw }}
+      "label": "Abstract",
+      "value": {{ data.abstract|json_encode|raw }}
     },
-{% endfor %}
-{
-"label": "description",
-"value": {{ data.description|json_encode|raw }}
-},
-{
-"label": "type",
-"value": {{ data.type|json_encode|raw }}
-},
-{
-"label": "navDate",
-"value": "{{ node.getChangedTime|date("F jS \\a\\t g:ia") }}"
-},
-{
-"label": "license",
-"value": "http://rightsstatements.org/vocab/InC-EDU/1.0/"
-},
-{
-"label": "attribution",
-"value": "Provided by Archipelago's demo"
-}
-],
+    {% endif %}
+    {% if data.access_rights %}
+    {
+      "label": "Access Rights",
+      "value": {{ data.access_rights|json_encode|raw }}
+    },
+    {% endif %}
+    {% for item in attribute(data, 'agent') %}
+    {
+      "label": {{ (item.role_label ? item.role_label : 'Creator/Contributor')|json_encode|raw }},
+      "value": {{ item.name_label|json_encode|raw }}
+    },
+    {% endfor %}
+    {% for item in attribute(data, 'agent_linked_data') %}
+    {
+      "label": {{ (item.role_label ? item.role_label : 'Creator/Contributor')|json_encode|raw }},
+      "value": {{ item.name_label|json_encode|raw }}
+    },
+    {% endfor %}
+    {% if data.audience %}
+    {
+      "label": "Audience",
+      "value": {{ data.audience|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.classification %}
+    {
+      "label": "Classification",
+      "value": {{ data.classification.value|default(data.classification)|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.collecting_area %}
+    {
+      "label": "Collecting Area",
+      "value": {{ data.collecting_area|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.content_type %}
+    {
+      "label": "Content Type",
+      "value": {{ data.content_type|json_encode|raw }}
+    },
+    {% endif %}
+    {% for creator in attribute(data, 'creator') %}
+    {
+      "label": "Creator",
+      "value": {{ creator|json_encode|raw }}
+    },
+    {% endfor %}
+    {% for contributor in attribute(data, 'contributor') %}
+    {
+      "label": "Contributor",
+      "value": {{ contributor|json_encode|raw }}
+    },
+    {% endfor %}
+    {% if data.coordinates %}
+    {
+      "label": "Coordinates",
+      "value": {{ data.coordinates|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.date_available %}
+    {
+      "label": "Date Available",
+      "value": {{ data.date_available|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.date_built %}
+    {
+      "label": "Date Built",
+      "value": {{ data.date_built|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.date_created %}
+    {
+      "label": "Date Created",
+      "value": {{ data.date_created|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.date_digital_creation %}
+    {
+      "label": "Date Available Online",
+      "value": {{ data.date_digital_creation|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.date_issued %}
+    {
+      "label": "Date Issued",
+      "value": {{ data.date_issued|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.date_razed %}
+    {
+      "label": "Date Razed",
+      "value": {{ data.date_razed|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.description %}
+    {
+      "label": "Description",
+      "value": {{ data.description|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.digital_exhibit %}
+    {
+      "label": "Part of Digital Exhibit",
+      "value": {{ data.digital_exhibit.value|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.digital_publisher %}
+    {
+      "label": "Digital Publisher",
+      "value": {{ data.digital_publisher|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.extent %}
+    {
+      "label": "Extent",
+      "value": {{ data.extent|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.format %}
+    {
+      "label": "Format",
+      "value": {{ data.format|json_encode|raw }}
+    },
+    {% endif %}
+    {% set genre_values = data.genre_form ? data.genre_form : [] %}
+    {% for item in attribute(data, 'genre_form_linked_data') %}
+      {% set genre_values = genre_values|merge([item.title]) %}
+    {% endfor %}
+    {% if genre_values %}
+    {
+      "label": "Genre",
+      "value": {{ genre_values|json_encode|raw }}
+    },
+    {% endif %}
+    {% set geo_subject_values = data.geographic_subject ? data.geographic_subject : [] %}
+    {% for item in attribute(data, 'geographic_subject_linked_data') %}
+      {% set geo_subject_values = geo_subject_values|merge([item.title]) %}
+    {% endfor %}
+    {% if geo_subject_values %}
+    {
+      "label": "Geographic Subject",
+      "value": {{ geo_subject_values|json_encode|raw }}
+    },
+    {% endif %}
+    {% for item in attribute(data, 'identifier') %}
+    {
+      "label": "Identifier",
+      "value": {{ item.value|json_encode|raw }}
+    },
+    {% endfor %}
+    {% if data.language %}
+    {
+      "label": "Language",
+      "value": {{ data.language|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.local_department %}
+    {
+      "label": "Local Department",
+      "value": {{ data.local_department|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.medium %}
+    {
+      "label": "Medium",
+      "value": {{ data.medium|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.note %}
+    {
+      "label": "Note",
+      "value": {{ data.note|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.original_publication %}
+    {
+      "label": "Original Publication",
+      "value": {{ data.original_publication|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.original_publisher %}
+    {
+      "label": "Original Publisher",
+      "value": {{ data.original_publisher|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.physical_collection %}
+    {
+      "label": "Physical Collection",
+      "value": {{ data.physical_collection|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.physical_location %}
+    {
+      "label": "Physical Location",
+      "value": {{ data.physical_location|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.projection %}
+    {
+      "label": "Projection",
+      "value": {{ data.projection|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.provenance %}
+    {
+      "label": "Provenance",
+      "value": {{ data.provenance|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.related_item %}
+    {
+      "label": "Related Item",
+      "value": {{ data.related_item|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.related_url %}
+    {
+      "label": "Related URL",
+      "value": {{ data.related_url|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.related_url_historic %}
+    {
+      "label": "Related URL (Historic)",
+      "value": {{ data.related_url_historic|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.rights_details %}
+    {
+      "label": "Rights Details",
+      "value": {{ data.rights_details|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.rights_holder %}
+    {
+      "label": "Rights Holder",
+      "value": {{ data.rights_holder|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.sponsorship %}
+    {
+      "label": "Sponsorship",
+      "value": {{ data.sponsorship|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.state_edition %}
+    {
+      "label": "State Edition",
+      "value": {{ data.state_edition|json_encode|raw }}
+    },
+    {% endif %}
+    {% set subject_values = data.subject ? data.subject : [] %}
+    {% for item in attribute(data, 'subject_linked_data') %}
+      {% set subject_values = subject_values|merge([item.title]) %}
+    {% endfor %}
+    {% if subject_values %}
+    {
+      "label": "Subject",
+      "value": {{ subject_values|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.table_of_contents %}
+    {
+      "label": "Table of Contents",
+      "value": {{ data.table_of_contents|json_encode|raw }}
+    },
+    {% endif %}
+    {% set temporal_values = data.temporal_subject ? data.temporal_subject : [] %}
+    {% for item in attribute(data, 'temporal_subject_linked_data') %}
+      {% set temporal_values = temporal_values|merge([item.title]) %}
+    {% endfor %}
+    {% if temporal_values %}
+    {
+      "label": "Temporal Subject",
+      "value": {{ temporal_values|json_encode|raw }}
+    },
+    {% endif %}
+    {% if data.title_alternative %}
+    {
+      "label": "Alternative Title",
+      "value": {{ data.title_alternative|json_encode|raw }}
+    },
+    {% endif %}
+    {
+      "label": "navDate",
+      "value": "{{ "now"|date("F jS \\a\\t g:ia") }}"
+    },
+    {
+      "label": "license",
+      "value": {{ data.rights|json_encode|raw }}
+    }
+  ],
 {% if attribute(data, 'memberof') %}
     {% set currentnode = 'node/' ~ data.memberof %}
     "within": "{{ url(currentnode) }}",
