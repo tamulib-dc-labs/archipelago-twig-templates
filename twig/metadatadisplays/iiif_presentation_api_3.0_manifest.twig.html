@@ -129,19 +129,19 @@ Without Double quotes.
     {% if data.access_rights %}
     {
       "label": { "{{ len }}": ["Access Rights"] },
-      "value": { "{{ len }}": {{ data.access_rights|json_encode|raw }} }
+      "value": { "{{ len }}": [{{ data.access_rights|json_encode|raw }}] }
     },
     {% endif %}
     {% for item in attribute(data, 'agent') %}
     {
-      "label": { "{{ len }}": [{{ (item.role ? item.role : 'Creator/Contributor')|json_encode|raw }}] },
-      "value": { "{{ len }}": [{{ item.value|json_encode|raw }}] }
+      "label": { "{{ len }}": [{{ (item.role_label ? item.role_label : 'Creator/Contributor')|json_encode|raw }}] },
+      "value": { "{{ len }}": [{{ item.name_label|json_encode|raw }}] }
     },
     {% endfor %}
     {% for item in attribute(data, 'agent_linked_data') %}
     {
-      "label": { "{{ len }}": [{{ (item.role ? item.role : 'Creator/Contributor')|json_encode|raw }}] },
-      "value": { "{{ len }}": [{{ item.value|json_encode|raw }}] }
+      "label": { "{{ len }}": [{{ (item.role_label ? item.role_label : 'Creator/Contributor')|json_encode|raw }}] },
+      "value": { "{{ len }}": [{{ item.name_label|json_encode|raw }}] }
     },
     {% endfor %}
     {% if data.audience %}
@@ -261,7 +261,7 @@ Without Double quotes.
     {% for item in attribute(data, 'genre_form_linked_data') %}
     {
       "label": { "{{ len }}": ["Genre"] },
-      "value": { "{{ len }}": [{{ item.value|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ item.title|json_encode|raw }}] }
     },
     {% endfor %}
     {% if data.geographic_subject %}
@@ -273,7 +273,7 @@ Without Double quotes.
     {% for item in attribute(data, 'geographic_subject_linked_data') %}
     {
       "label": { "{{ len }}": ["Geographic Subject"] },
-      "value": { "{{ len }}": [{{ item.value|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ item.title|json_encode|raw }}] }
     },
     {% endfor %}
     {% for item in attribute(data, 'identifier') %}
@@ -393,7 +393,7 @@ Without Double quotes.
     {% for item in attribute(data, 'subject_linked_data') %}
     {
       "label": { "{{ len }}": ["Subject"] },
-      "value": { "{{ len }}": [{{ item.value|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ item.title|json_encode|raw }}] }
     },
     {% endfor %}
     {% if data.table_of_contents %}
@@ -411,7 +411,7 @@ Without Double quotes.
     {% for item in attribute(data, 'temporal_subject_linked_data') %}
     {
       "label": { "{{ len }}": ["Temporal Subject"] },
-      "value": { "{{ len }}": [{{ item.value|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ item.title|json_encode|raw }}] }
     },
     {% endfor %}
     {% if data.title_alternative %}
