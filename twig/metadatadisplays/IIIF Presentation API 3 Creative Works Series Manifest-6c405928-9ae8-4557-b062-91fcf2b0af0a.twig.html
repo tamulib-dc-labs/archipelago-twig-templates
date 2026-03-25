@@ -101,56 +101,306 @@ Without Double quotes.
 },
 "rights": {{ computed_rights|json_encode|raw }},
 "metadata": [
-{% for agent in attribute(data, 'edm_agent') %}
-    {
-    "label": {
-    "{{ len }}": [
-    {{ agent.role_label|json_encode|raw }}
-    ]
-    },
-    "value": {
-    "{{ len }}": [
-    {{ agent.name_label|json_encode|raw }}
-    ]
-    }
-    },
-{% endfor %}
-{
-"label": {
-"{{ len }}": [
-"description"
-]
-},
-"value": {
-"{{ len }}": [
-{{ data.description|json_encode|raw }}
-]
-}
-},
-{
-"label": {
-"{{ len }}": [
-"navDate"
-]
-},
-"value":  {
-"{{ len }}": [
-   "{{ node.getChangedTime|date("F jS \\a\\t g:ia") }}"
-    ]
-  }
-},
-{
-"label": {
-   "{{ len }}": [
-       "license"
-  ]
-},
-"value": {
-  "{{ len }}": [
-     {{ computed_rights|json_encode|raw }}
-     ]
-    }
-  }
+            {% if data.abstract %}
+            {
+            "label": { "{{ len }}": ["Abstract"] },
+            "value": { "{{ len }}": [{{ data.abstract|markdown_2_html|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.access_rights %}
+            {
+            "label": { "{{ len }}": ["Access Rights"] },
+            "value": { "{{ len }}": [{{ data.access_rights|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% for item in attribute(data, 'agent') %}
+            {
+            "label": { "{{ len }}": [{{ (item.role_label ? item.role_label : 'Creator/Contributor')|json_encode|raw }}] },
+            "value": { "{{ len }}": [{{ item.name_label|json_encode|raw }}] }
+            },
+            {% endfor %}
+            {% for item in attribute(data, 'agent_linked_data') %}
+            {
+            "label": { "{{ len }}": [{{ (item.role_label ? item.role_label : 'Creator/Contributor')|json_encode|raw }}] },
+            "value": { "{{ len }}": [{{ item.name_label|json_encode|raw }}] }
+            },
+            {% endfor %}
+            {% if data.audience %}
+            {
+            "label": { "{{ len }}": ["Audience"] },
+            "value": { "{{ len }}": {{ data.audience|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.classification %}
+            {
+            "label": { "{{ len }}": ["Classification"] },
+            "value": { "{{ len }}": [{{ data.classification.value|default(data.classification)|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.collecting_area %}
+            {
+            "label": { "{{ len }}": ["Collecting Area"] },
+            "value": { "{{ len }}": [{{ data.collecting_area|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.content_type %}
+            {
+            "label": { "{{ len }}": ["Content Type"] },
+            "value": { "{{ len }}": {{ data.content_type|json_encode|raw }} }
+            },
+            {% endif %}
+            {% for creator in attribute(data, 'creator') %}
+            {
+            "label": { "{{ len }}": ["Creator"] },
+            "value": { "{{ len }}": [{{ creator|json_encode|raw }}] }
+            },
+            {% endfor %}
+            {% for contributor in attribute(data, 'contributor') %}
+            {
+            "label": { "{{ len }}": ["Contributor"] },
+            "value": { "{{ len }}": [{{ contributor|json_encode|raw }}] }
+            },
+            {% endfor %}
+            {% if data.coordinates %}
+            {
+            "label": { "{{ len }}": ["Coordinates"] },
+            "value": { "{{ len }}": {{ data.coordinates|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.date_available %}
+            {
+            "label": { "{{ len }}": ["Date Available"] },
+            "value": { "{{ len }}": [{{ data.date_available|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.date_built %}
+            {
+            "label": { "{{ len }}": ["Date Built"] },
+            "value": { "{{ len }}": [{{ data.date_built|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.date_created %}
+            {
+            "label": { "{{ len }}": ["Date Created"] },
+            "value": { "{{ len }}": [{{ data.date_created|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.date_digital_creation %}
+            {
+            "label": { "{{ len }}": ["Date Available Online"] },
+            "value": { "{{ len }}": [{{ data.date_digital_creation|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.date_issued %}
+            {
+            "label": { "{{ len }}": ["Date Issued"] },
+            "value": { "{{ len }}": [{{ data.date_issued|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.date_razed %}
+            {
+            "label": { "{{ len }}": ["Date Razed"] },
+            "value": { "{{ len }}": [{{ data.date_razed|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.description %}
+            {
+            "label": { "{{ len }}": ["Description"] },
+            "value": { "{{ len }}": {{ data.description|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.digital_exhibit %}
+            {
+            "label": { "{{ len }}": ["Part of Digital Exhibit"] },
+            "value": { "{{ len }}": [{{ data.digital_exhibit.value|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.digital_publisher %}
+            {
+            "label": { "{{ len }}": ["Digital Publisher"] },
+            "value": { "{{ len }}": {{ data.digital_publisher|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.extent %}
+            {
+            "label": { "{{ len }}": ["Extent"] },
+            "value": { "{{ len }}": {{ data.extent|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.format %}
+            {
+            "label": { "{{ len }}": ["Format"] },
+            "value": { "{{ len }}": [{{ data.format|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% set genre_values = data.genre_form ? data.genre_form : [] %}
+            {% for item in attribute(data, 'genre_form_linked_data') %}
+            {% set genre_values = genre_values|merge([item.title]) %}
+            {% endfor %}
+            {% if genre_values %}
+            {
+            "label": { "{{ len }}": ["Genre"] },
+            "value": { "{{ len }}": {{ genre_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% set geo_subject_values = data.geographic_subject ? data.geographic_subject : [] %}
+            {% for item in attribute(data, 'geographic_subject_linked_data') %}
+            {% set geo_subject_values = geo_subject_values|merge([item.title]) %}
+            {% endfor %}
+            {% if geo_subject_values %}
+            {
+            "label": { "{{ len }}": ["Geographic Subject"] },
+            "value": { "{{ len }}": {{ geo_subject_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% for item in attribute(data, 'identifier') %}
+            {
+            "label": { "{{ len }}": ["Identifier"] },
+            "value": { "{{ len }}": [{{ item.value|json_encode|raw }}] }
+            },
+            {% endfor %}
+            {% if data.language %}
+            {
+            "label": { "{{ len }}": ["Language"] },
+            "value": { "{{ len }}": {{ data.language|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.local_department %}
+            {
+            "label": { "{{ len }}": ["Local Department"] },
+            "value": { "{{ len }}": {{ data.local_department|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.medium %}
+            {
+            "label": { "{{ len }}": ["Medium"] },
+            "value": { "{{ len }}": {{ data.medium|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.note %}
+            {
+            "label": { "{{ len }}": ["Note"] },
+            "value": { "{{ len }}": {{ data.note|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.original_publication %}
+            {
+            "label": { "{{ len }}": ["Original Publication"] },
+            "value": { "{{ len }}": {{ data.original_publication|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.original_publisher %}
+            {
+            "label": { "{{ len }}": ["Original Publisher"] },
+            "value": { "{{ len }}": [{{ data.original_publisher|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.physical_collection %}
+            {
+            "label": { "{{ len }}": ["Physical Collection"] },
+            "value": { "{{ len }}": [{{ data.physical_collection|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.physical_location %}
+            {
+            "label": { "{{ len }}": ["Physical Location"] },
+            "value": { "{{ len }}": [{{ data.physical_location|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.projection %}
+            {
+            "label": { "{{ len }}": ["Projection"] },
+            "value": { "{{ len }}": {{ data.projection|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.provenance %}
+            {
+            "label": { "{{ len }}": ["Provenance"] },
+            "value": { "{{ len }}": {{ data.provenance|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.related_item %}
+            {
+            "label": { "{{ len }}": ["Related Item"] },
+            "value": { "{{ len }}": {{ data.related_item|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.related_url %}
+            {
+            "label": { "{{ len }}": ["Related URL"] },
+            "value": { "{{ len }}": [{{ data.related_url|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.related_url_historic %}
+            {
+            "label": { "{{ len }}": ["Related URL (Historic)"] },
+            "value": { "{{ len }}": [{{ data.related_url_historic|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.rights_details %}
+            {
+            "label": { "{{ len }}": ["Rights Details"] },
+            "value": { "{{ len }}": [{{ data.rights_details|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.rights_holder %}
+            {
+            "label": { "{{ len }}": ["Rights Holder"] },
+            "value": { "{{ len }}": {{ data.rights_holder|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.sponsorship %}
+            {
+            "label": { "{{ len }}": ["Sponsorship"] },
+            "value": { "{{ len }}": {{ data.sponsorship|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.state_edition %}
+            {
+            "label": { "{{ len }}": ["State Edition"] },
+            "value": { "{{ len }}": {{ data.state_edition|json_encode|raw }} }
+            },
+            {% endif %}
+            {% set subject_values = data.subject ? data.subject : [] %}
+            {% for item in attribute(data, 'subject_linked_data') %}
+            {% set subject_values = subject_values|merge([item.title]) %}
+            {% endfor %}
+            {% if subject_values %}
+            {
+            "label": { "{{ len }}": ["Subject"] },
+            "value": { "{{ len }}": {{ subject_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.table_of_contents %}
+            {
+            "label": { "{{ len }}": ["Table of Contents"] },
+            "value": { "{{ len }}": [{{ data.table_of_contents|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% set temporal_values = data.temporal_subject ? data.temporal_subject : [] %}
+            {% for item in attribute(data, 'temporal_subject_linked_data') %}
+            {% set temporal_values = temporal_values|merge([item.title]) %}
+            {% endfor %}
+            {% if temporal_values %}
+            {
+            "label": { "{{ len }}": ["Temporal Subject"] },
+            "value": { "{{ len }}": {{ temporal_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.title_alternative %}
+            {
+            "label": { "{{ len }}": ["Alternative Title"] },
+            "value": { "{{ len }}": {{ data.title_alternative|json_encode|raw }} }
+            },
+            {% endif %}
+            {
+            "label": { "{{ len }}": ["navDate"] },
+            "value": { "{{ len }}": [{{ "now"|date("F jS \\a\\t g:ia")|json_encode|raw }}] }
+            },
+            {
+            "label": { "{{ len }}": ["Rights"] },
+            "value": { "{{ len }}": [{{ computed_rights|json_encode|raw }}] }
+            }
 ],
 {# New Jan 2023:added to bring IIIF CWS and IIIF Normal V3 in sync #}
 {%- if attribute(data, 'ismemberof') %}
