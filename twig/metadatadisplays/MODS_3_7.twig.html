@@ -232,7 +232,13 @@
 		{% for creator in data.creator %}
 			<namePart>{{ creator }}</namePart>
 		{% endfor %}
-     {% else %}
+{% for creator in data.creator %}
+<namePart>{{ creator }}</namePart>
+<role>
+      <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
+</role
+{% endfor %}
+{% else %}
      	<namePart>{{ data.creator }}</namePart>
 	{% endif %} 
 </name>	
