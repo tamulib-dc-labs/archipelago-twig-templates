@@ -158,8 +158,8 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
   <dc:description>{{ data.projection }}</dc:description>
 {% endif %}
 {# related_item #}
-{% if data.related_item %}
-  {% for item in data.related_item %}
+{% if data.related_record %}
+  {% for item in data.related_record %}
     <dc:relation>{{ item }}</dc:relation>
   {% endfor %}
 {% endif %}
