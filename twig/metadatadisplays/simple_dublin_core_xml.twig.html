@@ -19,15 +19,41 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      	<dc:creator>{{ creator_lod.name_label }}</dc:creator>
 	{% endfor %}
 {% endif %}
-{# Contributor
-<dc:contributor></dc:contributor>
-#}
+{% if data.contributor|length > 0 %}
+  {% for contributor in data.contributor %}
+    <dc:contributor>{{ contributor }}</dc:contributor>
+  {% endfor %}
+{% endif %}
+{% if data.coordinates|length > 0 %}
+  {% for coord in data.coordinates %}
+    <dc:coverage>{{ coord }}</dc:coverage>
+  {% endfor %}
+{% endif %}
+{% if data.extent|length > 0 %}
+  {% for extent in data.extent %}
+    <dc:format>{{ extent }}</dc:format>
+  {% endfor %}
+{% endif %}
+{% if data.geographic_subject|length > 0 %}
+  {% for geo in data.geographic_subject %}
+    <dc:coverage>{{ geo }}</dc:coverage>
+  {% endfor %}
+{% endif %}
+{% if data.collecting_area|length > 0 %}
+  {% for area in data.collecting_area %}
+    <dc:relation>{{ area }}</dc:relation>
+  {% endfor %}
+{% endif %}
 {# Coverage 
 <dc:coverage></dc:coverage>
 #}
 {# Date #}
 {% if data.date_created|length > 0 %}
 	<dc:date>{{ data.date_created }}</dc:date>
+{% endif %}
+{# Abstract #}
+{% if data.abstract %}
+  <dc:description>{{ data.abstract }}</dc:description>
 {% endif %}
 {# Description #}
 {% if data.description|length > 0 %}
@@ -71,15 +97,10 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {# Format 
 <dc:format></dc:format>
 #}
-{# Identifier #}
-{% if data.local_identifier|length > 0 %}
- 	{% if data.local_identifier is iterable %}
-     	{% for local_identifier in data.local_identifier %}
-			<dc:identifier>{{ local_identifier|escape('html_attr') }}</dc:identifier>
-        {% endfor %}
-       {% else %}
-     		<dc:identifier>{{ data.local_identifier|escape('html_attr') }}</dc:identifier>
-    {% endif %}    
+{% if data.identifier|length > 0 %}
+  {% for id in data.identifier %}
+    <dc:identifier>{{ id.value }}</dc:identifier>
+  {% endfor %}
 {% endif %}
 {# Source #}
 {# Source #}
