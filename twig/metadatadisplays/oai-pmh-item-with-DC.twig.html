@@ -35,6 +35,180 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ 
          http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
 <dc:title>{{ data.label|escape('html_attr') }}</dc:title>
+{# access_rights #}
+{% if data.access_rights %}
+  <dc:rights>{{ data.access_rights }}</dc:rights>
+{% endif %}
+{# agent #}
+{% if data.agent %}
+  {% for agent in data.agent %}
+    <dc:creator>{{ agent.value }}</dc:creator>
+  {% endfor %}
+{% endif %}
+{# agent_linked_data #}
+{% if data.agent_linked_data %}
+  {% for agent in data.agent_linked_data %}
+    <dc:creator>{{ agent.value }}</dc:creator>
+  {% endfor %}
+{% endif %}
+{# classification #}
+{% if data.classification %}
+  {% for item in data.classification %}
+    <dc:subject>{{ item.value }}</dc:subject>
+  {% endfor %}
+{% endif %}
+{# content_type #}
+{% if data.content_type %}
+  <dc:type>{{ data.content_type }}</dc:type>
+{% endif %}
+{# date_issued #}
+{% if data.date_issued %}
+  <dc:date>{{ data.date_issued }}</dc:date>
+{% endif %}
+{# digital_exhibit (object, max:1) #}
+{% if data.digital_exhibit %}
+  <dc:relation>{{ data.digital_exhibit.value }}</dc:relation>
+{% endif %}
+{# digital_publisher #}
+{% if data.digital_publisher %}
+   <dc:publisher>{{ data.digital_publisher }}</dc:publisher>
+{% endif %}
+{# format #}
+{% if data.format %}
+  <dc:format>{{ data.format }}</dc:format>
+{% endif %}
+{# genre_form #}
+{% if data.genre_form %}
+  {% for item in data.genre_form %}
+    <dc:type>{{ item }}</dc:type>
+  {% endfor %}
+{% endif %}
+{# genre_form_linked_data #}
+{% if data.genre_form_linked_data %}
+  {% for item in data.genre_form_linked_data %}
+    <dc:type>{{ item.value }}</dc:type>
+  {% endfor %}
+{% endif %}
+{# geographic_subject #}
+{% if data.geographic_subject %}
+  {% for item in data.geographic_subject %}
+    <dc:coverage>{{ item }}</dc:coverage>
+  {% endfor %}
+{% endif %}
+{# geographic_subject_linked_data #}
+{% if data.geographic_subject_linked_data %}
+  {% for item in data.geographic_subject_linked_data %}
+    <dc:coverage>{{ item.value }}</dc:coverage>
+  {% endfor %}
+{% endif %}
+{# local_department #}
+{% if data.local_department %}
+  {% for item in data.local_department %}
+    <dc:contributor>{{ item }}</dc:contributor>
+  {% endfor %}
+{% endif %}
+{# medium #}
+{% if data.medium %}
+  {% for item in data.medium %}
+    <dc:format>{{ item }}</dc:format>
+  {% endfor %}
+{% endif %}
+{# mimetype #}
+{% if data.mimetype %}
+  {% for item in data.mimetype %}
+    <dc:format>{{ item }}</dc:format>
+  {% endfor %}
+{% endif %}
+{# note #}
+{% if data.note %}
+  {% for item in data.note %}
+    <dc:description>{{ item }}</dc:description>
+  {% endfor %}
+{% endif %}
+{# original_publication #}
+{% if data.original_publication %}
+  {% for item in data.original_publication %}
+    <dc:relation>{{ item }}</dc:relation>
+  {% endfor %}
+{% endif %}
+{# original_publisher (max:1) #}
+{% if data.original_publisher %}
+  <dc:publisher>{{ data.original_publisher }}</dc:publisher>
+{% endif %}
+{# physical_collection (max:1) #}
+{% if data.physical_collection %}
+  <dc:relation>{{ data.physical_collection }}</dc:relation>
+{% endif %}
+{# physical_location (max:1) #}
+{% if data.physical_location %}
+  <dc:description>{{ data.physical_location }}</dc:description>
+{% endif %}
+{# projection #}
+{% if data.projection %}
+  <dc:description>{{ data.projection }}</dc:description>
+{% endif %}
+{# related_item #}
+{% if data.related_record %}
+  {% for item in data.related_record %}
+    <dc:relation>{{ item }}</dc:relation>
+  {% endfor %}
+{% endif %}
+{# related_url #}
+{% if data.related_url %}
+  <dc:relation>{{ data.related_url }}</dc:relation>
+{% endif %}
+{# related_url_historic #}
+{% if data.related_url_historic %}
+  <dc:relation>{{ data.related_url_historic }}</dc:relation>
+{% endif %}
+{# rights_details #}
+{% if data.rights_details %}
+  <dc:rights>{{ data.rights_details }}</dc:rights>
+{% endif %}
+{# sponsorship #}
+{% if data.sponsorship %}
+  {% for item in data.sponsorship %}
+    <dc:contributor>{{ item }}</dc:contributor>
+  {% endfor %}
+{% endif %}
+{# state_edition #}
+{% if data.state_edition %}
+  <dc:description>{{ data.state_edition }}</dc:description>
+{% endif %}
+{# subject #}
+{% if data.subject %}
+  {% for item in data.subject %}
+    <dc:subject>{{ item }}</dc:subject>
+  {% endfor %}
+{% endif %}
+{# subject_linked_data #}
+{% if data.subject_linked_data %}
+  {% for item in data.subject_linked_data %}
+    <dc:subject>{{ item.value }}</dc:subject>
+  {% endfor %}
+{% endif %}
+{# table_of_contents #}
+{% if data.table_of_contents %}
+  <dc:description>{{ data.table_of_contents }}</dc:description>
+{% endif %}
+{# temporal_subject #}
+{% if data.temporal_subject %}
+  {% for item in data.temporal_subject %}
+    <dc:coverage>{{ item }}</dc:coverage>
+  {% endfor %}
+{% endif %}
+{# temporal_subject_linked_data #}
+{% if data.temporal_subject_linked_data %}
+  {% for item in data.temporal_subject_linked_data %}
+    <dc:coverage>{{ item.value }}</dc:coverage>
+  {% endfor %}
+{% endif %}
+{# title_alternative #}
+{% if data.title_alternative %}
+  {% for item in data.title_alternative %}
+    <dc:title>{{ item }}</dc:title>
+  {% endfor %}
+{% endif %}
 {# Creator #}
 {% if data.creator|length > 0  %}
 	{% if data.creator is iterable %}
@@ -64,16 +238,6 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% if data.coordinates %}
   <dc:coverage>{{ data.coordinates|escape('html_attr') }}</dc:coverage>
 {% endif %}
-{# Coverage (geographic_subject_lcnaf) #}
-{% if data.geographic_subject_lcnaf %}
-  {% if data.geographic_subject_lcnaf is iterable %}
-    {% for geo in data.geographic_subject_lcnaf %}
-      <dc:coverage>{{ geo.value|escape('html_attr') }}</dc:coverage>
-    {% endfor %}
-  {% else %}
-    <dc:coverage>{{ data.geographic_subject_lcnaf.value|escape('html_attr') }}</dc:coverage>
-  {% endif %}
-{% endif %}
 {# Date #}
 {% if data.date_created|length > 0 %}
 	<dc:date>{{ data.date_created }}</dc:date>
@@ -96,22 +260,6 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% elseif data.abstract %}
     <dc:description>{{ data.abstract|escape('html_attr') }}</dc:description>
 {% endif %}
-{# Subject #}
-{# LoD Subjects #}
-{% if data.subject_loc|length > 0 %}
-	{% for subject_loc in data.subject_loc %}
-     	<dc:subject>{{ subject_loc.label }}</dc:subject>
-	{% endfor %}
-{% endif %}
-{% if data.subject_lcgft_terms|length > 0 %}
-	{% for subject_lcgft_terms in data.subject_lcgft_terms %}
-     	<dc:subject>{{ subject_lcgft_terms.label }}</dc:subject>
-	{% endfor %}
-{% endif %}
-{# Publisher #}
-{% if data.publisher|length > 0 %}
-	<dc:publisher>{{ data.publisher }}</dc:publisher>
-{% endif %}  
 {# Language #}
 {% if data.language|length > 0 %}
      {% if data.language is iterable %}
@@ -145,10 +293,6 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
   {% else %}
     <dc:identifier>{{ data.identifier.value|escape('html_attr') }}</dc:identifier>
   {% endif %}
-{% endif %}
-{# Source #}
-{% if data.owner|length > 0 %}
-	<dc:source>{{ data.owner }}</dc:source>
 {% endif %}
 {# Relation #}
 {% if node.id %}

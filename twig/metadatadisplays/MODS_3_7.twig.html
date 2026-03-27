@@ -4,6 +4,218 @@
 <titleInfo>
 	<title>{{ data.label|escape('html_attr') }}</title>
 </titleInfo>
+{% if data.agent_linked_data %}
+  {% for agent in data.agent_linked_data %}
+    <name valueURI="{{ agent.uri }}">
+      <namePart>{{ agent.value }}</namePart>
+      <role>
+        <roleTerm valueURI="{{ agent.role_uri }}" authority="marcrelator" type="text">{{ agent.role }}</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
+{% endif %}
+{% if data.collecting_area %}
+  {% for item in data.collecting_area %}
+    <relatedItem type="host">
+      <titleInfo>
+        <title>{{ item }}</title>
+      </titleInfo>
+    </relatedItem>
+  {% endfor %}
+{% endif %}
+<typeOfResource>{{ data.content_type }}</typeOfResource>
+{% if data.contributor %}
+  {% for item in data.contributor %}
+    <name>
+      <namePart>{{ item }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
+{% endif %}
+{% if data.date_available %}
+  <dateOther>{{ data.date_available }}</dateOther>
+{% endif %}
+{% if data.date_digital_creation %}
+  <dateOther>{{ data.date_digital_creation }}</dateOther>
+{% endif %}
+{% if data.date_built %}
+  <note>{{ data.date_built }}</note>
+{% endif %}
+{% if data.date_razed %}
+  <note>{{ data.date_razed }}</note>
+{% endif %}
+{% if data.projection %}
+  <note>{{ data.projection }}</note>
+{% endif %}
+{% if data.state_edition %}
+  <note>{{ data.state_edition }}</note>
+{% endif %}
+{% if data.date_issued %}
+  <originInfo>
+    <dateIssued>{{ data.date_issued }}</dateIssued>
+  </originInfo>
+{% endif %}
+{% if data.digital_exhibit %}
+  {% for item in data.digital_exhibit %}
+    <relatedItem type="host">
+      <titleInfo>
+        <title>{{ item.value }}</title>
+      </titleInfo>
+    </relatedItem>
+  {% endfor %}
+{% endif %}
+{% if data.digital_publisher %}
+  <note>{{ data.digital_publisher }}</note>
+{% endif %}
+{% if data.original_publisher %}
+<originInfo eventType="publication">
+   <publisher>{{ data.original_publisher }}</publisher>
+{% endif %}
+{% if data.format %}
+  <physicalDescription>
+    <digitalOrigin>{{ data.format }}</digitalOrigin>
+  </physicalDescription>
+{% endif %}
+{% if data.medium %}
+  {% for item in data.medium %}
+    <physicalDescription>
+      <form>{{ item }}</form>
+    </physicalDescription>
+  {% endfor %}
+{% endif %}
+{% if data.mimetype %}
+  {% for item in data.mimetype %}
+    <physicalDescription>
+      <internetMediaType>{{ item }}</internetMediaType>
+    </physicalDescription>
+  {% endfor %}
+{% endif %}
+{% if data.genre_form %}
+  {% for item in data.genre_form %}
+    <genre>{{ item }}</genre>
+  {% endfor %}
+{% endif %}
+{% if data.genre_form_linked_data %}
+  {% for item in data.genre_form_linked_data %}
+    <genre valueURI="{{ item.uri }}">{{ item.value }}</genre>
+  {% endfor %}
+{% endif %}
+{% if data.geographic_subject %}
+  {% for item in data.geographic_subject %}
+    <subject><geographic>{{ item }}</geographic></subject>
+  {% endfor %}
+{% endif %}
+{% if data.geographic_subject_linked_data %}
+  {% for item in data.geographic_subject_linked_data %}
+    <subject>
+      <geographic valueURI="{{ item.uri }}">{{ item.value }}</geographic>
+    </subject>
+  {% endfor %}
+{% endif %}
+{% if data.local_department %}
+  {% for item in data.local_department %}
+    <name>
+      <namePart>{{ item }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
+{% endif %}
+{% if data.note %}
+  {% for item in data.note %}
+    <note>{{ item }}</note>
+  {% endfor %}
+{% endif %}
+{% if data.original_publication %}
+  {% for item in data.original_publication %}
+    <relatedItem>
+      <titleInfo><title>{{ item }}</title></titleInfo>
+    </relatedItem>
+  {% endfor %}
+{% endif %}
+{% if data.physical_collection %}
+  <relatedItem type="host">
+    <titleInfo><title>{{ data.physical_collection }}</title></titleInfo>
+  </relatedItem>
+{% endif %}
+{% if data.physical_location %}
+  <location>
+    <holdingSimple>
+      <copyInformation>
+        <shelfLocator>{{ data.physical_location }}</shelfLocator>
+      </copyInformation>
+    </holdingSimple>
+  </location>
+{% endif %}
+{% if data.related_record %}
+  {% for item in data.related_record %}
+    <relatedItem type="isReferencedBy" displayLabel="Catalog Record">
+      <location><url>{{ item }}</url></location>
+    </relatedItem>
+  {% endfor %}
+{% endif %}
+{% if data.related_url %}
+  <relatedItem type="references">
+    <location><url>{{ data.related_url }}</url></location>
+  </relatedItem>
+{% endif %}
+{% if data.related_url_historic %}
+  <relatedItem type="references">
+    <location><url>{{ data.related_url_historic }}</url></location>
+  </relatedItem>
+{% endif %}
+{% if data.rights_details %}
+  <accessCondition type="use and reproduction">
+    {{ data.rights_details }}
+  </accessCondition>
+{% endif %}
+{% if data.sponsorship %}
+  {% for item in data.sponsorship %}
+    <name>
+      <namePart>{{ item }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/spn" authority="marcrelator" type="text">sponsor</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
+{% endif %}
+{% if data.subject %}
+  {% for item in data.subject %}
+    <subject><topic>{{ item }}</topic></subject>
+  {% endfor %}
+{% endif %}
+{% if data.subject_linked_data %}
+  {% for item in data.subject_linked_data %}
+    <subject>
+      <topic valueURI="{{ item.uri }}">{{ item.value }}</topic>
+    </subject>
+  {% endfor %}
+{% endif %}
+{% if data.table_of_contents %}
+  <tableOfContents>{{ data.table_of_contents }}</tableOfContents>
+{% endif %}
+{% if data.temporal_subject %}
+  {% for item in data.temporal_subject %}
+    <subject><temporal>{{ item }}</temporal></subject>
+  {% endfor %}
+{% endif %}
+{% if data.temporal_subject_linked_data %}
+  {% for item in data.temporal_subject_linked_data %}
+    <subject>
+      <temporal valueURI="{{ item.uri }}">{{ item.value }}</temporal>
+    </subject>
+  {% endfor %}
+{% endif %}
+{% if data.title_alternative %}
+  {% for item in data.title_alternative %}
+    <titleInfo type="alternative">
+      <title>{{ item }}</title>
+    </titleInfo>
+  {% endfor %}
+{% endif %}
 {% if data.audience %}
     {% if data.audience is iterable %}
         {% for audience in data.audience %}
@@ -20,7 +232,13 @@
 		{% for creator in data.creator %}
 			<namePart>{{ creator }}</namePart>
 		{% endfor %}
-     {% else %}
+{% for creator in data.creator %}
+<namePart>{{ creator }}</namePart>
+<role>
+      <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
+</role
+{% endfor %}
+{% else %}
      	<namePart>{{ data.creator }}</namePart>
 	{% endif %} 
 </name>	
@@ -31,7 +249,9 @@
         <namePart>{{ agent.value }}</namePart>
         <role>
             <roleTerm type="text">{{ agent.role }}</roleTerm>
-        </role>
+<role>
+<roleTerm valueURI="{{ agent.role_uri }}" authority= "marcrelator" type="text">{{ agent.role }}</roleTerm>
+</role>
     </name>
     {% endfor %}
 {% endif %}
@@ -39,17 +259,6 @@
 <classification authority="{{ data.classification.authority }}">
     {{ data.classification.value }}
 </classification>
-{% endif %}
-{# LoD Creator #}
-{% if data.creator_lod|length > 0 %}
-	{% for creator_lod in data.creator_lod %}
-		<name authority="naf" type="{{ creator_lod.agent_type }}" valueURI="{{ creator_lod.name_uri }}">
-			<namePart>{{ creator_lod.name_label|escape('html_attr') }}</namePart>
-			<role>
-				<roleTerm authority="marcrelator" valueURI="{{ creator_lod.role_uri }}" type="text">{{ creator_lod.role_label }}</roleTerm>
-			</role>
-		</name>		
-	{% endfor %}
 {% endif %}
 <typeOfResource>{{ data.type|escape('html_attr') }}</typeOfResource>
 {% if data.subject_lcgft_terms|length > 0 %}
@@ -65,17 +274,11 @@
 </subject>
 {% endif %}
 <originInfo>
-	{% if data.publisher|length > 0 %}
-		<publisher>{{ data.publisher }}</publisher>
-	{% endif %}
 	{% if data.date_created|length > 0 %}
 		<dateCreated>{{ data.date_created|date("Y-m-d") }}</dateCreated>
 	{% endif %}
-	{% if data.date_published|length > 0 %}	
-		<dateIssued>{{ data.date_published|date("Y-m-d") }}</dateIssued>
-	{% endif %}	
 	{% if data.provenance %}
-    	<dateCaptured>{{ data.provenance }}</dateCaptured>
+    	<note>{{ data.provenance }}</note>
 	{% endif %}
 </originInfo>
 {% if data.language|length > 0 %}
@@ -91,95 +294,16 @@
 		</language>
 	{% endif %}
 {% endif %}	
-{% if data.abstract and (data.description|length == 0) %}
+{% if data.abstract %}
 <abstract type="Summary">
-    {{ data.abstract|escape('html_attr') }}
-</abstract>
-{% elseif data.description %}
-<abstract type="Summary">
-    {{ data.description|escape('html_attr') }}
+    {{ data.abstract }}
 </abstract>
 {% endif %}
-{# Begin Subjects & Names #}
-{# Local Subjects & Names #}
-{% if data.subjects_local|length > 0 %}
-    {% if data.subjects_local is iterable %}
-    	{% for subjects_local in data.subjects_local %}
-       	 	<subject><topic>{{ subjects_local }}</topic></subject>
-     	{% endfor %}
-     {% else %}
-     	<subject><topic>{{ subjects_local }}</topic></subject>
-     {% endif %} 
-{% endif %}
-{% if data.subjects_local_personal_names|length > 0 %}
-    {% if data.subjects_local_personal_names is iterable %}
-    	{% for subjects_local_personal_names in data.subjects_local_personal_names %}
-       	 	<subject><name>{{ subjects_local_personal_names }}</name></subject>
-     	{% endfor %}
-     {% else %}
-     	<subject><name>{{ subjects_local_personal_names }}</name></subject>
-     {% endif %} 
-{% endif %}
-{# LoC Subjects & Names #}
-{% if data.subject_loc|length > 0 %}
-	{% for subjects in attribute(data, 'subject_loc') %}
-		<subject authority="lcsh" authorityURI="http://id.loc.gov/authorities/subjects">
-			<topic valueURI="{{ subjects.uri }}">{{ subjects.label }}</topic>
-		</subject>	
-	{% endfor %}
-{% endif %}
-{% if data.subject_lcnaf_personal_names|length > 0 %}
-	{% for subjects in attribute(data, 'subject_lcnaf_personal_names') %}
-		<subject authority="lcnaf" authorityURI="https://id.loc.gov/authorities/names">
-			<name valueURI="{{ subjects.uri }}">{{ subjects.label }}</name>
-		</subject>	
-	{% endfor %}
-{% endif %}
-{% if data.subject_lcnaf_corporate_names|length > 0 %}
-	{% for subjects in attribute(data, 'subject_lcnaf_corporate_names') %}
-		<subject authority="lcnaf" authorityURI="https://id.loc.gov/authorities/names">
-			<name valueURI="{{ subjects.uri }}">{{ subjects.label }}</name>
-		</subject>	
-	{% endfor %}
-{% endif %}
-{% if data.subject_lcnaf_geographic_names|length > 0 %}
-	{% for subjects in attribute(data, 'subject_lcnaf_geographic_names') %}
-		<subject authority="lcnaf" authorityURI="https://id.loc.gov/authorities/names">
-			<geographic valueURI="{{ subjects.uri }}">{{ subjects.label }}</geographic>
-		</subject>	
-	{% endfor %}
-{% endif %}
-{# Getty Subjects #}
-{% if data.term_aat_getty|length > 0 %}
-	{% for getty_subjects in attribute(data, 'term_aat_getty') %}
-		<subject authority="aat" authorityURI="http://www.getty.edu/research/tools/vocabularies/aat/">
-				<topic valueURI="{{ getty_subjects.uri }}">{{ getty_subjects.label }}</topic>
-		</subject>	
-	{% endfor %}
-{% endif %}
-{# Wikidata Subjects & Names #}
-{% if data.subject_wikidata|length > 0 %}
-	{% for subject in attribute(data, 'subject_wikidata') %}
-		<subject authority="wikidata">
-			<topic valueURI="{{ subject.uri }}">{{ subject.label }}</topic>
-		</subject>	
-	{% endfor %}
-{% endif %}
-{% if data.edm_agent|length > 0 %}
-	{% for agent in attribute(data, 'edm_agent') %}
-		<subject authority="wikidata">
-			<name valueURI="{{ agent.name_uri }}">{{ agent.name_label }}</name>
-		</subject>	
-	{% endfor %}
-{% endif %}
-{# VIAF #}
-{% if data.viaf|length > 0 %}
-	{% for viaf in attribute(data, 'viaf') %}
-		<subject authority="viaf">
-			<name valueURI="{{ viaf.uri }}">{{ viaf.label }}</name>
-		</subject>	
-	{% endfor %}
-{% endif %}		
+{% if data.description %}
+  {% for item in data.description %}
+    <note>{{ item }}</note>
+  {% endfor %}
+{% endif %}	
 <physicalDescription>
 <form authority="marcform">electronic</form>
 <form authority="gmd">electronic resource</form>
@@ -202,58 +326,19 @@
         	<url displayLabel="electronic resource" usage="primary display">{{ current }}</url>
 	{% endif%}
 </location>
-{% if data.local_identifier|length > 0 %}
-	<identifier type="local">{{ data.local_identifier }}</identifier>
-{% endif %}
 {# Rights Statements #}
 {% if data.rights|length > 0 %} 	
 	<accessCondition type="use and reproduction" displayLabel="Rights Statement">{{ data.rights }}</accessCondition>
 {% endif %}
-{% if data.rights_statements|length > 0 %}
-	{% if data.rights_statements in ['In Copyright'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/InC/1.0/</accessCondition>
-	{% endif %}
-	{% if data.rights_statements in ['In Copyright - EU Orphan Work'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/InC-OW-EU/1.0/</accessCondition>
-	{% endif %}
-	{% if data.rights_statements in ['In Copyright - Educational Use Permitted'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/InC-EDU/1.0/</accessCondition>
-	{% endif %}
-	{% if data.rights_statements in ['In Copyright - Non-Commercial Use Permitted'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/InC-NC/1.0/</accessCondition>
-	{% endif %}
-	{% if data.rights_statements in ['In Copyright - Rights-holder(s) Unlocatable or Unidentifiable'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/InC-RUU/1.0/</accessCondition>
-    {% endif %}   
-	{% if data.rights_statements in ['No Copyright - Contractual Restrictions'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/NoC-CR/1.0/</accessCondition>
-	{% endif %} 
-	{% if data.rights_statements in ['No Copyright - Non-Commercial Use Only'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/NoC-NC/1.0/</accessCondition>
-	{% endif %}
-	{% if data.rights_statements in ['No Copyright - Other Known Legal Restrictions'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/NoC-OKLR/1.0/</accessCondition>
-	{% endif %}
-	{% if data.rights_statements in ['No Copyright - United States'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/NoC-US/1.0/</accessCondition>
-	{% endif %} 
-	{% if data.rights_statements in ['Copyright Not Evaluated'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/CNE/1.0/</accessCondition>
-	{% endif %}
-	{% if data.rights_statements in ['Copyright Undetermined'] %} 
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/UND/1.0/</accessCondition>
-	{% endif %}
-	{% if data.rights_statements in ['No Known Copyright'] %}
-		<accessCondition type="use and reproduction" displayLabel="Rights Statement">http://rightsstatements.org/vocab/NKC/1.0/</accessCondition>
-  	{% endif %}
+{% if data.rights_details %}
+  <accessCondition type="use and reproduction">
+    {{ data.rights_details }}
+  </accessCondition>
 {% endif %}
 {% if data.access_rights %}
 <accessCondition type="restriction on access">
     {{ data.access_rights }}
 </accessCondition>
-{% endif %}
-{% if data.owner|length > 0 %}
-	<note type="ownership">{{ data.owner }}</note>
 {% endif %}
 {% if attribute(data, 'ismemberof') %}
 	{% if attribute(data, 'ismemberof') is iterable %}
