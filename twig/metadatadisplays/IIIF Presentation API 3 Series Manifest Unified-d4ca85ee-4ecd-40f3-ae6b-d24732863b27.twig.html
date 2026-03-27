@@ -99,10 +99,12 @@ Without Double quotes.
 {{ node.label|json_encode|raw }}
 ]
 },
+{% if data.attribution %}
 "requiredStatement": {
-"label": { "en": [ "Attribution" ] },
-"value": { "en": [ "Provided by Archipelago Deployment" ] }
+    "label": { "en": [ "Attribution" ] },
+    "value": { "en": [ {{ data.attribution|json_endcode_raw }} ] }
 },
+{% endif %}
 "rights": {{ computed_rights|json_encode|raw }},
 "metadata": [
 {% for agent in attribute(data, 'edm_agent') %}

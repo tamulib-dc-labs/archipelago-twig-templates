@@ -92,8 +92,11 @@ Without Double quotes.
 "label": { "en": [ "Attribution" ] },
 "value": { "en": [ "Provided by Archipelago Deployment" ] }
 },
+{% if data.abstract %}
+"summary": { "{{ len }}": [ {{ data.abstract|json_encode|raw }} ] },
+{% endif %}
 "rights": {{ computed_rights|json_encode|raw }},
-        "metadata": [
+"metadata": [
         {% if data.abstract %}
         {
         "label": { "{{ len }}": ["Abstract"] },
