@@ -14,10 +14,6 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      	<dc:creator>{{ data.creator }}</dc:creator>
 	{% endif %} 
 {% endif %}
-{% if data.creator_lod|length > 0 %}
-	{% for creator_lod in data.creator_lod %}
-     	<dc:creator>{{ creator_lod.name_label }}</dc:creator>
-	{% endfor %}
 {% if data.contributor|length > 0 %}
   {% for contributor in data.contributor %}
     <dc:contributor>{{ contributor }}</dc:contributor>
@@ -75,16 +71,13 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      	<dc:subject>{{ subject_lcgft_terms.label }}</dc:subject>
 	{% endfor %}
 {% endif %}
-{# Publisher #}
-{% if data.publisher|length > 0 %}
-	<dc:publisher>{{ data.publisher }}</dc:publisher>
 {# Digital Publisher #}
 {% if data.digital_publisher|length > 0 %}
-<dc:publisher>{{ data.digital_publisher }}</dc:publisher>
+  <dc:publisher>{{ data.digital_publisher }}</dc:publisher>
 {% endif %}  
 {# Original Publisher #}
 {% if data.original_publisher|length > 0 %}
-<dc:publisher>{{ data.original_publisher }}</dc:publisher>
+  <dc:publisher>{{ data.original_publisher }}</dc:publisher>
 {% endif %}  
 {# Language #}
 {% if data.language|length > 0 %}

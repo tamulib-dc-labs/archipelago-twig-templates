@@ -41,10 +41,10 @@
   <dateOther>{{ data.date_digital_creation }}</dateOther>
 {% endif %}
 {% if data.date_built %}
-  <note>{{ data.date_built }}</note>
+  <note displayLabel="Date Built">{{ data.date_built }}</note>
 {% endif %}
 {% if data.date_razed %}
-  <note>{{ data.date_razed }}</note>
+  <note displayLabel="Date Razed">{{ data.date_razed }}</note>
 {% endif %}
 {% if data.projection %}
   <note>{{ data.projection }}</note>
@@ -70,8 +70,9 @@
   <note>{{ data.digital_publisher }}</note>
 {% endif %}
 {% if data.original_publisher %}
-<originInfo eventType="publication">
+  <originInfo eventType="publication">
    <publisher>{{ data.original_publisher }}</publisher>
+  </originInfo>
 {% endif %}
 {% if data.format %}
   <physicalDescription>
@@ -137,7 +138,7 @@
   {% endfor %}
 {% endif %}
 {% if data.physical_collection %}
-  <relatedItem type="host">
+ <relatedItem type="host">
     <titleInfo><title>{{ data.physical_collection }}</title></titleInfo>
   </relatedItem>
 {% endif %}
@@ -231,14 +232,11 @@
 	{% if data.creator is iterable %}
 		{% for creator in data.creator %}
 			<namePart>{{ creator }}</namePart>
+            <role>
+            	<roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
+            </role>
 		{% endfor %}
-{% for creator in data.creator %}
-<namePart>{{ creator }}</namePart>
-<role>
-      <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
-</role
-{% endfor %}
-{% else %}
+     {% else %}
      	<namePart>{{ data.creator }}</namePart>
 	{% endif %} 
 </name>	
@@ -248,10 +246,8 @@
     <name>
         <namePart>{{ agent.value }}</namePart>
         <role>
-            <roleTerm type="text">{{ agent.role }}</roleTerm>
-<role>
-<roleTerm valueURI="{{ agent.role_uri }}" authority= "marcrelator" type="text">{{ agent.role }}</roleTerm>
-</role>
+			<roleTerm valueURI="{{ agent.role_uri }}" authority= "marcrelator" type="text">{{ agent.role }}</roleTerm>
+		</role>
     </name>
     {% endfor %}
 {% endif %}
@@ -274,13 +270,13 @@
 </subject>
 {% endif %}
 <originInfo>
-	{% if data.date_created|length > 0 %}
+{% if data.date_created|length > 0 %}
 		<dateCreated>{{ data.date_created|date("Y-m-d") }}</dateCreated>
 	{% endif %}
-	{% if data.provenance %}
-    	<note>{{ data.provenance }}</note>
-	{% endif %}
 </originInfo>
+{% if data.provenance %}
+   <note>{{ data.provenance }}</note>
+{% endif %}
 {% if data.language|length > 0 %}
 	{% if data.language is iterable %}
 		{% for language in data.language %}
@@ -296,7 +292,7 @@
 {% endif %}	
 {% if data.abstract %}
 <abstract type="Summary">
-    {{ data.abstract }}
+{{ data.abstract }}
 </abstract>
 {% endif %}
 {% if data.description %}
