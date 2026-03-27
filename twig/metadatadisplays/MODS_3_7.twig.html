@@ -249,7 +249,9 @@
         <namePart>{{ agent.value }}</namePart>
         <role>
             <roleTerm type="text">{{ agent.role }}</roleTerm>
-        </role>
+<role>
+<roleTerm valueURI="{{ agent.role_uri }}" authority= "marcrelator" type="text">{{ agent.role }}</roleTerm>
+</role>
     </name>
     {% endfor %}
 {% endif %}
