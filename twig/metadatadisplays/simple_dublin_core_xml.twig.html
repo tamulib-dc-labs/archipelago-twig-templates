@@ -18,7 +18,6 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 	{% for creator_lod in data.creator_lod %}
      	<dc:creator>{{ creator_lod.name_label }}</dc:creator>
 	{% endfor %}
-{% endif %}
 {% if data.contributor|length > 0 %}
   {% for contributor in data.contributor %}
     <dc:contributor>{{ contributor }}</dc:contributor>
