@@ -71,9 +71,7 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% endif %}
 {# digital_publisher #}
 {% if data.digital_publisher %}
-  {% for pub in data.digital_publisher %}
-    <dc:publisher>{{ pub }}</dc:publisher>
-  {% endfor %}
+   <dc:publisher>{{ data.digital_publisher }}</dc:publisher>
 {% endif %}
 {# format #}
 {% if data.format %}
