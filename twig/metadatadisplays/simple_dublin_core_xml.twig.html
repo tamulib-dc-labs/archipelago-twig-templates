@@ -79,6 +79,13 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {# Publisher #}
 {% if data.publisher|length > 0 %}
 	<dc:publisher>{{ data.publisher }}</dc:publisher>
+{# Digital Publisher #}
+{% if data.digital_publisher|length > 0 %}
+<dc:publisher>{{ data.digital_publisher }}</dc:publisher>
+{% endif %}  
+{# Original Publisher #}
+{% if data.original_publisher|length > 0 %}
+<dc:publisher>{{ data.original_publisher }}</dc:publisher>
 {% endif %}  
 {# Language #}
 {% if data.language|length > 0 %}
