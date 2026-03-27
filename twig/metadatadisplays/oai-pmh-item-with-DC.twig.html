@@ -115,7 +115,6 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% if data.local_department %}
   {% for item in data.local_department %}
     <dc:contributor>{{ item }}</dc:contributor>
-    <dc:description>{{ item }}</dc:description>
   {% endfor %}
 {% endif %}
 {# medium #}
