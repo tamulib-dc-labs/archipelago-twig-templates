@@ -65,10 +65,6 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% if data.date_issued %}
   <dc:date>{{ data.date_issued }}</dc:date>
 {% endif %}
-{# date_razed #}
-{% if data.date_razed %}
-  <dc:description>{{ data.date_razed }}</dc:description>
-{% endif %}
 {# digital_exhibit (object, max:1) #}
 {% if data.digital_exhibit %}
   <dc:relation>{{ data.digital_exhibit.value }}</dc:relation>
