@@ -52,6 +52,9 @@
 {% if data.state_edition %}
   <note>{{ data.state_edition }}</note>
 {% endif %}
+{% if data.provenance %}
+  <note>{{ data.provenance }}</note>
+{% endif %}
 {% if data.date_issued %}
   <originInfo>
     <dateIssued>{{ data.date_issued }}</dateIssued>
@@ -70,8 +73,9 @@
   <note>{{ data.digital_publisher }}</note>
 {% endif %}
 {% if data.original_publisher %}
-<originInfo eventType="publication">
-   <publisher>{{ data.original_publisher }}</publisher>
+	<originInfo eventType="publication">
+   		<publisher>{{ data.original_publisher }}</publisher>
+	</originInfo>
 {% endif %}
 {% if data.format %}
   <physicalDescription>
@@ -231,15 +235,12 @@
 	{% if data.creator is iterable %}
 		{% for creator in data.creator %}
 			<namePart>{{ creator }}</namePart>
-		{% endfor %}
-{% for creator in data.creator %}
-<namePart>{{ creator }}</namePart>
-<role>
-      <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
-</role
-{% endfor %}
-{% else %}
-     	<namePart>{{ data.creator }}</namePart>
+			<role>
+				<roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
+			</role>
+		{% endfor %}	
+	{% else %}
+    	<namePart>{{ data.creator }}</namePart>
 	{% endif %} 
 </name>	
 {% endif %}
@@ -276,9 +277,6 @@
 <originInfo>
 	{% if data.date_created|length > 0 %}
 		<dateCreated>{{ data.date_created|date("Y-m-d") }}</dateCreated>
-	{% endif %}
-	{% if data.provenance %}
-    	<note>{{ data.provenance }}</note>
 	{% endif %}
 </originInfo>
 {% if data.language|length > 0 %}
@@ -339,6 +337,15 @@
 <accessCondition type="restriction on access">
     {{ data.access_rights }}
 </accessCondition>
+{% endif %}
+{% if data.date_built %}
+<note displayLabel="Date Built">
+    {{ data.date_built }}
+</note>
+{% if data.date_razed %}
+<note displayLabel="Date Razed">
+    {{ data.date_razed }}
+</note>
 {% endif %}
 {% if attribute(data, 'ismemberof') %}
 	{% if attribute(data, 'ismemberof') is iterable %}
