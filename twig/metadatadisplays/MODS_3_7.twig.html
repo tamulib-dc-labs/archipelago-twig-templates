@@ -70,7 +70,8 @@
   <note>{{ data.digital_publisher }}</note>
 {% endif %}
 {% if data.original_publisher %}
-  <publisher>{{ data.original_publisher }}</publisher>
+<originInfo eventType="publication">
+   <publisher>{{ data.original_publisher }}</publisher>
 {% endif %}
 {% if data.format %}
   <physicalDescription>
