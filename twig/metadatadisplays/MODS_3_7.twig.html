@@ -150,9 +150,9 @@
     </holdingSimple>
   </location>
 {% endif %}
-{% if data.related_item %}
-  {% for item in data.related_item %}
-    <relatedItem>
+{% if data.related_record %}
+  {% for item in data.related_record %}
+    <relatedItem type="isReferencedBy" displayLabel="Catalog Record">
       <location><url>{{ item }}</url></location>
     </relatedItem>
   {% endfor %}
