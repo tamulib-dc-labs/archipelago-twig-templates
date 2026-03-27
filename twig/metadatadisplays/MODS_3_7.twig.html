@@ -67,9 +67,7 @@
   {% endfor %}
 {% endif %}
 {% if data.digital_publisher %}
-  {% for pub in data.digital_publisher %}
-    <publisher>{{ pub }}</publisher>
-  {% endfor %}
+  <note>{{ data.digital_publisher }}</note>
 {% endif %}
 {% if data.original_publisher %}
   <publisher>{{ data.original_publisher }}</publisher>
