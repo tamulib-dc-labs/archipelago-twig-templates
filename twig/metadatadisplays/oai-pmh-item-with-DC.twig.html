@@ -61,10 +61,6 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% if data.content_type %}
   <dc:type>{{ data.content_type }}</dc:type>
 {% endif %}
-{# date_built #}
-{% if data.date_built %}
-  <dc:description>{{ data.date_built }}</dc:description>
-{% endif %}
 {# date_issued #}
 {% if data.date_issued %}
   <dc:date>{{ data.date_issued }}</dc:date>
