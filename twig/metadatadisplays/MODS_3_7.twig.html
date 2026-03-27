@@ -273,10 +273,10 @@
 {% if data.date_created|length > 0 %}
 		<dateCreated>{{ data.date_created|date("Y-m-d") }}</dateCreated>
 	{% endif %}
-   {% if data.provenance %}
-   <note>{{ data.provenance }}</note>
-	{% endif %}
 </originInfo>
+{% if data.provenance %}
+   <note>{{ data.provenance }}</note>
+{% endif %}
 {% if data.language|length > 0 %}
 	{% if data.language is iterable %}
 		{% for language in data.language %}
