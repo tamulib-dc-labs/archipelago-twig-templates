@@ -9,7 +9,7 @@
     <name valueURI="{{ agent.uri }}">
       <namePart>{{ agent.value }}</namePart>
       <role>
-        <roleTerm type="text">{{ agent.role }}</roleTerm>
+        <roleTerm valueURI="{{ agent.role_uri }}" authority="marcrelator" type="text">{{ agent.role }}</roleTerm>
       </role>
     </name>
   {% endfor %}
