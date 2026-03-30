@@ -47,10 +47,10 @@
   <note displayLabel="Date Razed">{{ data.date_razed }}</note>
 {% endif %}
 {% if data.projection %}
-  <note>{{ data.projection }}</note>
+  <note displayLabel="Projection">{{ data.projection }}</note>
 {% endif %}
 {% if data.state_edition %}
-  <note>{{ data.state_edition }}</note>
+  <note displayLabel="State/Edition of Map">{{ data.state_edition }}</note>
 {% endif %}
 {% if data.date_issued %}
   <originInfo>
@@ -67,7 +67,7 @@
   {% endfor %}
 {% endif %}
 {% if data.digital_publisher %}
-  <note>{{ data.digital_publisher }}</note>
+  <note displayLabel="Digital publisher">{{ data.digital_publisher }}</note>
 {% endif %}
 {% if data.original_publisher %}
   <originInfo eventType="publication">
