@@ -4,72 +4,86 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 <?xml version="1.0" encoding="UTF-8"?>
 <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
 <dc:title>{{ data.label|escape('html_attr') }}</dc:title>
-{# Creator #}
-{% if data.creator|length > 0  %}
-	{% if data.creator is iterable %}
-		{% for creator in data.creator %}
-			<dc:creator>{{ creator }}</dc:creator>
-		{% endfor %}
-     {% else %}
-     	<dc:creator>{{ data.creator }}</dc:creator>
-	{% endif %} 
+{# Alternative Title #}
+{% if data.title_alternative|length > 0 %}
+  {% for title in data.title_alternative %}
+    <dc:title>{{ title }}</dc:title>
+  {% endfor %}
+{% endif %}
+{# Creators and Contributors #}
+{% if data.creator|length > 0 %}
+  {% for creator in data.creator %}
+    <dc:creator>{{ creator }}</dc:creator>
+  {% endfor %}
 {% endif %}
 {% if data.contributor|length > 0 %}
   {% for contributor in data.contributor %}
     <dc:contributor>{{ contributor }}</dc:contributor>
   {% endfor %}
 {% endif %}
-{% if data.coordinates|length > 0 %}
-  {% for coord in data.coordinates %}
-    <dc:coverage>{{ coord }}</dc:coverage>
-  {% endfor %}
+{% if data.agent|length > 0 %}
+	{% for agent in data.agent %}
+     	<dc:creator>{{ agent.value }}</dc:creator>
+	{% endfor %}
 {% endif %}
-{% if data.extent|length > 0 %}
-  {% for extent in data.extent %}
-    <dc:format>{{ extent }}</dc:format>
-  {% endfor %}
+{% if data.agent_linked_data|length > 0 %}
+	{% for agent in data.agent_linked_data %}
+     	<dc:creator>{{ agent.value }}</dc:creator>
+	{% endfor %}
+{% endif %}
+{# Sponsorship #}
+{% if data.sponsorship|length > 0 %}
+	<dc:contributor>{{ data.sponsorship }}</dc:contributor>
+{% endif %}
+{# Coverage #}
+{% if data.coordinates|length > 0 %}
+   <dc:coverage>{{ data.coordinates }}</dc:coverage>
 {% endif %}
 {% if data.geographic_subject|length > 0 %}
   {% for geo in data.geographic_subject %}
     <dc:coverage>{{ geo }}</dc:coverage>
   {% endfor %}
 {% endif %}
-{% if data.collecting_area|length > 0 %}
-  {% for area in data.collecting_area %}
-    <dc:relation>{{ area }}</dc:relation>
+{% if data.geographic_subject_linked_data|length > 0 %}
+  {% for geo in data.geographic_subject_linked_data %}
+    <dc:coverage>{{ geo.value }}</dc:coverage>
   {% endfor %}
 {% endif %}
-{# Coverage 
-<dc:coverage></dc:coverage>
-#}
+{% if data.temporal_subject|length > 0 %}
+  {% for temp in data.temporal_subject %}
+    <dc:coverage>{{ temp }}</dc:coverage>
+  {% endfor %}
+{% endif %}
+{% if data.temporal_subject_linked_data|length > 0 %}
+  {% for temp in data.temporal_subject_linked_data %}
+    <dc:coverage>{{ temp.value }}</dc:coverage>
+  {% endfor %}
+{% endif %}
+{# Format #}
+{% if data.extent|length > 0 %}
+  {% for extent in data.extent %}
+    <dc:format>{{ extent }}</dc:format>
+  {% endfor %}
+{% endif %}
+{% if data.format|length > 0 %}
+   <dc:format>{{ data.format }}</dc:format>
+{% endif %}
+{% if data.medium|length > 0 %}
+  {% for medium in data.medium %}
+    <dc:format>{{ medium }}</dc:format>
+  {% endfor %}
+{% endif %}
+{% if data.mimetype|length > 0 %}
+  {% for mimetype in data.mimetype %}
+    <dc:format>{{ mimetype }}</dc:format>
+  {% endfor %}
+{% endif %}
 {# Date #}
 {% if data.date_created|length > 0 %}
 	<dc:date>{{ data.date_created }}</dc:date>
 {% endif %}
-{# Abstract #}
-{% if data.abstract %}
-  <dc:description>{{ data.abstract }}</dc:description>
-{% endif %}
-{# Description #}
-{% if data.description|length > 0 %}
-	{% if data.description is iterable %}
-		{% for description in data.description %}
-			<dc:description>{{ description }}</dc:description>
-		{% endfor %}
-     {% else %}
-	<dc:description>{{ data.description }}</dc:description>
-	{% endif %} 
-{% endif %}
-{# Subject #}
-{% if data.subject_loc|length > 0 %}
-	{% for subject_loc in data.subject_loc %}
-     	<dc:subject>{{ subject_loc.label }}</dc:subject>
-	{% endfor %}
-{% endif %}
-{% if data.subject_lcgft_terms|length > 0 %}
-	{% for subject_lcgft_terms in data.subject_lcgft_terms %}
-     	<dc:subject>{{ subject_lcgft_terms.label }}</dc:subject>
-	{% endfor %}
+{% if data.date_issued|length > 0 %}
+	<dc:date>{{ data.date_issued }}</dc:date>
 {% endif %}
 {# Digital Publisher #}
 {% if data.digital_publisher|length > 0 %}
@@ -78,35 +92,102 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {# Original Publisher #}
 {% if data.original_publisher|length > 0 %}
   <dc:publisher>{{ data.original_publisher }}</dc:publisher>
-{% endif %}  
+{% endif %} 
+{# Abstract #}
+{% if data.abstract %}
+  <dc:description>{{ data.abstract }}</dc:description>
+{% endif %}
+{# Description #}
+{% if data.description|length > 0 %}
+	{% for description in data.description %}
+		<dc:description>{{ description }}</dc:description>
+	{% endfor %}
+{% endif %}
+{# Note #}
+{% if data.note|length > 0 %}
+	{% for note in data.note %}
+		<dc:description>{{ note }}</dc:description>
+	{% endfor %}
+{% endif %}
+{# Table of Contents #}
+{% if data.table_of_contents|length > 0 %}
+	<dc:description>{{ data.table_of_contents }}</dc:description>
+{% endif %}
+{# Physical Location #}
+{% if data.physical_location|length > 0 %}
+	<dc:description>{{ data.physical_location }}</dc:description>
+{% endif %}
 {# Language #}
 {% if data.language|length > 0 %}
-     {% if data.language is iterable %}
-     	{% for language in data.language %}
-       		<dc:language>{{ language }}</dc:language>
-     	{% endfor %}
-     {% else %}
-     		<dc:language>{{ data.language }}</dc:language>
-     {% endif %} 
+     {% for language in data.language %}
+       	<dc:language>{{ language }}</dc:language>
+     {% endfor %}
+{% endif %}
+{# Subject #}
+{% if data.subject|length > 0 %}
+     {% for subject in data.subject %}
+       	<dc:subject>{{ subject }}</dc:subject>
+     {% endfor %}
+{% endif %}
+{% if data.subject_linked_data|length > 0 %}
+     {% for subject in data.subject_linked_data %}
+       	<dc:subject>{{ subject.value }}</dc:subject>
+     {% endfor %}
+{% endif %}
+{% if data.classification|length > 0 %}
+     {% for classification in data.classification %}
+       	<dc:subject>{{ classification.value }}</dc:subject>
+     {% endfor %}
 {% endif %}
 {# Type #}
 {% if data.type|length > 0 %}
 	<dc:type>{{ data.type }}</dc:type>
-{% endif %}    
-{# Format 
-<dc:format></dc:format>
-#}
+{% endif %} 
+{% if data.content_type|length > 0 %}
+	{% for type in data.content_type %}
+       	<dc:type>{{ type }}</dc:type>
+    {% endfor %}
+{% endif %} 
+{% if data.genre_form|length > 0 %}
+  {% for genre in data.genre_form %}
+    <dc:type>{{ genre }}</dc:type>
+  {% endfor %}
+{% endif %}
+{% if data.genre_form_linked_data|length > 0 %}
+  {% for genre in data.genre_form_linked_data %}
+    <dc:type>{{ genre.value }}</dc:type>
+  {% endfor %}
+{% endif %}
+{# Identifier #}
 {% if data.identifier|length > 0 %}
   {% for id in data.identifier %}
     <dc:identifier>{{ id.value }}</dc:identifier>
   {% endfor %}
 {% endif %}
-{# Source #}
-{# Source #}
-{% if data.owner|length > 0 %}
-	<dc:source>{{ data.owner }}</dc:source>
-{% endif %}
 {# Relation #}
+{% if data.collecting_area|length > 0 %}
+  {% for area in data.collecting_area %}
+    <dc:relation>{{ area }}</dc:relation>
+  {% endfor %}
+{% endif %}
+{% if data.digital_exhibit|length > 0 %}
+      <dc:relation>{{ data.digital_exhibit.value }}</dc:relation>
+{% endif %}
+{% if data.original_publication|length > 0 %}
+     <dc:relation>{{ data.original_publication }}</dc:relation>
+{% endif %}
+{% if data.physical_collection|length > 0 %}
+     <dc:relation>{{ data.physical_collection }}</dc:relation>
+{% endif %}
+{% if data.related_record|length > 0 %}
+     <dc:relation>{{ data.related_record }}</dc:relation>
+{% endif %}
+{% if data.related_url|length > 0 %}
+     <dc:relation>{{ data.related_url }}</dc:relation>
+{% endif %}
+{% if data.related_url_historic|length > 0 %}
+     <dc:relation>{{ data.related_url_historic }}</dc:relation>
+{% endif %}
 {% if node.id %}
     {% set nodeurl = url('entity.node.canonical', {'node': node.id}, {'absolute': true}) %}
 {% else %}
@@ -128,5 +209,11 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {# Rights #}
 {% if data.rights|length > 0 %} 
   <dc:rights>{{ data.rights }}</dc:rights>
+{% endif %}
+{% if data.rights_details|length > 0 %} 
+  <dc:rights>{{ data.rights_details }}</dc:rights>
+{% endif %}
+{% if data.access_rights|length > 0 %}
+	<dc:rights>{{ data.access_rights }}</dc:rights>
 {% endif %}
 </oai_dc:dc>
