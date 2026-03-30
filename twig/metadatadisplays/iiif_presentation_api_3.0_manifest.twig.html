@@ -647,7 +647,11 @@ Without Double quotes.
 {% if data.annotations[0].transcribing[loop.index0] is defined %}
   {% set transcription = data.annotations[0].transcribing[loop.index0] %}
 {% endif %}
-{% if texts|length > 0 or transcription or data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
+{% set reasoning = null %}
+{% if data.annotations[0].reasoning[loop.index0] is defined %}
+  {% set reasoning = data.annotations[0].reasoning[loop.index0] %}
+{% endif %}
+{% if texts|length > 0 or transcription or reasoning or data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
        ,
        "annotations": [
   {%- if texts|length > 0 -%}
@@ -698,8 +702,29 @@ Without Double quotes.
               ]
             }
   {% endif %}
-  {% if data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
+  {% if reasoning %}
     {%- if texts|length > 0 or transcription -%},{% endif %}
+            {
+              "id": "{{ nodeurl }}/iiif/reasoning/p{{ itemCount }}",
+              "type": "AnnotationPage",
+              "items": [
+                {
+                  "id": "{{ nodeurl }}/iiif/reasoning/p{{ itemCount }}/1",
+                  "type": "Annotation",
+                  "motivation": "tagging",
+                  "body": {
+                    "type": "TextualBody",
+                    "value": {{ reasoning.value|json_encode|raw }},
+                    "format": {{ reasoning.mime_type|json_encode|raw }},
+                    "language": "none"
+                  },
+                  "target": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}"
+                }
+              ]
+            }
+  {% endif %}
+  {% if data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
+    {%- if texts|length > 0 or transcription or reasoning -%},{% endif %}
             {
               "id": "{{ nodeurl }}/iiif/comments/p{{ itemCount }}",
               "type": "AnnotationPage",
