@@ -76,7 +76,9 @@
 
 {# Type of Resource #}
 {% if data.content_type %}
-	<typeOfResource>{{ data.content_type }}</typeOfResource>
+	{% for item in data.content_type %}
+    	<typeOfResource>{{ item }}</typeOfResource>
+    {% endfor %}
 {% endif %}
 <typeOfResource>{{ data.type|escape('html_attr') }}</typeOfResource>
 
