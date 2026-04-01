@@ -300,7 +300,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
   {{ _self.html_output('Description', data.description, true) }}
 
 {# Creators and Contributors (creator str, contributor str, agent objects) #}
-{% if data.creator|length > 0 or data.contributor|length > 0 or data.agent|length > 0 %}
+{% if data.creator|length > 0 or data.contributor|length > 0 or data.agent|length > 0 or data.agent_linked_data|length > 0 %}
 <dt>Creators and Contributors</dt>
 <dd><ul>
   {% if data.creator|length > 0 %}
@@ -334,6 +334,17 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     {% else %}
       <li>{{ data.agent }}</li>
     {% endif %}
+  {% endif %}
+  {% if data.agent_linked_data|length > 0 %}
+  	{% for agent in data.agent_linked_data %}
+      <li>
+        {% if agent.uri is defined and agent.uri|length > 2 %}
+          <a href="{{ agent.uri }}" target="_blank">{{ agent.value }}</a>
+    	{% else %}
+          {{ agent.value }}
+      {% endif %}
+      </li>
+    {% endfor %}
   {% endif %}
 </ul></dd>
 {% endif %}
@@ -444,7 +455,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 </ul></dd>
 {% endif %}
 
-{# Genre/Form - Linked Data (object: value + uri) #}
+{# Genre/Form - Linked Data (object: value + uri) and Non-linked data #}
 {% if data.genre_form_linked_data|length > 0 or data.genre_form|length > 0 %}
 <dt>Genre</dt>
 <dd><ul>
@@ -513,7 +524,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endif %}
 
 {# Rights Details (free text) #}
-{{ _self.html_output('Rights Details', data.rights_statement, true) }}
+{{ _self.html_output('Rights Details', data.rights_details, true) }}
 
 {# Access Rights and Rights Holder #}
 {{ _self.html_output('Access Rights', data.access_rights) }}
@@ -578,6 +589,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {# Notes and contents #}
 {{ _self.html_output('Note', data.note) }}
 {{ _self.html_output('Table of Contents', data.table_of_contents) }}
+{{ _self.html_output('Attribution', data.attribution) }}
 
 {# Audience, provenance, sponsorship #}
 {{ _self.html_output('Audience', data.audience) }}
