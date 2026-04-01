@@ -306,22 +306,22 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
   {% if data.creator|length > 0 %}
     {% if data.creator is iterable %}
       {% for creator_item in data.creator %}
-        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator_item|url_encode }}" target="_blank">{{ creator_item }}</a> (Creator)</li>
+        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator_item|url_encode }}" target="_blank">{{ creator_item }}</a> (creator)</li>
       {% endfor %}
     {% else %}
       {% for creator_item in data.creator|split('|') %}
-        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator_item|trim|url_encode }}" target="_blank">{{ creator_item|trim }}</a> (Contributor)</li>
+        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ creator_item|trim|url_encode }}" target="_blank">{{ creator_item|trim }}</a> (contributor)</li>
       {% endfor %}
     {% endif %}
   {% endif %}
   {% if data.contributor|length > 0 %}
     {% if data.contributor is iterable %}
       {% for contributor_item in data.contributor %}
-        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ contributor_item|url_encode }}" target="_blank">{{ contributor_item }}</a> (Contributor)</li>
+        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ contributor_item|url_encode }}" target="_blank">{{ contributor_item }}</a> (contributor)</li>
       {% endfor %}
     {% else %}
       {% for contributor_item in data.contributor|split('|') %}
-        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ contributor_item|trim|url_encode }}" target="_blank">{{ contributor_item|trim }}</a> (Contributor)</li>
+        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ contributor_item|trim|url_encode }}" target="_blank">{{ contributor_item|trim }}</a> (contributor)</li>
       {% endfor %}
     {% endif %}
   {% endif %}
@@ -329,7 +329,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     {% if data.agent is iterable %}
       {% for agent_item in data.agent %}
     {# Todo: Fix role term logic #}
-        <li>{% if agent_item.role is defined and agent_item.role|length > 0 %}{{ agent_item.role }}: {% endif %}<a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ agent_item.value|url_encode }}" target="_blank">{{ agent_item.value }}</a></li>
+        <li><a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ agent_item.value|url_encode }}" target="_blank">{{ agent_item.value }}</a>{% if agent_item.role is defined and agent_item.role|length > 0 %} ({{ agent_item.role }}){% endif %}</li>
       {% endfor %}
     {% else %}
       <li>{{ data.agent }}</li>
@@ -381,43 +381,89 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {# Language #}
 {{ _self.html_output('Language', data.language) }}
 
-{# Subject - Linked Data (object: value + uri) #}
-{% if data.subject_linked_data|length > 0 %}
+{# Subject - Linked Data (object: value + uri) and Non-linked data #}
+{% if data.subject_linked_data|length > 0 or data.subject|length > 0 %}
 <dt>Subject</dt>
 <dd><ul>
-  {% for subject_item in data.subject_linked_data %}
-    <li>
-      {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
-        <a href="{{ subject_item.uri }}" target="_blank">{{ subject_item.value }}</a>
-      {% else %}
-        {{ subject_item.value }}
+  	{% for subject_item in data.subject_linked_data %}
+      <li>
+        {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
+          <a href="{{ subject_item.uri }}" target="_blank">{{ subject_item.value }}</a>
+    	{% else %}
+          {{ subject_item.value }}
       {% endif %}
-    </li>
-  {% endfor %}
+      </li>
+    {% endfor %}
+    {% for subject_item in data.subject %}
+      <li>
+  	    <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ subject_item|url_encode }}" target="_blank">{{ subject_item }}</a>
+      </li>
+    {% endfor %}
 </ul></dd>
 {% endif %}
 
-{# Subject - Local (str, pipe-separated) #}
-{{ _self.html_output_search('Subject', data.subject, 'descriptive_metadata_subjects') }}
+{# Geographic Subject - Linked Data (object: value + uri) and Non-linked data #}
+{% if data.geographic_subject_linked_data|length > 0 or data.geographic_subject|length > 0 %}
+<dt>Geographic Subject</dt>
+<dd><ul>
+  	{% for subject_item in data.geographic_subject_linked_data %}
+      <li>
+        {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
+          <a href="{{ subject_item.uri }}" target="_blank">{{ subject_item.value }}</a>
+    	{% else %}
+          {{ subject_item.value }}
+      {% endif %}
+      </li>
+    {% endfor %}
+    {% for subject_item in data.geographic_subject %}
+      <li>
+  	    <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ subject_item|url_encode }}" target="_blank">{{ subject_item }}</a>
+      </li>
+    {% endfor %}
+</ul></dd>
+{% endif %}
+
+{# Temporal Subject - Linked Data (object: value + uri) and Non-linked data #}
+{% if data.temporal_subject_linked_data|length > 0 or data.temporal_subject|length > 0 %}
+<dt>Temporal Subject</dt>
+<dd><ul>
+  	{% for subject_item in data.temporal_subject_linked_data %}
+      <li>
+        {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
+          <a href="{{ subject_item.uri }}" target="_blank">{{ subject_item.value }}</a>
+    	{% else %}
+          {{ subject_item.value }}
+      {% endif %}
+      </li>
+    {% endfor %}
+    {% for subject_item in data.temporal_subject %}
+      <li>
+  	    <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ subject_item|url_encode }}" target="_blank">{{ subject_item }}</a>
+      </li>
+    {% endfor %}
+</ul></dd>
+{% endif %}
 
 {# Genre/Form - Linked Data (object: value + uri) #}
-{% if data.genre_form_linked_data|length > 0 %}
+{% if data.genre_form_linked_data|length > 0 or data.genre_form|length > 0 %}
 <dt>Genre</dt>
 <dd><ul>
-  {% for genre_item in data.genre_form_linked_data %}
-    <li>
-      {% if genre_item.uri is defined and genre_item.uri|length > 2 %}
-        <a href="{{ genre_item.uri }}" target="_blank">{{ genre_item.value }}</a>
-      {% else %}
-        {{ genre_item.value }}
+  	{% for genre_item in data.genre_form_linked_data %}
+      <li>
+        {% if genre_item.uri is defined and genre_item.uri|length > 2 %}
+          <a href="{{ genre_item.uri }}" target="_blank">{{ genre_item.value }}</a>
+    	{% else %}
+          {{ genre_item.value }}
       {% endif %}
-    </li>
-  {% endfor %}
+      </li>
+    {% endfor %}
+    {% for genre_item in data.genre_form %}
+      <li>
+  	    {{ genre_item }}
+      </li>
+    {% endfor %}
 </ul></dd>
 {% endif %}
-
-{# Genre/Form - Local (str) #}
-{{ _self.html_output('Genre', data.genre_form) }}
 
 {# Content Type and ADO Type #}
 {{ _self.html_output('Content Type', data.content_type) }}
@@ -486,7 +532,14 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {{ _self.html_output('Physical Collection', data.physical_collection) }}
 {{ _self.html_output('Physical Location', data.physical_location) }}
 {{ _self.html_output('Collecting Area', data.collecting_area) }}
-{{ _self.html_output('Digital Exhibit', data.digital_exhibit) }}
+
+{# Digital Exhibit #}
+{% if data.digital_exhibit.value|length > 0 %}
+<dt>Digital Exhibit</dt>
+<dd>
+   <a href="{{ data.digital_exhibit.uri }}" target="_blank">{{ data.digital_exhibit.value }}</a>
+</dd>
+{% endif %}
 
 {# Identifier (object: value + authority) #}
 {% if data.identifier|length > 0 %}
