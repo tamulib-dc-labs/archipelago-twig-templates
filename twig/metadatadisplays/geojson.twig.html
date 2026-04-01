@@ -32,7 +32,7 @@
 {# 2. Construct the final Collection #}
 {% set collection = {
   "type": "FeatureCollection",
-  "features": feature ? [feature] : []
+  "features": [ data.geojson_feature ] ? : []
 } %}
 
 {# 3. Output as clean JSON #}
