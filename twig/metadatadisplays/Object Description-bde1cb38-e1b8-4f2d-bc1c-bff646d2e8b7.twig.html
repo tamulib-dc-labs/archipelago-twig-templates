@@ -383,6 +383,8 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 <dd>{{ date_issued }}</dd>
   {% endfor %}
 {% endif %}
+
+
 {# Remaining date fields #}
 {{ _self.html_output('Date Available', data.date_available) }}
 {{ _self.html_output('Date Available Online', data.date_digital_creation) }}
@@ -581,7 +583,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endif %}
 
 {# Related resources #}
-{{ _self.html_output('Related Item', data.related_item) }}
+{{ _self.html_output('Related Item', data.related_record) }}
 {{ _self.html_output('Related URL', data.related_url) }}
 {{ _self.html_output('Related URL (Historic)', data.related_url_historic) }}
 {{ _self.html_output('Original Publication', data.original_publication) }}
