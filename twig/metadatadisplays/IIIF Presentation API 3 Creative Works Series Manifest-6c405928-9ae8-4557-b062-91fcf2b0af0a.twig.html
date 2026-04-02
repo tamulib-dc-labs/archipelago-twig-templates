@@ -176,7 +176,7 @@ Without Double quotes.
             {% if data.date_built %}
             {
             "label": { "{{ len }}": ["Date Built"] },
-            "value": { "{{ len }}": [{{ data.date_built|json_encode|raw }}] }
+            "value": { "{{ len }}": [ {{ data.date_built|json_encode|raw }}] }
             },
             {% endif %}
             {% if data.date_created %}
@@ -212,25 +212,25 @@ Without Double quotes.
             {% if data.digital_exhibit %}
             {
             "label": { "{{ len }}": ["Part of Digital Exhibit"] },
-            "value": { "{{ len }}": [{{ data.digital_exhibit.value|json_encode|raw }}] }
+            "value": { "{{ len }}": [ {{ data.digital_exhibit.value|json_encode|raw }} ] }
             },
             {% endif %}
             {% if data.digital_publisher %}
             {
             "label": { "{{ len }}": ["Digital Publisher"] },
-            "value": { "{{ len }}": {{ data.digital_publisher|json_encode|raw }} }
+            "value": { "{{ len }}": [ {{ data.digital_publisher|json_encode|raw }} ] }
             },
             {% endif %}
             {% if data.extent %}
             {
             "label": { "{{ len }}": ["Extent"] },
-            "value": { "{{ len }}": {{ data.extent|json_encode|raw }} }
+            "value": { "{{ len }}": [ {{ data.extent|json_encode|raw }} ] }
             },
             {% endif %}
             {% if data.format %}
             {
             "label": { "{{ len }}": ["Format"] },
-            "value": { "{{ len }}": [{{ data.format|json_encode|raw }}] }
+            "value": { "{{ len }}": [ {{ data.format|json_encode|raw }} ] }
             },
             {% endif %}
             {% set genre_values = data.genre_form ? data.genre_form : [] %}
@@ -256,31 +256,31 @@ Without Double quotes.
             {% for item in attribute(data, 'identifier') %}
             {
             "label": { "{{ len }}": ["Identifier"] },
-            "value": { "{{ len }}": [{{ item.value|json_encode|raw }}] }
+            "value": { "{{ len }}": [ {{ item.value|json_encode|raw }} ] }
             },
             {% endfor %}
             {% if data.language %}
             {
             "label": { "{{ len }}": ["Language"] },
-            "value": { "{{ len }}": {{ data.language|json_encode|raw }} }
+            "value": { "{{ len }}": [ {{ data.language|json_encode|raw }} ] }
             },
             {% endif %}
             {% if data.local_department %}
             {
             "label": { "{{ len }}": ["Local Department"] },
-            "value": { "{{ len }}": {{ data.local_department|json_encode|raw }} }
+            "value": { "{{ len }}": [ {{ data.local_department|json_encode|raw }} ] }
             },
             {% endif %}
             {% if data.medium %}
             {
             "label": { "{{ len }}": ["Medium"] },
-            "value": { "{{ len }}": {{ data.medium|json_encode|raw }} }
+            "value": { "{{ len }}": [ {{ data.medium|json_encode|raw }} ] }
             },
             {% endif %}
             {% if data.note %}
             {
             "label": { "{{ len }}": ["Note"] },
-            "value": { "{{ len }}": {{ data.note|json_encode|raw }} }
+            "value": { "{{ len }}": [ {{ data.note|json_encode|raw }} ] }
             },
             {% endif %}
             {% if data.original_publication %}
