@@ -86,6 +86,7 @@ Without Double quotes.
 {# Top Object Metadata #}
 "@context": [
   "http://www.w3.org/ns/anno.jsonld",
+  "http://iiif.io/api/extension/navplace/context.json",
   "http://iiif.io/api/presentation/3/context.json"
 ],
 "type": "Manifest",
@@ -453,6 +454,15 @@ Without Double quotes.
         }
     ],
 {%- endif -%}
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+"navPlace": {
+  "id": "{{ nodeurl }}/iiif/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+},
+{% endif %}
 {# fetch all children using a View and attach them as Items #}
 "items": [
 {%- set itemCount = 0 %}

@@ -104,6 +104,7 @@ Without Double quotes.
 {%- set max_thumb_width = 240 -%}{
   "@context": [
   "http://www.w3.org/ns/anno.jsonld",
+  "http://iiif.io/api/extension/navplace/context.json",
   "http://iiif.io/api/presentation/3/context.json"
   ],
   "type": "Manifest",
@@ -440,6 +441,15 @@ Without Double quotes.
         }
     ],
 {%- endif -%}
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+"navPlace": {
+  "id": "{{ nodeurl }}/iiif/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+},
+{% endif %}
 "items": [
 {%- set document_count = attribute(data, 'as:document')|length -%}
 {%- set TotalpageCount = 0 -%}
@@ -530,6 +540,15 @@ Without Double quotes.
           ]
         }
       ]
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+,"navPlace": {
+  "id": "{{ nodeurl }}/iiif/{{ document['dr:uuid'] }}/canvas/p{{ pagenumber }}/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+}
+{% endif %}
     }{{ itemCount < TotalpageCount ? ',' : '' }}
 {% endfor %}
 {#- WIZARDLY UPDATED BY ARCHIPELAGO -#}
@@ -775,6 +794,15 @@ Without Double quotes.
        ]
       {% endif %}
 {#- ends Pure text, transcription, and Direct Image annotation -#}
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+,"navPlace": {
+  "id": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+}
+{% endif %}
     }{{ not loop.last ? ',' : '' }}
 {% endfor %}
 {#- Video Manifest -#}
@@ -885,6 +913,15 @@ Without Double quotes.
     }]
       {% endif %}
 {#- ends subtitle annotation -#}
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+,"navPlace": {
+  "id": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+}
+{% endif %}
     }{{ not loop.last ? ',' : '' }}
   {% endfor %}
 {% endif %}
@@ -931,6 +968,15 @@ Without Double quotes.
           ]
         }
       ]
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+,"navPlace": {
+  "id": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+}
+{% endif %}
     }{{ not loop.last ? ',' : '' }}
   {% endfor %}
 {% endif %}
