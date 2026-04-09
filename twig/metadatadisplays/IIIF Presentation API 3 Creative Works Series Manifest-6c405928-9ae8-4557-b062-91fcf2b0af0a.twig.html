@@ -463,6 +463,9 @@ Without Double quotes.
   ]
 },
 {% endif %}
+{% if data.date_built is defined and data.date_built matches '/^\\d{4}$/' %}
+"navDate": "{{ data.date_built }}-01-01T00:00:00Z",
+{% endif %}
 {# fetch all children using a View and attach them as Items #}
 "items": [
 {%- set itemCount = 0 %}
