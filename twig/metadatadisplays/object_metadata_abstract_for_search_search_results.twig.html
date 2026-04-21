@@ -4,7 +4,7 @@ Updated 31/10/2023 for 1.3.0
 -  Previously updated November 2021: trim output of data.description, add Rights Statement mapping, and show trimmed output for data.rights (local rights statement) #}
 
 {% if data.abstract or data.description | length > 0 %}
-<h4>Abstract</h4>
+<h3>Abstract</h3>
 
     {% if data.abstract %}
         <p>{{ data.abstract }}</p>
@@ -16,7 +16,7 @@ Updated 31/10/2023 for 1.3.0
 {% endif %}
 
   {% if data.creator or data.creator_lod or data.contributor or data.agent or data.agent_linked_data %}
-  <h4>Creators and contributors</h4>
+  <h3>Creators and contributors</h3>
   <div class="field-content">
     <ul>
       {# creator #}
@@ -59,7 +59,7 @@ Updated 31/10/2023 for 1.3.0
   {% endif %}
 
 {% if data.date_created or data.date_issued %}
-<h4>Date</h4>
+<h3>Date</h3>
 
     {% if data.date_created %}
         <p>{{ data.date_created|edtf_2_human_date }}</p>
