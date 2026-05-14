@@ -104,6 +104,7 @@ Without Double quotes.
 {%- set max_thumb_width = 240 -%}{
   "@context": [
   "http://www.w3.org/ns/anno.jsonld",
+  "http://iiif.io/api/extension/navplace/context.json",
   "http://iiif.io/api/presentation/3/context.json"
   ],
   "type": "Manifest",
@@ -437,19 +438,18 @@ Without Double quotes.
             "type": "SearchService1",
             "@context": "http://iiif.io/api/search/1/context.json",
             "profile": "http://iiif.io/api/search/1/search"
-        },
-        {
-            "id": "{{ baseurl }}iiifcontentsearch/v2/do/{{ node.uuid.value }}/metadatadisplayexposed/iiifmanifest/mode/advanced/page/0",
-            "type": "SearchService2"
-        },
-        {
-            "@id": "{{ baseurl }}iiifcontentsearch/v1/do/{{ node.uuid.value }}/metadatadisplayexposed/iiifmanifest/mode/advanced/page/0",
-            "@context": "http://iiif.io/api/search/0/context.json",
-            "type": "SearchService0",
-            "profile": "http://iiif.io/api/search/0/search"
         }
     ],
 {%- endif -%}
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+"navPlace": {
+  "id": "{{ nodeurl }}/iiif/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+},
+{% endif %}
 "items": [
 {%- set document_count = attribute(data, 'as:document')|length -%}
 {%- set TotalpageCount = 0 -%}
@@ -540,6 +540,15 @@ Without Double quotes.
           ]
         }
       ]
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+,"navPlace": {
+  "id": "{{ nodeurl }}/iiif/{{ document['dr:uuid'] }}/canvas/p{{ pagenumber }}/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+}
+{% endif %}
     }{{ itemCount < TotalpageCount ? ',' : '' }}
 {% endfor %}
 {#- WIZARDLY UPDATED BY ARCHIPELAGO -#}
@@ -657,7 +666,11 @@ Without Double quotes.
 {% if data.annotations[0].transcribing[loop.index0] is defined %}
   {% set transcription = data.annotations[0].transcribing[loop.index0] %}
 {% endif %}
-{% if texts|length > 0 or transcription or data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
+{% set reasoning = null %}
+{% if data.annotations[0].reasoning[loop.index0] is defined %}
+  {% set reasoning = data.annotations[0].reasoning[loop.index0] %}
+{% endif %}
+{% if texts|length > 0 or transcription or reasoning or data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
        ,
        "annotations": [
   {%- if texts|length > 0 -%}
@@ -708,8 +721,29 @@ Without Double quotes.
               ]
             }
   {% endif %}
-  {% if data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
+  {% if reasoning %}
     {%- if texts|length > 0 or transcription -%},{% endif %}
+            {
+              "id": "{{ nodeurl }}/iiif/reasoning/p{{ itemCount }}",
+              "type": "AnnotationPage",
+              "items": [
+                {
+                  "id": "{{ nodeurl }}/iiif/reasoning/p{{ itemCount }}/1",
+                  "type": "Annotation",
+                  "motivation": "tagging",
+                  "body": {
+                    "type": "TextualBody",
+                    "value": {{ reasoning.value|json_encode|raw }},
+                    "format": {{ reasoning.mime_type|json_encode|raw }},
+                    "language": "none"
+                  },
+                  "target": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}"
+                }
+              ]
+            }
+  {% endif %}
+  {% if data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
+    {%- if texts|length > 0 or transcription or reasoning -%},{% endif %}
             {
               "id": "{{ nodeurl }}/iiif/comments/p{{ itemCount }}",
               "type": "AnnotationPage",
@@ -760,6 +794,15 @@ Without Double quotes.
        ]
       {% endif %}
 {#- ends Pure text, transcription, and Direct Image annotation -#}
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+,"navPlace": {
+  "id": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+}
+{% endif %}
     }{{ not loop.last ? ',' : '' }}
 {% endfor %}
 {#- Video Manifest -#}
@@ -870,6 +913,15 @@ Without Double quotes.
     }]
       {% endif %}
 {#- ends subtitle annotation -#}
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+,"navPlace": {
+  "id": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+}
+{% endif %}
     }{{ not loop.last ? ',' : '' }}
   {% endfor %}
 {% endif %}
@@ -916,6 +968,15 @@ Without Double quotes.
           ]
         }
       ]
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+,"navPlace": {
+  "id": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+}
+{% endif %}
     }{{ not loop.last ? ',' : '' }}
   {% endfor %}
 {% endif %}

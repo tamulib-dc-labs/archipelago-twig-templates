@@ -99,10 +99,12 @@ Without Double quotes.
 {{ node.label|json_encode|raw }}
 ]
 },
+{% if data.attribution %}
 "requiredStatement": {
-"label": { "en": [ "Attribution" ] },
-"value": { "en": [ "Provided by Archipelago Deployment" ] }
+    "label": { "en": [ "Attribution" ] },
+    "value": { "en": [ {{ data.attribution|json_endcode_raw }} ] }
 },
+{% endif %}
 "rights": {{ computed_rights|json_encode|raw }},
 "metadata": [
 {% for agent in attribute(data, 'edm_agent') %}
@@ -190,19 +192,10 @@ Without Double quotes.
 {%- if node.uuid.value -%} 
     "service": [
         { 
-            "id": "{{ baseurl }}iiifcontentsearch/v2/do/{{ node.uuid.value }}/metadatadisplayexposed/iiifmanifest3cws_multiple/mode/advanced/page/0",
-            "type": "SearchService2" 
-        }, 
-        { 
             "id": "{{ baseurl }}iiifcontentsearch/v1/do/{{ node.uuid.value }}/metadatadisplayexposed/iiifmanifest3cws_multiple/mode/advanced/page/0",
             "type": "SearchService1", 
             "@context": "http://iiif.io/api/search/1/context.json", 
             "profile": "http://iiif.io/api/search/1/search" 
-        }, 
-        { 
-            "@id": "{{ baseurl }}iiifcontentsearch/v1/do/{{ node.uuid.value }}/metadatadisplayexposed/iiifmanifest3cws_multiple/mode/advanced/page/0",
-            "@context": "http://iiif.io/api/search/0/context.json", 
-            "profile": "http://iiif.io/api/search/0/search" 
         }
     ],
 {%- endif -%}
