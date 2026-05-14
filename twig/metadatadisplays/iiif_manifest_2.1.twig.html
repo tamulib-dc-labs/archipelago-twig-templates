@@ -243,6 +243,12 @@ Updated Dec 14th 2020
       "value": {{ data.physical_location|json_encode|raw }}
     },
     {% endif %}
+    {% if data.place_of_origin %}
+    {
+      "label": "Place of Origin",
+      "value": {{ data.place_of_origin|json_encode|raw }}
+    },
+    {% endif %}
     {% if data.projection %}
     {
       "label": "Projection",
