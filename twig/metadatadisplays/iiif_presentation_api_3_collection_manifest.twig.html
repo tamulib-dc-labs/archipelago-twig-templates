@@ -303,6 +303,12 @@ Without Double quotes.
         "value": { "{{ len }}": [{{ data.physical_location|json_encode|raw }}] }
         },
         {% endif %}
+        {% if data.place_of_origin %}
+        {
+        "label": { "{{ len }}": ["Place of Origin"] },
+        "value": { "{{ len }}": [{{ data.place_of_origin|json_encode|raw }}] }
+        },
+        {% endif %}
         {% if data.projection %}
         {
         "label": { "{{ len }}": ["Projection"] },
