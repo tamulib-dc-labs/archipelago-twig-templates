@@ -1,0 +1,21 @@
+{#- Simple card thumbnail — plain img, no IIIF viewer scripts -#}
+{% set width = 240 %}
+{% set IIIFserverurl = iiif_server ? iiif_server ~ "/" : "" %}
+{% set source = "" %}
+{% if attribute(data, "as:image")|length > 0 %}
+{% set document = data["as:image"]|first %}
+{% set cantaloupeid = IIIFserverurl ~ document["url"]|replace({"s3://":""})|replace({"private://":""})|url_encode %}
+{% set source = cantaloupeid ~ "/full/" ~ width ~ ",/0/default.jpg" %}
+{% elseif attribute(data, "as:document")|length > 0 %}
+{% for document in data["as:document"] %}
+{% if source == "" and document["flv:exif"].MIMEType == "application/pdf" %}
+{% set cantaloupeid = IIIFserverurl ~ document["url"]|replace({"s3://":""})|replace({"private://":""})|url_encode %}
+{% set source = cantaloupeid ~ ";1/full/" ~ width ~ ",/0/default.jpg" %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% if source %}
+<img src="{{ source }}" alt="{{ data.label ?? node.label.value }}" width="{{ width }}" class="img-fluid">
+{% else %}
+<i class="fas fa-archive fa-4x" style="display:block;text-align:center;padding-top:40%;color:rgba(255,255,255,0.5);"></i>
+{% endif %}
