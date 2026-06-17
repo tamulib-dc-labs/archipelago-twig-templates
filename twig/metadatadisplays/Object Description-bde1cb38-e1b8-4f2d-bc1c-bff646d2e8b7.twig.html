@@ -338,11 +338,10 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
   {% if data.agent_linked_data|length > 0 %}
   	{% for agent in data.agent_linked_data %}
       <li>
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ agent.value|url_encode }}" target="_blank">{{ agent.value }}</a>
         {% if agent.uri is defined and agent.uri|length > 2 %}
-          <a href="{{ agent.uri }}" target="_blank">{{ agent.value }}</a>
-    	{% else %}
-          {{ agent.value }}
-      {% endif %}
+          <a href="{{ agent.uri }}" target="_blank">🔗</a>
+        {% endif %}
       </li>
     {% endfor %}
   {% endif %}
