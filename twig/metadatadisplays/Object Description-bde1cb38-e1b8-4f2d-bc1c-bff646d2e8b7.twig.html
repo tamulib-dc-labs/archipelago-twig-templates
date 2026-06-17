@@ -399,11 +399,10 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 <dd><ul>
   	{% for subject_item in data.subject_linked_data %}
       <li>
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ subject_item.value|url_encode }}" target="_blank">{{ subject_item.value }}</a>
         {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
-          <a href="{{ subject_item.uri }}" target="_blank">{{ subject_item.value }}</a>
-    	{% else %}
-          {{ subject_item.value }}
-      {% endif %}
+          <a href="{{ subject_item.uri }}" target="_blank">🔗</a>
+        {% endif %}
       </li>
     {% endfor %}
     {% for subject_item in data.subject %}
@@ -420,11 +419,10 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 <dd><ul>
   	{% for subject_item in data.geographic_subject_linked_data %}
       <li>
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ subject_item.value|url_encode }}" target="_blank">{{ subject_item.value }}</a>
         {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
-          <a href="{{ subject_item.uri }}" target="_blank">{{ subject_item.value }}</a>
-    	{% else %}
-          {{ subject_item.value }}
-      {% endif %}
+          <a href="{{ subject_item.uri }}" target="_blank">🔗</a>
+        {% endif %}
       </li>
     {% endfor %}
     {% for subject_item in data.geographic_subject %}
@@ -441,11 +439,10 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 <dd><ul>
   	{% for subject_item in data.temporal_subject_linked_data %}
       <li>
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ subject_item.value|url_encode }}" target="_blank">{{ subject_item.value }}</a>
         {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
-          <a href="{{ subject_item.uri }}" target="_blank">{{ subject_item.value }}</a>
-    	{% else %}
-          {{ subject_item.value }}
-      {% endif %}
+          <a href="{{ subject_item.uri }}" target="_blank">🔗</a>
+        {% endif %}
       </li>
     {% endfor %}
     {% for subject_item in data.temporal_subject %}
