@@ -336,12 +336,21 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     {% endif %}
   {% endif %}
   {% if data.agent_linked_data|length > 0 %}
-  	{% for agent in data.agent_linked_data %}
+    {% set agent_grouped = {} %}
+    {% for agent in data.agent_linked_data %}
+      {% if agent_grouped[agent.value] is not defined %}
+        {% set agent_grouped = agent_grouped|merge({(agent.value): []}) %}
+      {% endif %}
+      {% if agent.uri is defined and agent.uri|length > 2 %}
+        {% set agent_grouped = agent_grouped|merge({(agent.value): agent_grouped[agent.value]|merge([agent.uri])}) %}
+      {% endif %}
+    {% endfor %}
+    {% for label, uris in agent_grouped %}
       <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ agent.value|url_encode }}" target="_blank">{{ agent.value }}</a>
-        {% if agent.uri is defined and agent.uri|length > 2 %}
-          <a href="{{ agent.uri }}" target="_blank">🔗</a>
-        {% endif %}
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
+        {% for uri in uris %}
+          <a href="{{ uri }}" target="_blank">🔗</a>
+        {% endfor %}
       </li>
     {% endfor %}
   {% endif %}
@@ -397,12 +406,21 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% if data.subject_linked_data|length > 0 or data.subject|length > 0 %}
 <dt>Subject</dt>
 <dd><ul>
-  	{% for subject_item in data.subject_linked_data %}
+  	{% set subject_grouped = {} %}
+    {% for subject_item in data.subject_linked_data %}
+      {% if subject_grouped[subject_item.value] is not defined %}
+        {% set subject_grouped = subject_grouped|merge({(subject_item.value): []}) %}
+      {% endif %}
+      {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
+        {% set subject_grouped = subject_grouped|merge({(subject_item.value): subject_grouped[subject_item.value]|merge([subject_item.uri])}) %}
+      {% endif %}
+    {% endfor %}
+    {% for label, uris in subject_grouped %}
       <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ subject_item.value|url_encode }}" target="_blank">{{ subject_item.value }}</a>
-        {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
-          <a href="{{ subject_item.uri }}" target="_blank">🔗</a>
-        {% endif %}
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
+        {% for uri in uris %}
+          <a href="{{ uri }}" target="_blank">🔗</a>
+        {% endfor %}
       </li>
     {% endfor %}
     {% for subject_item in data.subject %}
@@ -417,12 +435,21 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% if data.geographic_subject_linked_data|length > 0 or data.geographic_subject|length > 0 %}
 <dt>Geographic Subject</dt>
 <dd><ul>
-  	{% for subject_item in data.geographic_subject_linked_data %}
+  	{% set geo_grouped = {} %}
+    {% for subject_item in data.geographic_subject_linked_data %}
+      {% if geo_grouped[subject_item.value] is not defined %}
+        {% set geo_grouped = geo_grouped|merge({(subject_item.value): []}) %}
+      {% endif %}
+      {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
+        {% set geo_grouped = geo_grouped|merge({(subject_item.value): geo_grouped[subject_item.value]|merge([subject_item.uri])}) %}
+      {% endif %}
+    {% endfor %}
+    {% for label, uris in geo_grouped %}
       <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ subject_item.value|url_encode }}" target="_blank">{{ subject_item.value }}</a>
-        {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
-          <a href="{{ subject_item.uri }}" target="_blank">🔗</a>
-        {% endif %}
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
+        {% for uri in uris %}
+          <a href="{{ uri }}" target="_blank">🔗</a>
+        {% endfor %}
       </li>
     {% endfor %}
     {% for subject_item in data.geographic_subject %}
@@ -437,12 +464,21 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% if data.temporal_subject_linked_data|length > 0 or data.temporal_subject|length > 0 %}
 <dt>Temporal Subject</dt>
 <dd><ul>
-  	{% for subject_item in data.temporal_subject_linked_data %}
+  	{% set temporal_grouped = {} %}
+    {% for subject_item in data.temporal_subject_linked_data %}
+      {% if temporal_grouped[subject_item.value] is not defined %}
+        {% set temporal_grouped = temporal_grouped|merge({(subject_item.value): []}) %}
+      {% endif %}
+      {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
+        {% set temporal_grouped = temporal_grouped|merge({(subject_item.value): temporal_grouped[subject_item.value]|merge([subject_item.uri])}) %}
+      {% endif %}
+    {% endfor %}
+    {% for label, uris in temporal_grouped %}
       <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ subject_item.value|url_encode }}" target="_blank">{{ subject_item.value }}</a>
-        {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
-          <a href="{{ subject_item.uri }}" target="_blank">🔗</a>
-        {% endif %}
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
+        {% for uri in uris %}
+          <a href="{{ uri }}" target="_blank">🔗</a>
+        {% endfor %}
       </li>
     {% endfor %}
     {% for subject_item in data.temporal_subject %}
