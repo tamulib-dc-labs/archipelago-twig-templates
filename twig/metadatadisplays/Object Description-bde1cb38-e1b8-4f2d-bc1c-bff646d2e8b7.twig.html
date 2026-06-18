@@ -388,7 +388,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% if all_date_issued|length > 0 %}
 <dt>Date Issued</dt>
   {% for date_issued in all_date_issued %}
-<dd>{{ date_issued }}</dd>
+<dd>{{ date_issued|edtf_2_human_date }}</dd>
   {% endfor %}
 {% endif %}
 
