@@ -493,18 +493,26 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% if data.genre_form_linked_data|length > 0 or data.genre_form|length > 0 %}
 <dt>Genre</dt>
 <dd><ul>
-  	{% for genre_item in data.genre_form_linked_data %}
-      <li>
-        {% if genre_item.uri is defined and genre_item.uri|length > 2 %}
-          <a href="{{ genre_item.uri }}" target="_blank">{{ genre_item.value }}</a>
-    	{% else %}
-          {{ genre_item.value }}
+    {% set genre_grouped = {} %}
+    {% for genre_item in data.genre_form_linked_data %}
+      {% if genre_grouped[genre_item.value] is not defined %}
+        {% set genre_grouped = genre_grouped|merge({(genre_item.value): []}) %}
       {% endif %}
+      {% if genre_item.uri is defined and genre_item.uri|length > 2 %}
+        {% set genre_grouped = genre_grouped|merge({(genre_item.value): genre_grouped[genre_item.value]|merge([genre_item.uri])}) %}
+      {% endif %}
+    {% endfor %}
+    {% for label, uris in genre_grouped %}
+      <li>
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_genre%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
+        {% for uri in uris %}
+          <a href="{{ uri }}" target="_blank">🔗</a>
+        {% endfor %}
       </li>
     {% endfor %}
     {% for genre_item in data.genre_form %}
       <li>
-  	    {{ genre_item }}
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_genre%3A{{ genre_item|url_encode }}" target="_blank">{{ genre_item }}</a>
       </li>
     {% endfor %}
 </ul></dd>
