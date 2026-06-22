@@ -14,83 +14,96 @@
 
 {# Creators and Contributors #}
 {% if data.creator %}
-{% for item in data.creator %}
-<name>
-  <namePart>{{ item }}</namePart>
-  <role>
-    <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
-  </role>
-</name>
-{% endfor %}
+  {% for item in data.creator %}
+    <name>
+      <namePart>{{ item }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
 {% endif %}
 {% if data.contributor %}
-{% for item in data.contributor %}
-<name>
-  <namePart>{{ item }}</namePart>
-  <role>
-    <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
-  </role>
-</name>
-{% endfor %}
+  {% for item in data.contributor %}
+    <name>
+      <namePart>{{ item }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
 {% endif %}
 {% if data.agent %}
-{% for agent in data.agent %}
-<name>
-  <namePart>{{ agent.value }}</namePart>
-  <role>
-		<roleTerm valueURI="{{ agent.role_uri }}" authority= "marcrelator" type="text">{{ agent.role }}</roleTerm>
-	</role>
-</name>
-{% endfor %}
+    {% for agent in data.agent %}
+    <name>
+        <namePart>{{ agent.value }}</namePart>
+        <role>
+			<roleTerm valueURI="{{ agent.role_uri }}" authority= "marcrelator" type="text">{{ agent.role }}</roleTerm>
+		</role>
+    </name>
+    {% endfor %}
 {% endif %}
 {% if data.agent_linked_data %}
-{% for agent in data.agent_linked_data %}
-<name valueURI="{{ agent.uri }}">
-  <namePart>{{ agent.value }}</namePart>
-  <role>
-    <roleTerm valueURI="{{ agent.role_uri }}" authority="marcrelator" type="text">{{ agent.role }}</roleTerm>
-  </role>
-</name>
-{% endfor %}
+  {% for agent in data.agent_linked_data %}
+    <name valueURI="{{ agent.uri }}">
+      <namePart>{{ agent.value }}</namePart>
+      <role>
+        <roleTerm valueURI="{{ agent.role_uri }}" authority="marcrelator" type="text">{{ agent.role }}</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
+{% endif %}
+{% if data.creator_linked_data %}
+  {% for creator in data.creator_linked_data %}
+    <name valueURI="{{ creator.uri }}">
+      <namePart>{{ creator.value }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
+{% endif %}
+{% if data.contributor_linked_data %}
+  {% for contributor in data.contributor_linked_data %}
+    <name valueURI="{{ contributor.uri }}">
+      <namePart>{{ contributor.value }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
 {% endif %}
 {% if data.local_department %}
-{% for item in data.local_department %}
-<name>
-  <namePart>{{ item }}</namePart>
-  <role>
-    <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
-  </role>
-</name>
-{% endfor %}
+  {% for item in data.local_department %}
+    <name>
+      <namePart>{{ item }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
 {% endif %}
 {% if data.sponsorship %}
-{% for item in data.sponsorship %}
-<name>
-  <namePart>{{ item }}</namePart>
-  <role>
-    <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/spn" authority="marcrelator" type="text">sponsor</roleTerm>
-  </role>
-</name>
-{% endfor %}
+  {% for item in data.sponsorship %}
+    <name>
+      <namePart>{{ item }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/spn" authority="marcrelator" type="text">sponsor</roleTerm>
+      </role>
+    </name>
+  {% endfor %}
 {% endif %}
 
 {# Type of Resource #}
 {% if data.content_type %}
-{% for item in data.content_type %}
-<typeOfResource>{{ item }}</typeOfResource>
-{% endfor %}
+	{% for item in data.content_type %}
+    	<typeOfResource>{{ item }}</typeOfResource>
+    {% endfor %}
 {% endif %}
 <typeOfResource>{{ data.type|escape('html_attr') }}</typeOfResource>
 
 {# Origin Info #}
 <originInfo>
-{% if data.place_of_origin %}
-{% for place in data.place_of_origin %}
-  <place>
-    <placeTerm>{{ place }}</placeTerm>
-  </place>
-{% endfor %}
-{% endif %}
 {% if data.date_created|length > 0 %}
 	<dateCreated>{{ data.date_created|date("Y-m-d") }}</dateCreated>
 {% endif %}
@@ -114,88 +127,91 @@
 
 {# Physical Description #}
 <physicalDescription>
-  <form authority="marcform">electronic</form>
-  <form authority="gmd">electronic resource</form>
+<form authority="marcform">electronic</form>
+<form authority="gmd">electronic resource</form>
 {% if data.extent %}
-{% for extent in data.extent %}
-  <extent>{{ extent }}</extent>
-{% endfor %}
+	{% for extent in data.extent %}
+        <extent>{{ extent }}</extent>
+    {% endfor %}
 {% endif %}
 {% if data.format %}
-  <digitalOrigin>{{ data.format }}</digitalOrigin>
+    <digitalOrigin>{{ data.format }}</digitalOrigin>
+{% endif %}
+{% if data.digital_origin %}
+    <digitalOrigin>{{ data.digital_origin }}</digitalOrigin>
 {% endif %}
 {% if data.medium %}
-{% for item in data.medium %}
-  <form>{{ item }}</form>
-{% endfor %}
+	{% for item in data.medium %}
+  		<form>{{ item }}</form>
+   	{% endfor %}
 {% endif %}
 {% if data.mimetype %}
 	{% for item in data.mimetype %}
-  <internetMediaType>{{ item }}</internetMediaType>
-{% endfor %}
+		<internetMediaType>{{ item }}</internetMediaType>
+    {% endfor %}
 {% endif %}
 </physicalDescription>
 
 {# Genre #}
 {% if data.genre_form %}
-{% for item in data.genre_form %}
-<genre>{{ item }}</genre>
-{% endfor %}
+  {% for item in data.genre_form %}
+    <genre>{{ item }}</genre>
+  {% endfor %}
 {% endif %}
 {% if data.genre_form_linked_data %}
-{% for item in data.genre_form_linked_data %}
-<genre valueURI="{{ item.uri }}">{{ item.value }}</genre>
-{% endfor %}
+  {% for item in data.genre_form_linked_data %}
+    <genre valueURI="{{ item.uri }}">{{ item.value }}</genre>
+  {% endfor %}
 {% endif %}
 
 {# Subject #}
 {% if data.geographic_subject %}
-{% for item in data.geographic_subject %}
-<subject><geographic>{{ item }}</geographic></subject>
-{% endfor %}
+  {% for item in data.geographic_subject %}
+    <subject><geographic>{{ item }}</geographic></subject>
+  {% endfor %}
 {% endif %}
 {% if data.geographic_subject_linked_data %}
-{% for item in data.geographic_subject_linked_data %}
-<subject><geographic valueURI="{{ item.uri }}">{{ item.value }}</geographic></subject>
-{% endfor %}
+  {% for item in data.geographic_subject_linked_data %}
+    <subject><geographic valueURI="{{ item.uri }}">{{ item.value }}</geographic></subject>
+  {% endfor %}
 {% endif %}
 {% if data.subject %}
-{% for item in data.subject %}
-<subject><topic>{{ item }}</topic></subject>
-{% endfor %}
+  {% for item in data.subject %}
+    <subject><topic>{{ item }}</topic></subject>
+  {% endfor %}
 {% endif %}
 {% if data.subject_linked_data %}
-{% for item in data.subject_linked_data %}
-<subject><topic valueURI="{{ item.uri }}">{{ item.value }}</topic></subject>
-{% endfor %}
+  {% for item in data.subject_linked_data %}
+    <subject><topic valueURI="{{ item.uri }}">{{ item.value }}</topic></subject>
+  {% endfor %}
 {% endif %}
 {% if data.temporal_subject %}
-{% for item in data.temporal_subject %}
-<subject><temporal>{{ item }}</temporal></subject>
-{% endfor %}
+  {% for item in data.temporal_subject %}
+    <subject><temporal>{{ item }}</temporal></subject>
+  {% endfor %}
 {% endif %}
 {% if data.temporal_subject_linked_data %}
-{% for item in data.temporal_subject_linked_data %}
-<subject><temporal valueURI="{{ item.uri }}">{{ item.value }}</temporal></subject>
-{% endfor %}
+  {% for item in data.temporal_subject_linked_data %}
+    <subject><temporal valueURI="{{ item.uri }}">{{ item.value }}</temporal></subject>
+  {% endfor %}
 {% endif %}
 {% if data.coordinates %}
 <subject>
-  <cartographics>
-    <cartographicExtension>{{ data.coordinates|escape('html_attr') }}</cartographicExtension>
-  </cartographics>
+    <cartographics>
+        <cartographicExtension>{{ data.coordinates|escape('html_attr') }}</cartographicExtension>
+    </cartographics>
 </subject>
 {% endif %}
 
 {# Location #}
 {% if data.physical_location %}
-<location>
-  <holdingSimple>
-    <copyInformation>
-      <shelfLocator>{{ data.physical_location }}</shelfLocator>
-    </copyInformation>
-  </holdingSimple>
-</location>
+  <location>
+    <holdingSimple>
+      <copyInformation>
+        <shelfLocator>{{ data.physical_location }}</shelfLocator>
+      </copyInformation>
+    </holdingSimple>
+  </location>
 {% endif %}
 <location>
     {% if node.id %}
@@ -209,30 +225,30 @@
 
 {# Table of Contents #}
 {% if data.table_of_contents %}
-<tableOfContents>{{ data.table_of_contents }}</tableOfContents>
+  <tableOfContents>{{ data.table_of_contents }}</tableOfContents>
 {% endif %}
 
 {# Audience #}
 {% if data.audience %}
-{% for item in data.audience %}
-<targetAudience>{{ item }}</targetAudience>
-{% endfor %}
+  {% for item in data.audience %}
+    <targetAudience>{{ item }}</targetAudience>
+  {% endfor %}
 {% endif %}
 
 {# Classification #}
 {% if data.classification %}
 <classification authority="{{ data.classification.authority }}">
-  {{ data.classification.value }}
+    {{ data.classification.value }}
 </classification>
 {% endif %}
 
 {# Language #}
 {% if data.language %}
-{% for language in data.language %}
-<language>
-	<languageTerm type="text" authority="iso639-2b">{{ language }}</languageTerm>
-</language>
-{% endfor %}
+	{% for language in data.language %}
+		<language>
+			<languageTerm type="text" authority="iso639-2b">{{ language }}</languageTerm>
+		</language>
+	{% endfor %}
 {% endif %}	
 
 {# Abstract #}
@@ -244,95 +260,95 @@
 
 {# Note #}
 {% if data.date_built %}
-<note displayLabel="Date Built">{{ data.date_built }}</note>
+  <note displayLabel="Date Built">{{ data.date_built }}</note>
 {% endif %}
 {% if data.date_razed %}
-<note displayLabel="Date Razed">{{ data.date_razed }}</note>
+  <note displayLabel="Date Razed">{{ data.date_razed }}</note>
 {% endif %}
 {% if data.projection %}
-<note displayLabel="Projection">{{ data.projection }}</note>
+  <note displayLabel="Projection">{{ data.projection }}</note>
 {% endif %}
 {% if data.state_edition %}
-<note displayLabel="State/Edition of Map">{{ data.state_edition }}</note>
+  <note displayLabel="State/Edition of Map">{{ data.state_edition }}</note>
 {% endif %}
 {% if data.digital_publisher %}
-<note displayLabel="Digital publisher">{{ data.digital_publisher }}</note>
+  <note displayLabel="Digital publisher">{{ data.digital_publisher }}</note>
 {% endif %}
 {% if data.note %}
-{% for item in data.note %}
-<note>{{ item }}</note>
-{% endfor %}
+  {% for item in data.note %}
+    <note>{{ item }}</note>
+  {% endfor %}
 {% endif %}
 {% if data.provenance %}
-<note>{{ data.provenance }}</note>
+   <note>{{ data.provenance }}</note>
 {% endif %}
 {% if data.description %}
-{% for item in data.description %}
-<note>{{ item }}</note>
-{% endfor %}
+  {% for item in data.description %}
+    <note>{{ item }}</note>
+  {% endfor %}
 {% endif %}	
 
 {# Related Item #}
 {% if data.collecting_area %}
-{% for item in data.collecting_area %}
-<relatedItem type="host">
-  <titleInfo>
-    <title>{{ item }}</title>
-  </titleInfo>
-</relatedItem>
-{% endfor %}
+  {% for item in data.collecting_area %}
+    <relatedItem type="host">
+      <titleInfo>
+        <title>{{ item }}</title>
+      </titleInfo>
+    </relatedItem>
+  {% endfor %}
 {% endif %}
 {% if data.digital_exhibit %}
-{% for item in data.digital_exhibit %}
-<relatedItem type="host">
-  <titleInfo>
-    <title>{{ item.value }}</title>
-  </titleInfo>
-</relatedItem>
-{% endfor %}
+  {% for item in data.digital_exhibit %}
+    <relatedItem type="host">
+      <titleInfo>
+        <title>{{ item.value }}</title>
+      </titleInfo>
+    </relatedItem>
+  {% endfor %}
 {% endif %}
 {% if data.original_publication %}
-{% for item in data.original_publication %}
-<relatedItem>
-  <titleInfo><title>{{ item }}</title></titleInfo>
-</relatedItem>
-{% endfor %}
+  {% for item in data.original_publication %}
+    <relatedItem>
+      <titleInfo><title>{{ item }}</title></titleInfo>
+    </relatedItem>
+  {% endfor %}
 {% endif %}
 {% if data.physical_collection %}
-<relatedItem type="host">
-  <titleInfo><title>{{ data.physical_collection }}</title></titleInfo>
-</relatedItem>
+ <relatedItem type="host">
+    <titleInfo><title>{{ data.physical_collection }}</title></titleInfo>
+  </relatedItem>
 {% endif %}
 {% if data.related_record %}
-{% for item in data.related_record %}
-<relatedItem type="isReferencedBy" displayLabel="Catalog Record">
-  <location><url>{{ item }}</url></location>
-</relatedItem>
-{% endfor %}
+  {% for item in data.related_record %}
+    <relatedItem type="isReferencedBy" displayLabel="Catalog Record">
+      <location><url>{{ item }}</url></location>
+    </relatedItem>
+  {% endfor %}
 {% endif %}
 {% if data.related_url %}
-<relatedItem type="references">
-  <location><url>{{ data.related_url }}</url></location>
-</relatedItem>
+  <relatedItem type="references">
+    <location><url>{{ data.related_url }}</url></location>
+  </relatedItem>
 {% endif %}
 {% if data.related_url_historic %}
-<relatedItem type="references">
-  <location><url>{{ data.related_url_historic }}</url></location>
-</relatedItem>
+  <relatedItem type="references">
+    <location><url>{{ data.related_url_historic }}</url></location>
+  </relatedItem>
 {% endif %}
 
 {# Rights Statements #}
 {% if data.rights|length > 0 %} 	
-<accessCondition type="use and reproduction" displayLabel="Rights Statement">{{ data.rights }}</accessCondition>
+	<accessCondition type="use and reproduction" displayLabel="Rights Statement">{{ data.rights }}</accessCondition>
 {% endif %}
 {% if data.rights_details %}
-<accessCondition type="use and reproduction">
-  {{ data.rights_details }}
-</accessCondition>
+  <accessCondition type="use and reproduction">
+    {{ data.rights_details }}
+  </accessCondition>
 {% endif %}
 {% if data.access_rights %}
 <accessCondition type="restriction on access">
-  {{ data.access_rights }}
+    {{ data.access_rights }}
 </accessCondition>
 {% endif %}
 

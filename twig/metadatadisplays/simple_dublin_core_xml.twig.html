@@ -23,12 +23,22 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {% endif %}
 {% if data.agent|length > 0 %}
 	{% for agent in data.agent %}
-     	<dc:creator>{{ agent.value }}</dc:creator>
+     	<dc:contributor>{{ agent.value }}</dc:contributor>
 	{% endfor %}
 {% endif %}
 {% if data.agent_linked_data|length > 0 %}
 	{% for agent in data.agent_linked_data %}
-     	<dc:creator>{{ agent.value }}</dc:creator>
+     	<dc:contributor>{{ agent.value }}</dc:contributor>
+	{% endfor %}
+{% endif %}
+{% if data.creator_linked_data|length > 0 %}
+	{% for creator in data.creator_linked_data %}
+     	<dc:creator>{{ creator.value }}</dc:creator>
+	{% endfor %}
+{% endif %}
+{% if data.contributor_linked_data|length > 0 %}
+	{% for contributor in data.contributor_linked_data %}
+     	<dc:contributor>{{ contributor.value }}</dc:contributor>
 	{% endfor %}
 {% endif %}
 {# Sponsorship #}
@@ -67,6 +77,9 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {% endif %}
 {% if data.format|length > 0 %}
    <dc:format>{{ data.format }}</dc:format>
+{% endif %}
+{% if data.digital_origin|length > 0 %}
+   <dc:format>{{ data.digital_origin }}</dc:format>
 {% endif %}
 {% if data.medium|length > 0 %}
   {% for medium in data.medium %}
