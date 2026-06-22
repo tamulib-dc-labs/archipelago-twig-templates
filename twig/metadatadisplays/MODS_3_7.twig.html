@@ -104,6 +104,13 @@
 
 {# Origin Info #}
 <originInfo>
+{% if data.place_of_origin %}
+  {% for place in data.place_of_origin %}
+  <place>
+    <placeTerm>{{ place }}</placeTerm>
+  </place>
+  {% endfor %}
+{% endif %}
 {% if data.date_created|length > 0 %}
 	<dateCreated>{{ data.date_created|date("Y-m-d") }}</dateCreated>
 {% endif %}
