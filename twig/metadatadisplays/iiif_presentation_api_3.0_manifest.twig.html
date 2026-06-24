@@ -431,11 +431,9 @@ Without Double quotes.
     }
   ],
 {% if attribute(data, 'ismemberof') -%}
-  "within": "{{ parentcollectionurl }}",
   "partOf": [ { "id": "{{ parentcollectionurl }}/metadata/iiifmanifest3collection/default.jsonld", "type": "Manifest" } ],
 {%- endif -%}
 {%- if attribute(data, 'ispartof') %}
-  "within": "{{ parentnodeurl }}",
   "partOf": [ { "id": "{{ parentnodeurl }}/metadata/iiifmanifest3cws/default.jsonld", "type": "Manifest" } ],
 {%- endif -%}
 {# Allison: add note why we have 3 services. SearchService2 is the current one, no viewer supports it, SearchService1 is for Mirador, http://iiif.io/api/search/0/search is for UV #}
