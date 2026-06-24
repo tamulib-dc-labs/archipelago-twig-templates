@@ -322,10 +322,11 @@ Without Double quotes.
     },
     {% endif %}
     {% if data.physical_location %}
-    {
-      "label": { "{{ len }}": ["Physical Location"] },
-      "value": { "{{ len }}": [{{ data.physical_location|json_encode|raw }}] }
-    },
+      {% set physical_location_array = data.physical_location is iterable ? data.physical_location : [data.physical_location] %}
+        {
+          "label": { "{{ len }}": ["Physical Location"] },
+          "value": { "{{ len }}": {{ physical_location_array|json_encode|raw }} }
+        },
     {% endif %}
     {% if data.place_of_origin %}
     {
