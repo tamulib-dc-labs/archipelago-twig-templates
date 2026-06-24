@@ -364,9 +364,10 @@ Without Double quotes.
     },
     {% endif %}
     {% if data.rights_details %}
+      {% set rights_array = data.rights_details is iterable ? data.rights_details : [data.rights_details] %}
     {
       "label": { "{{ len }}": ["Rights Details"] },
-      "value": { "{{ len }}": [{{ data.rights_details|json_encode|raw }}] }
+      "value": { "{{ len }}": {{ rights_array|json_encode|raw }} }
     },
     {% endif %}
     {% if data.rights_holder %}
