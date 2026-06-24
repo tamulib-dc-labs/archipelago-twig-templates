@@ -354,44 +354,6 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
       </li>
     {% endfor %}
   {% endif %}
-  {% if data.creator_linked_data|length > 0 %}
-    {% set creator_grouped = {} %}
-    {% for creator in data.creator_linked_data %}
-      {% if creator_grouped[creator.value] is not defined %}
-        {% set creator_grouped = creator_grouped|merge({(creator.value): []}) %}
-      {% endif %}
-      {% if creator.uri is defined and creator.uri|length > 2 %}
-        {% set creator_grouped = creator_grouped|merge({(creator.value): creator_grouped[creator.value]|merge([creator.uri])}) %}
-      {% endif %}
-    {% endfor %}
-    {% for label, uris in creator_grouped %}
-      <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
-        {% for uri in uris %}
-          <a href="{{ uri }}" target="_blank">🔗</a>
-        {% endfor %}
-      </li>
-    {% endfor %}
-  {% endif %}
-  {% if data.contributor_linked_data|length > 0 %}
-    {% set contributor_grouped = {} %}
-    {% for contributor in data.contributor_linked_data %}
-      {% if contributor_grouped[contributor.value] is not defined %}
-        {% set contributor_grouped = contributor_grouped|merge({(contributor.value): []}) %}
-      {% endif %}
-      {% if contributor.uri is defined and contributor.uri|length > 2 %}
-        {% set contributor_grouped = contributor_grouped|merge({(creator.value): contributor_grouped[creator.value]|merge([contributor.uri])}) %}
-      {% endif %}
-    {% endfor %}
-    {% for label, uris in contributor_grouped %}
-      <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
-        {% for uri in uris %}
-          <a href="{{ uri }}" target="_blank">🔗</a>
-        {% endfor %}
-      </li>
-    {% endfor %}
-  {% endif %}
 </ul></dd>
 {% endif %}
 
