@@ -15,7 +15,7 @@ Updated 31/10/2023 for 1.3.0
 
 {% endif %}
 
-  {% if data.creator or data.creator_lod or data.contributor or data.agent or data.agent_linked_data %}
+  {% if data.creator or data.creator_lod or data.contributor or data.agent or data.agent_linked_data or data.creator_linked_data or data.contributor_linked_data %}
   <h4>Creators and contributors</h4>
   <div class="field-content">
     <ul>
@@ -52,6 +52,20 @@ Updated 31/10/2023 for 1.3.0
       {% if data.agent_linked_data %}
         {% for agent_ld in data.agent_linked_data %}
           <li>{{ agent_ld.value }}</li>
+        {% endfor %}
+      {% endif %}
+      
+       {# creator_linked_data #}
+      {% if data.creator_linked_data %}
+        {% for creator_ld in data.creator_linked_data %}
+          <li>{{ creator_ld.value }}</li>
+        {% endfor %}
+      {% endif %}
+      
+      {# contributor_linked_data #}
+      {% if data.contributor_linked_data %}
+        {% for contributor_ld in data.contributor_linked_data %}
+          <li>{{ contributor_ld.value }}</li>
         {% endfor %}
       {% endif %}
     </ul>
