@@ -322,10 +322,11 @@ Without Double quotes.
     },
     {% endif %}
     {% if data.physical_location %}
-    {
-      "label": { "{{ len }}": ["Physical Location"] },
-      "value": { "{{ len }}": [{{ data.physical_location|json_encode|raw }}] }
-    },
+      {% set physical_location_array = data.physical_location is iterable ? data.physical_location : [data.physical_location] %}
+        {
+          "label": { "{{ len }}": ["Physical Location"] },
+          "value": { "{{ len }}": {{ physical_location_array|json_encode|raw }} }
+        },
     {% endif %}
     {% if data.place_of_origin %}
     {
@@ -364,9 +365,10 @@ Without Double quotes.
     },
     {% endif %}
     {% if data.rights_details %}
+      {% set rights_array = data.rights_details is iterable ? data.rights_details : [data.rights_details] %}
     {
       "label": { "{{ len }}": ["Rights Details"] },
-      "value": { "{{ len }}": [{{ data.rights_details|json_encode|raw }}] }
+      "value": { "{{ len }}": {{ rights_array|json_encode|raw }} }
     },
     {% endif %}
     {% if data.rights_holder %}
@@ -429,11 +431,9 @@ Without Double quotes.
     }
   ],
 {% if attribute(data, 'ismemberof') -%}
-  "within": "{{ parentcollectionurl }}",
   "partOf": [ { "id": "{{ parentcollectionurl }}/metadata/iiifmanifest3collection/default.jsonld", "type": "Manifest" } ],
 {%- endif -%}
 {%- if attribute(data, 'ispartof') %}
-  "within": "{{ parentnodeurl }}",
   "partOf": [ { "id": "{{ parentnodeurl }}/metadata/iiifmanifest3cws/default.jsonld", "type": "Manifest" } ],
 {%- endif -%}
 {# Allison: add note why we have 3 services. SearchService2 is the current one, no viewer supports it, SearchService1 is for Mirador, http://iiif.io/api/search/0/search is for UV #}

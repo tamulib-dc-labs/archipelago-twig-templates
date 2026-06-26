@@ -303,10 +303,11 @@ Without Double quotes.
             },
             {% endif %}
             {% if data.physical_location %}
-            {
-            "label": { "{{ len }}": ["Physical Location"] },
-            "value": { "{{ len }}": [{{ data.physical_location|json_encode|raw }}] }
-            },
+              {% set physical_location_array = data.physical_location is iterable ? data.physical_location : [data.physical_location] %}
+                {
+                  "label": { "{{ len }}": ["Physical Location"] },
+                  "value": { "{{ len }}": {{ physical_location_array|json_encode|raw }} }
+                },
             {% endif %}
             {% if data.projection %}
             {
@@ -339,10 +340,12 @@ Without Double quotes.
             },
             {% endif %}
             {% if data.rights_details %}
+              {% set rights_array = data.rights_details is iterable ? data.rights_details : [data.rights_details] %}
             {
-            "label": { "{{ len }}": ["Rights Details"] },
-            "value": { "{{ len }}": [{{ data.rights_details|json_encode|raw }}] }
+              "label": { "{{ len }}": ["Rights Details"] },
+              "value": { "{{ len }}": {{ rights_array|json_encode|raw }} }
             },
+            {% endif %}
             {% endif %}
             {% if data.rights_holder %}
             {
