@@ -196,6 +196,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 
 </ul>
 </nav>
+<div class="tab-content">
 <div class="tab-pane fade show active" id="nav-en" role="tabpanel" aria-labelledby="nav-en-tab">
 {# Collection, Part of membership section #}
 {% if attribute(data, 'ismemberof') or attribute(data, 'ispartof') %}
@@ -745,3 +746,5 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
   </p>
 </div>
 {% endif %}
+
+</div>{# Closes tab-content #}
