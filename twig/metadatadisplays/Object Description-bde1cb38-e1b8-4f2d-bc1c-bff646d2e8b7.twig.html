@@ -734,7 +734,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% if annotation_url %}
 <div class="tab-pane fade" id="nav-allmaps" role="tabpanel" aria-labelledby="nav-allmaps-tab">
   <iframe
-    src="https://viewer.allmaps.org/?url={{ annotation_url|url_encode }}"
+    data-src="https://viewer.allmaps.org/?url={{ annotation_url|url_encode }}"
     width="100%"
     height="600"
     style="border:none;"
@@ -744,6 +744,20 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     Georeferenced map via <a href="https://allmaps.org" target="_blank" rel="noopener">Allmaps</a>.
     <a href="https://editor.allmaps.org/?url={{ manifest_url|url_encode }}" target="_blank" rel="noopener">Edit in Allmaps Editor</a>
   </p>
+  <script>
+    (function () {
+      var btn = document.getElementById('nav-allmaps-tab');
+      if (!btn) return;
+      btn.addEventListener('shown.bs.tab', function () {
+        var panel = document.getElementById('nav-allmaps');
+        var iframe = panel.querySelector('iframe[data-src]');
+        if (iframe) {
+          iframe.src = iframe.dataset.src;
+          delete iframe.dataset.src;
+        }
+      }, { once: true });
+    })();
+  </script>
 </div>
 {% endif %}
 
