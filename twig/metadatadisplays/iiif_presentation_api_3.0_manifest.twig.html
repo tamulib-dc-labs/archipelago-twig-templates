@@ -114,6 +114,15 @@ Without Double quotes.
       {{ node.label|json_encode|raw }}
     ]
   },
+  "homepage": [
+    {
+      "id": "{{ nodeurl }}",
+      "type": "Text",
+      "label": { "en": [ "View in Texas A&M Digital Collections" ] },
+      "format": "text/html",
+      "language": [ "en" ]
+    }
+  ],
   "rights": {{ computed_rights|json_encode|raw }},
   "behavior": ["individuals"],
   "requiredStatement": {
