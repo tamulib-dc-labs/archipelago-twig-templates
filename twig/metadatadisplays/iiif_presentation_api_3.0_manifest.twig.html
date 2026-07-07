@@ -115,6 +115,14 @@ Without Double quotes.
     ]
   },
   "rights": {{ computed_rights|json_encode|raw }},
+  "homepage": [
+    {
+    "id": "{{nodeurl}}",
+    "type": "Text",
+    "label": { "en": [ "Explore {{node.label}} from Texas A&M Libraries" ] },
+    "format": "text/html"
+    }
+  ],
   "behavior": ["individuals"],
   "requiredStatement": {
     "label": { "en": [ "Attribution" ] },

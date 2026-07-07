@@ -101,6 +101,14 @@ Without Double quotes.
 "value": { "en": [ "Provided by Archipelago Deployment" ] }
 },
 "rights": {{ computed_rights|json_encode|raw }},
+"homepage": [
+            {
+            "id": "{{nodeurl}}",
+            "type": "Text",
+            "label": { "en": [ "Explore {{node.label}} from Texas A&M Libraries" ] },
+            "format": "text/html"
+            }
+],
 "metadata": [
             {% if data.abstract %}
             {

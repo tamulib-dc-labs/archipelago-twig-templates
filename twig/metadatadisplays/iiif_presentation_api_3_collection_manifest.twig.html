@@ -90,8 +90,16 @@ Without Double quotes.
 },
 "requiredStatement": {
 "label": { "en": [ "Attribution" ] },
-"value": { "en": [ "Provided by Archipelago Deployment" ] }
+"value": { "en": [ "Provided by Texas A&M University Libraries" ] }
 },
+"homepage": [
+  {
+    "id": "{{nodeurl}}",
+    "type": "Text",
+    "label": { "en": [ "Explore {{node.label}} from Texas A&M Libraries" ] },
+    "format": "text/html"
+  }
+],
 {% if data.abstract %}
 "summary": { "{{ len }}": [ {{ data.abstract|json_encode|raw }} ] },
 {% endif %}
