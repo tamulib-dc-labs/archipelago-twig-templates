@@ -99,6 +99,13 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
    {# also restrict if embargoed #}
    {% set file_download_restricted = true %}
 {% endif %}
+
+{# AllMaps #}
+{# was: nodeinfo.uuid -- that's empty in this template context #}
+{% set manifest_url = 'https://digitalcollections.library.tamu.edu/do/' ~ node.uuid.value ~ '/metadata/iiifmanifest/default.jsonld' %}
+{% set annotation_url = allmaps_annotation_url(manifest_url) %}
+{# End AllMaps #}
+
 {# -- File Downloads Section -- #}
   {% set download_label = "Download" %}
   {% set download_metadata_label = "Metadata" %}
@@ -167,6 +174,15 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     <button class="nav-link active" id="nav-en-tab" data-bs-toggle="tab" data-bs-target="#nav-en" type="button" role="tab" aria-controls="nav-en" aria-selected="false">Description</button>
   </li>
 
+
+{# Add AllMap Tab #}
+{% if annotation_url %}
+  <li class="nav-item">
+    <button class="nav-link" id="nav-allmaps-tab" data-bs-toggle="tab" data-bs-target="#nav-allmaps" type="button" role="tab" aria-controls="nav-allmaps" aria-selected="false">Georeferenced Map</button>
+  </li>
+{% endif %}
+
+
 {# evaluate download restriction here #}
   <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{ download_label }}</a>
@@ -177,12 +193,15 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     </ul>
   </li>
 {# End evaluate download restriction here #}
+
 </ul>
 </nav>
+<div class="tab-content">
 <div class="tab-pane fade show active" id="nav-en" role="tabpanel" aria-labelledby="nav-en-tab">
 {# Collection, Part of membership section #}
 {% if attribute(data, 'ismemberof') or attribute(data, 'ispartof') %}
 <dl>
+
 {% if attribute(data, 'ismemberof') %}
 <dt>Part of Collection</dt>
 <dd>
@@ -346,6 +365,44 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
       {% endif %}
     {% endfor %}
     {% for label, uris in agent_grouped %}
+      <li>
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
+        {% for uri in uris %}
+          <a href="{{ uri }}" target="_blank">🔗</a>
+        {% endfor %}
+      </li>
+    {% endfor %}
+  {% endif %}
+  {% if data.creator_linked_data|length > 0 %}
+    {% set creator_grouped = {} %}
+    {% for creator in data.creator_linked_data %}
+      {% if creator_grouped[creator.value] is not defined %}
+        {% set creator_grouped = creator_grouped|merge({(creator.value): []}) %}
+      {% endif %}
+      {% if creator.uri is defined and creator.uri|length > 2 %}
+        {% set creator_grouped = creator_grouped|merge({(creator.value): creator_grouped[creator.value]|merge([creator.uri])}) %}
+      {% endif %}
+    {% endfor %}
+    {% for label, uris in creator_grouped %}
+      <li>
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
+        {% for uri in uris %}
+          <a href="{{ uri }}" target="_blank">🔗</a>
+        {% endfor %}
+      </li>
+    {% endfor %}
+  {% endif %}
+  {% if data.contributor_linked_data|length > 0 %}
+    {% set contributor_grouped = {} %}
+    {% for contributor in data.contributor_linked_data %}
+      {% if contributor_grouped[contributor.value] is not defined %}
+        {% set contributor_grouped = contributor_grouped|merge({(contributor.value): []}) %}
+      {% endif %}
+      {% if contributor.uri is defined and contributor.uri|length > 2 %}
+        {% set contributor_grouped = contributor_grouped|merge({(creator.value): contributor_grouped[creator.value]|merge([contributor.uri])}) %}
+      {% endif %}
+    {% endfor %}
+    {% for label, uris in contributor_grouped %}
       <li>
         <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
         {% for uri in uris %}
@@ -673,3 +730,35 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endif %}
 
 </div>{# Closes Main Content Nav-tab #}
+
+{% if annotation_url %}
+<div class="tab-pane fade" id="nav-allmaps" role="tabpanel" aria-labelledby="nav-allmaps-tab">
+  <iframe
+    data-src="https://viewer.allmaps.org/?url={{ annotation_url|url_encode }}"
+    width="100%"
+    height="600"
+    style="border:none;"
+    allowfullscreen
+  ></iframe>
+  <p class="mt-2 small text-muted">
+    Georeferenced map via <a href="https://allmaps.org" target="_blank" rel="noopener">Allmaps</a>.
+    <a href="https://editor.allmaps.org/?url={{ manifest_url|url_encode }}" target="_blank" rel="noopener">Edit in Allmaps Editor</a>
+  </p>
+  <script>
+    (function () {
+      var btn = document.getElementById('nav-allmaps-tab');
+      if (!btn) return;
+      btn.addEventListener('shown.bs.tab', function () {
+        var panel = document.getElementById('nav-allmaps');
+        var iframe = panel.querySelector('iframe[data-src]');
+        if (iframe) {
+          iframe.src = iframe.dataset.src;
+          delete iframe.dataset.src;
+        }
+      }, { once: true });
+    })();
+  </script>
+</div>
+{% endif %}
+
+</div>{# Closes tab-content #}
