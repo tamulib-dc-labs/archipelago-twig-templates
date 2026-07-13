@@ -182,6 +182,11 @@
     <subject><geographic valueURI="{{ item.uri }}">{{ item.value }}</geographic></subject>
   {% endfor %}
 {% endif %}
+{% if data.spatial_linked_data %}
+  {% for item in data.spatial_linked_data %}
+    <subject><geographic valueURI="{{ item.uri }}">{{ item.value }}</geographic></subject>
+  {% endfor %}
+{% endif %}
 {% if data.subject %}
   {% for item in data.subject %}
     <subject><topic>{{ item }}</topic></subject>

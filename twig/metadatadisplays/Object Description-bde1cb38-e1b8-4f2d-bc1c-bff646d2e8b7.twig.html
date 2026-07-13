@@ -489,11 +489,27 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endif %}
 
 {# Geographic Subject - Linked Data (object: value + uri) and Non-linked data #}
-{% if data.geographic_subject_linked_data|length > 0 or data.geographic_subject|length > 0 %}
+{% if data.geographic_subject_linked_data|length > 0 or data.geographic_subject|length > 0 or data.spatial_linked_data|length > 0 %}
 <dt>Geographic Subject</dt>
 <dd><ul>
   	{% set geo_grouped = {} %}
     {% for subject_item in data.geographic_subject_linked_data %}
+      {% if geo_grouped[subject_item.value] is not defined %}
+        {% set geo_grouped = geo_grouped|merge({(subject_item.value): []}) %}
+      {% endif %}
+      {% if subject_item.uri is defined and subject_item.uri|length > 2 %}
+        {% set geo_grouped = geo_grouped|merge({(subject_item.value): geo_grouped[subject_item.value]|merge([subject_item.uri])}) %}
+      {% endif %}
+    {% endfor %}
+    {% for label, uris in geo_grouped %}
+      <li>
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
+        {% for uri in uris %}
+          <a href="{{ uri }}" target="_blank">🔗</a>
+        {% endfor %}
+      </li>
+    {% endfor %}
+    {% for subject_item in data.spatial_linked_data %}
       {% if geo_grouped[subject_item.value] is not defined %}
         {% set geo_grouped = geo_grouped|merge({(subject_item.value): []}) %}
       {% endif %}
@@ -702,7 +718,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {{ _self.html_output('Projection', data.projection) }}
 {{ _self.html_output('State Edition', data.state_edition) }}
 
-{# Sequence and alternative title #}
+{# Alternative title #}
 {{ _self.html_output('Alternative Title', data.title_alternative) }}
 </dl>
 
