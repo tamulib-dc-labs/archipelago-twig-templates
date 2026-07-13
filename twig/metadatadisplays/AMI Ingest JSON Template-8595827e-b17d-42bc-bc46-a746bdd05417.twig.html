@@ -42,6 +42,7 @@ if all is valid based on previously known state #}
     "physical_location": {{ data.physical_location|json_encode|raw }},
     "rights": {{ data.rights|json_encode|raw }},
     "geographic_subject_linked_data": {{ data.geographic_subject_linked_data|json_encode|raw }},
+    "spatial_linked_data": {{ data.geographic_subject_linked_data|json_encode|raw }},
     "content_type": {{ data.content_type|json_encode|raw }},
     "geographic_location": {{ data.geographic_location|json_encode|raw }},
     "annotations": {{ data.annotations|json_encode|raw }},
