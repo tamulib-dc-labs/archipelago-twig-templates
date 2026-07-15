@@ -47,7 +47,9 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {% endif %}
 {# Coverage #}
 {% if data.coordinates|length > 0 %}
-   <dc:coverage>{{ data.coordinates }}</dc:coverage>
+{% for coordinates in data.coordinates %}
+   <dc:coverage>{{ coordinates }}</dc:coverage>
+   {% endfor %}
 {% endif %}
 {% if data.geographic_subject|length > 0 %}
   {% for geo in data.geographic_subject %}

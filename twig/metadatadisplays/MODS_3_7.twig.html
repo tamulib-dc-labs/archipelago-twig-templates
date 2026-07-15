@@ -203,11 +203,13 @@
   {% endfor %}
 {% endif %}
 {% if data.coordinates %}
+{% for coordinates in data.coordinates %}
 <subject>
     <cartographics>
-        <cartographicExtension>{{ data.coordinates|escape('html_attr') }}</cartographicExtension>
+        <cartographicExtension>{{ coordinates|escape('html_attr') }}</cartographicExtension>
     </cartographics>
 </subject>
+ {% endfor %}
 {% endif %}
 
 {# Location #}
