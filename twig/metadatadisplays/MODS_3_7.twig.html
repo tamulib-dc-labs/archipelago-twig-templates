@@ -104,13 +104,6 @@
 
 {# Origin Info #}
 <originInfo>
-{% if data.place_of_origin %}
-  {% for place in data.place_of_origin %}
-  <place>
-    <placeTerm>{{ place }}</placeTerm>
-  </place>
-  {% endfor %}
-{% endif %}
 {% if data.date_created|length > 0 %}
 	<dateCreated>{{ data.date_created|date("Y-m-d") }}</dateCreated>
 {% endif %}
@@ -125,9 +118,11 @@
 {% endif %}
 </originInfo>
 {% if data.original_publisher %}
+{% for publisher in original_publisher %}
 <originInfo eventType="publication">
-	<publisher>{{ data.original_publisher }}</publisher>
+	<publisher>{{ data.publisher }}</publisher>
 </originInfo>
+{% endfor %}
 {% endif %}
 
 
@@ -217,13 +212,15 @@
 
 {# Location #}
 {% if data.physical_location %}
+{% for location in data.physical_location %}
   <location>
     <holdingSimple>
       <copyInformation>
-        <shelfLocator>{{ data.physical_location }}</shelfLocator>
+        <shelfLocator>{{ location }}</shelfLocator>
       </copyInformation>
     </holdingSimple>
   </location>
+  {% endfor %}
 {% endif %}
 <location>
     {% if node.id %}
@@ -237,7 +234,9 @@
 
 {# Table of Contents #}
 {% if data.table_of_contents %}
-  <tableOfContents>{{ data.table_of_contents }}</tableOfContents>
+{% for table in data.table_of_contents %}
+  <tableOfContents>{{ table }}</tableOfContents>
+  {% endfor %}
 {% endif %}
 
 {# Audience #}
@@ -249,9 +248,11 @@
 
 {# Classification #}
 {% if data.classification %}
-<classification authority="{{ data.classification.authority }}">
-    {{ data.classification.value }}
+{% for classification in data.classification %}
+<classification authority="{{ classification.authority }}">
+    {{ classification.value }}
 </classification>
+  {% endfor %}
 {% endif %}
 
 {# Language #}
@@ -284,7 +285,9 @@
   <note displayLabel="State/Edition of Map">{{ data.state_edition }}</note>
 {% endif %}
 {% if data.digital_publisher %}
-  <note displayLabel="Digital publisher">{{ data.digital_publisher }}</note>
+{% for publisher in data.digital_publisher %}
+  <note displayLabel="Digital publisher">{{ publisher }}</note>
+   {% endfor %}
 {% endif %}
 {% if data.note %}
   {% for item in data.note %}
@@ -327,9 +330,11 @@
   {% endfor %}
 {% endif %}
 {% if data.physical_collection %}
+{% for collection in data.physical_collection %}
  <relatedItem type="host">
-    <titleInfo><title>{{ data.physical_collection }}</title></titleInfo>
+    <titleInfo><title>{{ collection }}</title></titleInfo>
   </relatedItem>
+  {% endfor %}
 {% endif %}
 {% if data.related_record %}
   {% for item in data.related_record %}
@@ -339,9 +344,11 @@
   {% endfor %}
 {% endif %}
 {% if data.related_url %}
+{% for url in data.related_url %}
   <relatedItem type="references">
-    <location><url>{{ data.related_url }}</url></location>
+    <location><url>{{ url }}</url></location>
   </relatedItem>
+ {% endfor %}
 {% endif %}
 {% if data.related_url_historic %}
   <relatedItem type="references">
@@ -353,15 +360,12 @@
 {% if data.rights|length > 0 %} 	
 	<accessCondition type="use and reproduction" displayLabel="Rights Statement">{{ data.rights }}</accessCondition>
 {% endif %}
-{% if data.rights_details %}
-  <accessCondition type="use and reproduction">
-    {{ data.rights_details }}
-  </accessCondition>
-{% endif %}
 {% if data.access_rights %}
-<accessCondition type="restriction on access">
-    {{ data.access_rights }}
-</accessCondition>
+	{% for rights in data.access_rights %}
+	<accessCondition type="restriction on access">
+    	{{ rights }}
+	</accessCondition>
+	{% endfor %}
 {% endif %}
 
 {% if attribute(data, 'ismemberof') %}
