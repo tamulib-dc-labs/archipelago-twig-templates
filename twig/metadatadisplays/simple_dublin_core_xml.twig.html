@@ -47,7 +47,9 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {% endif %}
 {# Coverage #}
 {% if data.coordinates|length > 0 %}
-   <dc:coverage>{{ data.coordinates }}</dc:coverage>
+{% for coordinates in data.coordinates %}
+   <dc:coverage>{{ coordinates }}</dc:coverage>
+   {% endfor %}
 {% endif %}
 {% if data.geographic_subject|length > 0 %}
   {% for geo in data.geographic_subject %}
@@ -105,11 +107,15 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {% endif %}
 {# Digital Publisher #}
 {% if data.digital_publisher|length > 0 %}
-  <dc:publisher>{{ data.digital_publisher }}</dc:publisher>
+{% for publisher in data.digital_publisher %}
+  <dc:publisher>{{ publisher }}</dc:publisher>
+ {% endfor %}
 {% endif %}  
 {# Original Publisher #}
 {% if data.original_publisher|length > 0 %}
-  <dc:publisher>{{ data.original_publisher }}</dc:publisher>
+{% for publisher in data.original_publisher %}
+		<dc:publisher>{{ publisher }}</dc:publisher>
+	{% endfor %}
 {% endif %} 
 {# Abstract #}
 {% if data.abstract %}
@@ -133,7 +139,9 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {% endif %}
 {# Physical Location #}
 {% if data.physical_location|length > 0 %}
-	<dc:description>{{ data.physical_location }}</dc:description>
+{% for location in data.physical_location %}
+	<dc:description>{{ location }}</dc:description>
+   {% endfor %}
 {% endif %}
 {# Language #}
 {% if data.language|length > 0 %}
@@ -195,13 +203,17 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      <dc:relation>{{ data.original_publication }}</dc:relation>
 {% endif %}
 {% if data.physical_collection|length > 0 %}
-     <dc:relation>{{ data.physical_collection }}</dc:relation>
+{% for collection in data.physical_collection %}
+     <dc:relation>{{ collection }}</dc:relation>
+    {% endfor %}
 {% endif %}
 {% if data.related_record|length > 0 %}
      <dc:relation>{{ data.related_record }}</dc:relation>
 {% endif %}
 {% if data.related_url|length > 0 %}
-     <dc:relation>{{ data.related_url }}</dc:relation>
+{% for url in data.related_url %}
+     <dc:relation>{{ url }}</dc:relation>
+    {% endfor %}
 {% endif %}
 {% if data.related_url_historic|length > 0 %}
      <dc:relation>{{ data.related_url_historic }}</dc:relation>
@@ -227,11 +239,5 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {# Rights #}
 {% if data.rights|length > 0 %} 
   <dc:rights>{{ data.rights }}</dc:rights>
-{% endif %}
-{% if data.rights_details|length > 0 %} 
-  <dc:rights>{{ data.rights_details }}</dc:rights>
-{% endif %}
-{% if data.access_rights|length > 0 %}
-	<dc:rights>{{ data.access_rights }}</dc:rights>
 {% endif %}
 </oai_dc:dc>
