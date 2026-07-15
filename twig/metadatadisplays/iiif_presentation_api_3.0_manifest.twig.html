@@ -520,6 +520,8 @@ Without Double quotes.
       "label": { "{{ len }}": [
       {%- if (pageCount > 1) -%}
       {{ (loop.index ~ ' of ' ~ pageCount ~ ' pages: ' ~ data.label)|json_encode|raw }}
+      {%- elseif data.canvas_labels is defined and data.canvas_labels[pagenumber - 1] is defined -%}
+      {{ data.canvas_labels[pagenumber - 1]|json_encode|raw }}
       {% else %}
         {{ data.label|json_encode|raw }}
       {%- endif -%}
@@ -579,7 +581,8 @@ Without Double quotes.
 {% endfor %}
 {#- ImagesManifest -#}
 {#- Count Images upfront -#}
-{%- if (attribute(data, 'as:image')|length > 0) -%}
+{%- set image_count = attribute(data, 'as:image')|length -%}
+{%- if (image_count > 0) -%}
 {%- if itemCount > 0 -%}
 ,
 {%- endif -%}
@@ -616,7 +619,9 @@ Without Double quotes.
       "id": "{{ canvasId }}",
       "type": "Canvas",
       "label": { "{{ len }}": [
-      {%- if (image_count > 1) -%}
+      {%- if data.canvas_labels is defined and data.canvas_labels[loop.index - 1] is defined -%}
+      {{ data.canvas_labels[loop.index - 1]|json_encode|raw }}
+      {%- elseif (image_count > 1) -%}
       {{ (loop.index ~ ' of ' ~ image_count ~ ' images: ' ~ data.label)|json_encode|raw }}
       {% else %}
        {{ data.label|json_encode|raw }}
