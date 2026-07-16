@@ -399,7 +399,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
         {% set contributor_grouped = contributor_grouped|merge({(contributor.value): []}) %}
       {% endif %}
       {% if contributor.uri is defined and contributor.uri|length > 2 %}
-        {% set contributor_grouped = contributor_grouped|merge({(creator.value): contributor_grouped[creator.value]|merge([contributor.uri])}) %}
+        {% set contributor_grouped = contributor_grouped|merge({(contributor.value): contributor_grouped[contributor.value]|merge([contributor.uri])}) %}
       {% endif %}
     {% endfor %}
     {% for label, uris in contributor_grouped %}
