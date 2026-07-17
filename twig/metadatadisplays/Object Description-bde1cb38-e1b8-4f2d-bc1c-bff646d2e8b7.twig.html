@@ -696,6 +696,20 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 </ul></dd>
 {% endif %}
 
+{# IIIF Manifest #}
+{% if not file_download_restricted %}
+<dt>IIIF Manifest</dt>
+<dd>
+    {% if data.type not in ['Collection','CreativeWorkSeries'] %}
+    <a target="_blank" href="/do/{{ node.uuid.value }}/metadata/iiifmanifest/default.jsonld">View IIIF Presentation Manifest</a>
+    {% elseif data.type == 'CreativeWorkSeries' %}
+    <a  target="_blank" href="/do/{{ node.uuid.value }}/metadata/iiifmanifest3cws/default.jsonld">View IIIF Presentation Manifest</a>
+    {% else %}
+    <a target="_blank" href="/do/{{ node.uuid.value }}/metadata/iiifmanifest3collection/default.jsonld">View IIIF Presentation Manifest</a>
+    {% endif %}
+</dd>
+{% endif %}
+
 {# Related resources #}
 {{ _self.html_output('Related Item', data.related_record) }}
 {{ _self.html_output('Related URL', data.related_url) }}
