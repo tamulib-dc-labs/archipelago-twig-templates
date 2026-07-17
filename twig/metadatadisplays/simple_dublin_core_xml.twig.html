@@ -61,11 +61,6 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
     <dc:coverage>{{ geo.value }}</dc:coverage>
   {% endfor %}
 {% endif %}
-{% if data.spatial_linked_data|length > 0 %}
-  {% for geo in data.spatial_linked_data %}
-    <dc:coverage>{{ geo.value }}</dc:coverage>
-  {% endfor %}
-{% endif %}
 {% if data.temporal_subject|length > 0 %}
   {% for temp in data.temporal_subject %}
     <dc:coverage>{{ temp }}</dc:coverage>
@@ -208,7 +203,9 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
     {% endfor %}
 {% endif %}
 {% if data.related_record|length > 0 %}
-     <dc:relation>{{ data.related_record }}</dc:relation>
+{% for record in data.related_record %}
+     <dc:relation>{{ record }}</dc:relation>
+   {% endfor %}
 {% endif %}
 {% if data.related_url|length > 0 %}
 {% for url in data.related_url %}
