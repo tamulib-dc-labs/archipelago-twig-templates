@@ -185,6 +185,14 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endif %}
 
 
+{# Add View Transcription Tab #}
+{% if data.annotations %}
+  <li class="nav-item">
+    <button class="nav-link" id="nav-transcription-tab" data-bs-toggle="tab" data-bs-target="#nav-transcription" type="button" role="tab" aria-controls="nav-transcription" aria-selected="false">View Transcription</button>
+  </li>
+{% endif %}
+
+
 {# evaluate download restriction here #}
   <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">{{ download_label }}</a>
@@ -742,30 +750,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {{ _self.html_output('Alternative Title', data.title_alternative) }}
 </dl>
 
-    {% if data.annotations %}
-    {% if data.generative_ai_details %}
-    <h4 class="clover-browse">Generative AI Details:</h4>
-    <dl>
-        <dt>AI Model used:</dt>
-        <dd>{{ data.generative_ai_details.model }}</dd>
-        <dt>Generated with:</dt>
-        <dd>{{ data.generative_ai_details.generator }}</dd>
-        <dt>Date of Generation:</dt>
-        <dd>{{ data.generative_ai_details.date }}</dd>
-    </dl>
-    {% endif %}
-      <h4 class="clover-browse">Handwritten Text Transcription & Reasoning:</h4>
-      <p>This item was transcribed using AI and may contain errors. To provide transparency, the reasoning captured for each
-        transcription is included below.</p>
-    <div class="clover-twig-scroll"
-         data-iiif-manifest="/do/{{ node.uuid.value }}/metadata/iiifmanifest/default.jsonld"
-         data-figure-display="image-viewer"
-         data-figure-aspect-ratio="0.6667"
-         data-scroll-offset="0">
-    </div>
-    {% endif %}
-
-{# Still part of nav-tab for Additional Information #}
+    {# Still part of nav-tab for Additional Information #}
 {% if logged_in %}
 {# Optional 'user_roles' check - first remove or comment out the '{% if logged_in %}' above, then remove the enclosing comments in the line below to use #}
 {# {% if logged_in and "administrator" in user_roles %} #}
@@ -816,6 +801,31 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
       }, { once: true });
     })();
   </script>
+</div>
+{% endif %}
+
+{% if data.annotations %}
+<div class="tab-pane fade" id="nav-transcription" role="tabpanel" aria-labelledby="nav-transcription-tab">
+    {% if data.generative_ai_details %}
+    <h4 class="clover-browse">Generative AI Details:</h4>
+    <dl>
+        <dt>AI Model used:</dt>
+        <dd>{{ data.generative_ai_details.model }}</dd>
+        <dt>Generated with:</dt>
+        <dd>{{ data.generative_ai_details.generator }}</dd>
+        <dt>Date of Generation:</dt>
+        <dd>{{ data.generative_ai_details.date }}</dd>
+    </dl>
+    {% endif %}
+      <h4 class="clover-browse">Handwritten Text Transcription & Reasoning:</h4>
+      <p>This item was transcribed using AI and may contain errors. To provide transparency, the reasoning captured for each
+        transcription is included below.</p>
+    <div class="clover-twig-scroll"
+         data-iiif-manifest="/do/{{ node.uuid.value }}/metadata/iiifmanifest/default.jsonld"
+         data-figure-display="image-viewer"
+         data-figure-aspect-ratio="0.6667"
+         data-scroll-offset="0">
+    </div>
 </div>
 {% endif %}
 
