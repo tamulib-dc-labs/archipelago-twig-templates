@@ -93,6 +93,8 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
   {%- endif -%}
 {%- endmacro html_output_search_lod -%}
 {#- --- End Macros ---- -#}
+{{ attach_library('strawberryfield_clover/clover_data_attr') }}
+{{ attach_library('strawberryfield_clover_iiif/clover_data_attr') }}
 {# -- Embargo option -- #}
 {% set file_download_restricted = false %}
 {% if data_embargo.embargoed == true %}
@@ -739,6 +741,29 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {# Alternative title #}
 {{ _self.html_output('Alternative Title', data.title_alternative) }}
 </dl>
+
+    {% if data.annotations %}
+    {% if data.generative_ai_details %}
+    <h4 class="clover-browse">Generative AI Details:</h4>
+    <dl>
+        <dt>AI Model used:</dt>
+        <dd>{{ data.generative_ai_details.model }}</dd>
+        <dt>Generated with:</dt>
+        <dd>{{ data.generative_ai_details.generator }}</dd>
+        <dt>Date of Generation:</dt>
+        <dd>{{ data.generative_ai_details.date }}</dd>
+    </dl>
+    {% endif %}
+      <h4 class="clover-browse">Handwritten Text Transcription & Reasoning:</h4>
+      <p>This item was transcribed using AI and may contain errors. To provide transparency, the reasoning captured for each
+        transcription is included below.</p>
+    <div class="clover-twig-scroll"
+         data-iiif-manifest="/do/{{ node.uuid.value }}/metadata/iiifmanifest/default.jsonld"
+         data-figure-display="image-viewer"
+         data-figure-aspect-ratio="0.6667"
+         data-scroll-offset="0">
+    </div>
+    {% endif %}
 
 {# Still part of nav-tab for Additional Information #}
 {% if logged_in %}
