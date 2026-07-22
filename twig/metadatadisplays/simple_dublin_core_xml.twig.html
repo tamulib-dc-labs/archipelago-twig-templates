@@ -135,7 +135,9 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {% endif %}
 {# Table of Contents #}
 {% if data.table_of_contents|length > 0 %}
-	<dc:description>{{ data.table_of_contents }}</dc:description>
+{% for table in data.table_of_contents %}
+	<dc:description>{{ table }}</dc:description>
+    	{% endfor %}
 {% endif %}
 {# Physical Location #}
 {% if data.physical_location|length > 0 %}
@@ -208,7 +210,9 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
     {% endfor %}
 {% endif %}
 {% if data.related_record|length > 0 %}
-     <dc:relation>{{ data.related_record }}</dc:relation>
+{% for record in data.related_record %}
+     <dc:relation>{{ record }}</dc:relation>
+   {% endfor %}
 {% endif %}
 {% if data.related_url|length > 0 %}
 {% for url in data.related_url %}
