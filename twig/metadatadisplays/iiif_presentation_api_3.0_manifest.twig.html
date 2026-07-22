@@ -336,6 +336,7 @@ Without Double quotes.
     {
       "label": { "{{ len }}": ["Physical Collection"] },
       "value": { "{{ len }}": [{{ data.physical_collection|json_encode|raw }}] }
+      "value": { "{{ len }}": {% if data.physical_collection is iterable %}{{ data.physical_collection|json_encode|raw }}{% else %}[{{ data.physical_collection|json_encode|raw }}]{% endif %} }
     },
     {% endif %}
     {% if data.physical_location %}
