@@ -177,7 +177,7 @@ Without Double quotes.
     {% if data.collecting_area %}
     {
       "label": { "{{ len }}": ["Collecting Area"] },
-      "value": { "{{ len }}": [{{ data.collecting_area|json_encode|raw }}] }
+      "value": { "{{ len }}": {% if data.collecting_area is iterable %}{{ data.collecting_area|json_encode|raw }}{% else %}[{{ data.collecting_area|json_encode|raw }}]{% endif %} }
     },
     {% endif %}
     {% if data.content_type %}
@@ -213,13 +213,13 @@ Without Double quotes.
     {% if data.date_built %}
     {
       "label": { "{{ len }}": ["Date Built"] },
-      "value": { "{{ len }}": [{{ data.date_built|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ (data.date_built ~ '')|json_encode|raw }}] }
     },
     {% endif %}
     {% if data.date_created %}
     {
       "label": { "{{ len }}": ["Date Created"] },
-      "value": { "{{ len }}": [{{ data.date_created|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ (data.date_created ~ '')|json_encode|raw }}] }
     },
     {% endif %}
     {% if data.date_digital_creation %}
@@ -231,13 +231,13 @@ Without Double quotes.
     {% if data.date_issued %}
     {
       "label": { "{{ len }}": ["Date Issued"] },
-      "value": { "{{ len }}": [{{ data.date_issued|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ (data.date_issued ~ '')|json_encode|raw }}] }
     },
     {% endif %}
     {% if data.date_razed %}
     {
       "label": { "{{ len }}": ["Date Razed"] },
-      "value": { "{{ len }}": [{{ data.date_razed|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ (data.date_razed ~ '')|json_encode|raw }}] }
     },
     {% endif %}
     {% if data.description %}
@@ -261,13 +261,19 @@ Without Double quotes.
     {% if data.extent %}
     {
       "label": { "{{ len }}": ["Extent"] },
-      "value": { "{{ len }}": {{ data.extent|json_encode|raw }} }
+      "value": { "{{ len }}": {% if data.extent is iterable %}{{ data.extent|json_encode|raw }}{% else %}[{{ data.extent|json_encode|raw }}]{% endif %} }
     },
     {% endif %}
     {% if data.format %}
     {
       "label": { "{{ len }}": ["Format"] },
       "value": { "{{ len }}": [{{ data.format|json_encode|raw }}] }
+    },
+    {% endif %}
+    {% if data.type %}
+    {
+      "label": { "{{ len }}": ["ADO Type"] },
+      "value": { "{{ len }}": [{{ data.type|json_encode|raw }}] }
     },
     {% endif %}
     {% set genre_values = data.genre_form ? data.genre_form : [] %}
@@ -335,7 +341,7 @@ Without Double quotes.
     {% if data.physical_collection %}
     {
       "label": { "{{ len }}": ["Physical Collection"] },
-      "value": { "{{ len }}": [{{ data.physical_collection|json_encode|raw }}] }
+      "value": { "{{ len }}": {% if data.physical_collection is iterable %}{{ data.physical_collection|json_encode|raw }}{% else %}[{{ data.physical_collection|json_encode|raw }}]{% endif %} }
     },
     {% endif %}
     {% if data.physical_location %}
