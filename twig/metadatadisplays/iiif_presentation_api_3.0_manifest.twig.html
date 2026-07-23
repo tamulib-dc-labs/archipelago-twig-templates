@@ -270,6 +270,12 @@ Without Double quotes.
       "value": { "{{ len }}": [{{ data.format|json_encode|raw }}] }
     },
     {% endif %}
+    {% if data.type %}
+    {
+      "label": { "{{ len }}": ["ADO Type"] },
+      "value": { "{{ len }}": [{{ data.type|json_encode|raw }}] }
+    },
+    {% endif %}
     {% set genre_values = data.genre_form ? data.genre_form : [] %}
     {% for item in attribute(data, 'genre_form_linked_data') %}
       {% set genre_values = genre_values|merge([item.title]) %}
