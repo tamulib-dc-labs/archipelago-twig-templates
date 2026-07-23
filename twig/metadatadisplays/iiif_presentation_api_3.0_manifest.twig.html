@@ -261,7 +261,7 @@ Without Double quotes.
     {% if data.extent %}
     {
       "label": { "{{ len }}": ["Extent"] },
-      "value": { "{{ len }}": {{ data.extent|json_encode|raw }} }
+      "value": { "{{ len }}": {% if data.extent is iterable %}{{ data.extent|json_encode|raw }}{% else %}[{{ data.extent|json_encode|raw }}]{% endif %} }
     },
     {% endif %}
     {% if data.format %}
@@ -341,7 +341,6 @@ Without Double quotes.
     {% if data.physical_collection %}
     {
       "label": { "{{ len }}": ["Physical Collection"] },
-      "value": { "{{ len }}": [{{ data.physical_collection|json_encode|raw }}] }
       "value": { "{{ len }}": {% if data.physical_collection is iterable %}{{ data.physical_collection|json_encode|raw }}{% else %}[{{ data.physical_collection|json_encode|raw }}]{% endif %} }
     },
     {% endif %}

@@ -233,7 +233,7 @@ Without Double quotes.
             {% if data.extent %}
             {
             "label": { "{{ len }}": ["Extent"] },
-            "value": { "{{ len }}": [ {{ data.extent|json_encode|raw }} ] }
+            "value": { "{{ len }}": {% if data.extent is iterable %}{{ data.extent|json_encode|raw }}{% else %}[{{ data.extent|json_encode|raw }}]{% endif %} }
             },
             {% endif %}
             {% if data.format %}
