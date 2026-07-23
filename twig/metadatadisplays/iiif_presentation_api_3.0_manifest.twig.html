@@ -213,13 +213,13 @@ Without Double quotes.
     {% if data.date_built %}
     {
       "label": { "{{ len }}": ["Date Built"] },
-      "value": { "{{ len }}": [{{ data.date_built|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ (data.date_built ~ '')|json_encode|raw }}] }
     },
     {% endif %}
     {% if data.date_created %}
     {
       "label": { "{{ len }}": ["Date Created"] },
-      "value": { "{{ len }}": [{{ data.date_created|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ (data.date_created ~ '')|json_encode|raw }}] }
     },
     {% endif %}
     {% if data.date_digital_creation %}
@@ -231,13 +231,13 @@ Without Double quotes.
     {% if data.date_issued %}
     {
       "label": { "{{ len }}": ["Date Issued"] },
-      "value": { "{{ len }}": [{{ data.date_issued|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ (data.date_issued ~ '')|json_encode|raw }}] }
     },
     {% endif %}
     {% if data.date_razed %}
     {
       "label": { "{{ len }}": ["Date Razed"] },
-      "value": { "{{ len }}": [{{ data.date_razed|json_encode|raw }}] }
+      "value": { "{{ len }}": [{{ (data.date_razed ~ '')|json_encode|raw }}] }
     },
     {% endif %}
     {% if data.description %}
