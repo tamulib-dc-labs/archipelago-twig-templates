@@ -41,21 +41,19 @@ Without Double quotes.
 {%- endif -%}
 {%- if attribute(data, 'ismemberof') %}
     {%- if attribute(data, 'ismemberof') is iterable -%}
-	    {%- for collection in attribute(data, 'ismemberof') -%}
-		   {%- set parentcollectionurl = url('entity.node.canonical', {'node': collection}, {'absolute': true}) -%}
-	    {%- endfor -%}
-	{%- else -%}
-		{%- set parentcollectionurl = url('entity.node.canonical', {'node': attribute(data, 'ismemberof')}, {'absolute': true}) -%}
+	    {%- set parentcollection_id = attribute(data, 'ismemberof')|last -%}
+    {%- else -%}
+        {%- set parentcollection_id = attribute(data, 'ismemberof') -%}
     {%- endif -%}
+    {%- set parentcollectionurl = url('entity.node.canonical', {'node': parentcollection_id}, {'absolute': true}) -%}
 {%- endif -%}
 {%- if attribute(data, 'ispartof') -%}
     {%- if attribute(data, 'ispartof') is iterable -%}
-	{%- for child in attribute(data, 'ispartof') -%}
-		{%- set parentnodeurl = url('entity.node.canonical', {'node': child}, {'absolute': true}) -%}
-	{%- endfor -%}
-	{%- else -%}
-		{%- set parentnodeurl = url('entity.node.canonical', {'node': attribute(data, 'ispartof')}, {'absolute': true}) -%}
-   {%- endif -%}
+	{%- set parentnode_id = attribute(data, 'ispartof')|last -%}
+    {%- else -%}
+        {%- set parentnode_id = attribute(data, 'ispartof') -%}
+    {%- endif -%}
+    {%- set parentnodeurl = url('entity.node.canonical', {'node': parentnode_id}, {'absolute': true}) -%}
 {%- endif -%}
 {%- set len = language.getId() ? language.getId() : "en" -%}
 {% set computed_rights = "http://rightsstatements.org/vocab/InC-EDU/1.0/" %}
