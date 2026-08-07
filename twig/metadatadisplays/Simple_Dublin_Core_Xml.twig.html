@@ -389,7 +389,7 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {% endif %}
 {% if data.related_url_historic|length > 0 %}
      {% if data.related_url_historic is iterable %}
-     	{% for related_url_historic in data.related_url %}
+     	{% for related_url_historic in data.related_url_historic %}
        		<dc:relation>{{ related_url_historic }}</dc:relation>
      	{% endfor %}
      {% else %}
