@@ -30,6 +30,11 @@ genre_form_linked_data, subject_linked_data, geographic_subject_linked_data and
 temporal_subject_linked_data now follow the same shape as agent_linked_data:
 normalise a single object or an array of objects first, then accumulate
 item.value into the shared entry. subject also accepts a bare string now.
+classification, digital_exhibit and identifier now accept either a single object
+or an array of objects (ported from the 3.0 manifest). Previously an array of
+objects emitted raw objects for classification and null for digital_exhibit,
+and a single object made identifier emit null. identifier still emits one entry
+per value, so its label repeats -- unchanged here on purpose.
 Updated December 2025 for 1.6.0
 Previously Updated for 1.5.0 June 2025
 Previously Updated for 1.4.0 Nov 2024
@@ -176,9 +181,14 @@ Without Double quotes.
             },
             {% endif %}
             {% if data.classification %}
+              {% set classification_items = data.classification.value is defined ? [data.classification] : (data.classification is iterable ? data.classification : [data.classification]) %}
+              {% set classification_values = [] %}
+              {% for item in classification_items %}
+                {% set classification_values = classification_values|merge([item.value|default(item)]) %}
+              {% endfor %}
             {
             "label": { "{{ len }}": ["Classification"] },
-            "value": { "{{ len }}": [{{ data.classification.value|default(data.classification)|json_encode|raw }}] }
+            "value": { "{{ len }}": {{ classification_values|json_encode|raw }} }
             },
             {% endif %}
             {% if data.collecting_area %}
@@ -258,9 +268,14 @@ Without Double quotes.
             },
             {% endif %}
             {% if data.digital_exhibit %}
+              {% set digital_exhibit_items = data.digital_exhibit.value is defined ? [data.digital_exhibit] : (data.digital_exhibit is iterable ? data.digital_exhibit : [data.digital_exhibit]) %}
+              {% set digital_exhibit_values = [] %}
+              {% for item in digital_exhibit_items %}
+                {% set digital_exhibit_values = digital_exhibit_values|merge([item.value|default(item)]) %}
+              {% endfor %}
             {
             "label": { "{{ len }}": ["Part of Digital Exhibit"] },
-            "value": { "{{ len }}": [ {{ data.digital_exhibit.value|json_encode|raw }} ] }
+            "value": { "{{ len }}": {{ digital_exhibit_values|json_encode|raw }} }
             },
             {% endif %}
             {% if data.digital_origin %}
@@ -311,10 +326,11 @@ Without Double quotes.
             "value": { "{{ len }}": {{ geo_subject_values|json_encode|raw }} }
             },
             {% endif %}
-            {% for item in attribute(data, 'identifier') %}
+            {% set identifier_items = data.identifier is defined and data.identifier.value is defined ? [data.identifier] : (attribute(data, 'identifier')|default([])) %}
+            {% for item in identifier_items %}
             {
             "label": { "{{ len }}": ["Identifier"] },
-            "value": { "{{ len }}": [ {{ item.value|json_encode|raw }} ] }
+            "value": { "{{ len }}": [{{ item.value|default(item)|json_encode|raw }}] }
             },
             {% endfor %}
             {% if data.language %}

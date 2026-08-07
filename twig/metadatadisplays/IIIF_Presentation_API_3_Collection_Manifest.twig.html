@@ -29,6 +29,13 @@ Fixed date_built/date_created/date_issued/date_razed emitting a bare number
 (e.g. 1802 instead of "1802"). IIIF requires metadata values to be strings, and
 these lacked the ~ '' coercion the 3.0 and CWS manifests already had.
 date_digital_creation is left uncoerced, matching those two templates.
+classification, digital_exhibit and identifier now accept either a single object
+or an array of objects (ported from the 3.0 manifest). Previously an array of
+objects emitted raw objects for classification and null for digital_exhibit,
+and a single object made identifier emit null. identifier still emits one entry
+per value, so its label repeats -- unchanged here on purpose.
+
+
 Updated 06/13/2024 for 1.4.0
 
 Uses metadata exposed endpoint Route to generate URL so Aliases don't break it
@@ -170,9 +177,14 @@ Without Double quotes.
         },
         {% endif %}
         {% if data.classification %}
+          {% set classification_items = data.classification.value is defined ? [data.classification] : (data.classification is iterable ? data.classification : [data.classification]) %}
+          {% set classification_values = [] %}
+          {% for item in classification_items %}
+            {% set classification_values = classification_values|merge([item.value|default(item)]) %}
+          {% endfor %}
         {
         "label": { "{{ len }}": ["Classification"] },
-        "value": { "{{ len }}": [{{ data.classification.value|default(data.classification)|json_encode|raw }}] }
+        "value": { "{{ len }}": {{ classification_values|json_encode|raw }} }
         },
         {% endif %}
         {% if data.collecting_area %}
@@ -252,9 +264,14 @@ Without Double quotes.
         },
         {% endif %}
         {% if data.digital_exhibit %}
+          {% set digital_exhibit_items = data.digital_exhibit.value is defined ? [data.digital_exhibit] : (data.digital_exhibit is iterable ? data.digital_exhibit : [data.digital_exhibit]) %}
+          {% set digital_exhibit_values = [] %}
+          {% for item in digital_exhibit_items %}
+            {% set digital_exhibit_values = digital_exhibit_values|merge([item.value|default(item)]) %}
+          {% endfor %}
         {
         "label": { "{{ len }}": ["Part of Digital Exhibit"] },
-        "value": { "{{ len }}": [{{ data.digital_exhibit.value|json_encode|raw }}] }
+        "value": { "{{ len }}": {{ digital_exhibit_values|json_encode|raw }} }
         },
         {% endif %}
         {% if data.digital_origin %}
@@ -305,10 +322,11 @@ Without Double quotes.
         "value": { "{{ len }}": {{ geo_subject_values|json_encode|raw }} }
         },
         {% endif %}
-        {% for item in attribute(data, 'identifier') %}
+        {% set identifier_items = data.identifier is defined and data.identifier.value is defined ? [data.identifier] : (attribute(data, 'identifier')|default([])) %}
+        {% for item in identifier_items %}
         {
         "label": { "{{ len }}": ["Identifier"] },
-        "value": { "{{ len }}": [{{ item.value|json_encode|raw }}] }
+        "value": { "{{ len }}": [{{ item.value|default(item)|json_encode|raw }}] }
         },
         {% endfor %}
         {% if data.language %}
