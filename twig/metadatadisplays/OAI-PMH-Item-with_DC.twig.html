@@ -1,4 +1,5 @@
-{# Created by Allison & Diego March 2024.
+{# Updated 08/07/2026. Removed the related_url_historic (dc:relation) element.
+Created by Allison & Diego March 2024.
 Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {%- set oai_id = 'oai:fake:test' -%}
 {%- if node.uuid.value -%}
@@ -156,10 +157,6 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {# related_url #}
 {% if data.related_url %}
   <dc:relation>{{ data.related_url }}</dc:relation>
-{% endif %}
-{# related_url_historic #}
-{% if data.related_url_historic %}
-  <dc:relation>{{ data.related_url_historic }}</dc:relation>
 {% endif %}
 {# rights_details #}
 {% if data.rights_details %}

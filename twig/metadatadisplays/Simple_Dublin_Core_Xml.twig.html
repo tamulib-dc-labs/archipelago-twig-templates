@@ -1,4 +1,5 @@
-{# Updated August 2022 for 1.0.0 to fix:
+{# Updated 08/07/2026. Removed the related_url_historic (dc:relation) element.
+Updated August 2022 for 1.0.0 to fix:
 - data.local_identifier that could be multiples
 Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 <?xml version="1.0" encoding="UTF-8"?>
@@ -218,9 +219,6 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 {% for url in data.related_url %}
      <dc:relation>{{ url }}</dc:relation>
     {% endfor %}
-{% endif %}
-{% if data.related_url_historic|length > 0 %}
-     <dc:relation>{{ data.related_url_historic }}</dc:relation>
 {% endif %}
 {% if node.id %}
     {% set nodeurl = url('entity.node.canonical', {'node': node.id}, {'absolute': true}) %}

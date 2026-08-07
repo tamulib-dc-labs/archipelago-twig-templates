@@ -1,5 +1,7 @@
 {#-
-Last updated March 18th, 2026 by Mark Baggett. Rewrote description dl block to align with TAMU Archipelago field schema v0.2.
+Last updated 08/07/2026. Removed the Date Available (date_available) and
+Related URL (Historic) (related_url_historic) rows from the description list.
+Previously updated March 18th, 2026 by Mark Baggett. Rewrote description dl block to align with TAMU Archipelago field schema v0.2.
 Last updated February 11th, 2026 by Mark Baggett. Converted from h3/child model to dl/dt/dd semantic structure.
 Previously updated December 5th, 2025. Adds Custom Media Controller and example inline 3D Viewer.
 Previously updated August 29, 2025 - update the Administrative Information section with additional elements.
@@ -376,7 +378,6 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
         {% endfor %}
         {% endif %}
         {# Remaining date fields #}
-        {{ _self.html_output('Date Available', data.date_available) }}
         {{ _self.html_output('Date Available Online', data.date_digital_creation) }}
         {{ _self.html_output('Date Built', data.date_built) }}
         {{ _self.html_output('Date Razed', data.date_razed) }}
@@ -522,7 +523,6 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
         {# Related resources #}
         {{ _self.html_output('Related Item', data.related_item) }}
         {{ _self.html_output('Related URL', data.related_url) }}
-        {{ _self.html_output('Related URL (Historic)', data.related_url_historic) }}
         {{ _self.html_output('Original Publication', data.original_publication) }}
 
         {# Notes and contents #}

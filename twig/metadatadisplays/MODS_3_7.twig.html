@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+{# Updated 08/07/2026. Removed the date_available (dateOther) and related_url_historic
+(relatedItem type="references") elements. #}
 {# Date: May 2021. This template produces MODS records incorporating many of the most common MODS elements. This template can be expanded to incorproate additonal MODS elements as needed, if present in your Archipelago Digital Objects and Collections source data. #}
 <mods xmlns="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-7.xsd" version="3.7">
 <titleInfo>
@@ -116,9 +118,6 @@
 {% endif %}
 {% if data.date_issued %}
 	<dateIssued>{{ data.date_issued }}</dateIssued>
-{% endif %}
-{% if data.date_available %}
-	<dateOther>{{ data.date_available }}</dateOther>
 {% endif %}
 {% if data.date_digital_creation %}
 	<dateOther>{{ data.date_digital_creation }}</dateOther>
@@ -358,11 +357,6 @@
     <location><url>{{ url }}</url></location>
   </relatedItem>
  {% endfor %}
-{% endif %}
-{% if data.related_url_historic %}
-  <relatedItem type="references">
-    <location><url>{{ data.related_url_historic }}</url></location>
-  </relatedItem>
 {% endif %}
 
 {# Rights Statements #}
