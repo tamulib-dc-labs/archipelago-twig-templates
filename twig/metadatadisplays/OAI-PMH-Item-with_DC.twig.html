@@ -454,15 +454,6 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
      		<dc:relation>{{ data.related_url }}</dc:relation>
      {% endif %} 
 {% endif %}
-{% if data.related_url_historic|length > 0 %}
-     {% if data.related_url_historic is iterable %}
-     	{% for related_url_historic in data.related_url %}
-       		<dc:relation>{{ related_url_historic }}</dc:relation>
-     	{% endfor %}
-     {% else %}
-     		<dc:relation>{{ data.related_url_historic }}</dc:relation>
-     {% endif %} 
-{% endif %}
 
 {# Rights #}
 {% if data.rights|length > 0 %} 
