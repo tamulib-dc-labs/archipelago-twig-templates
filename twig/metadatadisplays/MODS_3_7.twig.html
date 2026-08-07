@@ -230,6 +230,17 @@
 {% endif %}
 </physicalDescription>
 
+{# Identifier #}
+{% if data.identifier %}
+{% if data.identifier is iterable %}
+  {% for item in data.identifier %}
+    <identifier type="{{ item.authority }}">{{ item.value }}</identifier>
+  {% endfor %}
+  {% else %}
+  <identifier type="{{ data.identifier.authority }}">{{ data.identifier.value }}</identifier>
+{% endif %}
+{% endif %}
+
 {# Genre #}
 {% if data.genre_form %}
 {% if data.genre_form is iterable %}

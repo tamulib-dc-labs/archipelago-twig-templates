@@ -321,13 +321,13 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      {% endif %} 
 {% endif %}
 {# Identifier #}
-{% if data.local_identifier|length > 0 %}
- 	{% if data.local_identifier is iterable %}
-     	{% for local_identifier in data.local_identifier %}
-			<dc:identifier>{{ local_identifier|escape('html_attr') }}</dc:identifier>
+{% if data.identifier %}
+ 	{% if data.identifier is iterable %}
+     	{% for identifier in data.identifier %}
+			<dc:identifier>{{ identifier.value }}</dc:identifier>
         {% endfor %}
        {% else %}
-     		<dc:identifier>{{ data.local_identifier|escape('html_attr') }}</dc:identifier>
+     		<dc:identifier>{{ data.identifier.value }}</dc:identifier>
     {% endif %}    
 {% endif %}
 {# Relation #}
