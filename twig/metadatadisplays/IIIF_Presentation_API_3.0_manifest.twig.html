@@ -199,7 +199,7 @@ Without Double quotes.
     },
     {% endif %}
     {% if data.classification %}
-      {% set classification_items = data.classification.value is defined ? [data.classification] : (data.classification is iterable ? data.classification : [data.classification]) %}
+      {% set classification_items = data.classification is iterable ? data.classification : [data.classification] %}
       {% set classification_values = [] %}
       {% for item in classification_items %}
         {% set classification_values = classification_values|merge([item.value|default(item)]) %}
