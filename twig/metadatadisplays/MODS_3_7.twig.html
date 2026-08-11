@@ -51,82 +51,74 @@
     </name>
 {% endif %}
 {% endif %}
-{% if data.agent %}
-{% if data.agent is iterable %}
-    {% for agent in data.agent %}
+
+{% if data.agent.value is defined %}
+  <name>
+    <namePart>{{ data.agent.value }}</namePart>
+    <role>
+		  <roleTerm valueURI="{{ data.agent.role_uri }}" authority= "marcrelator" type="text">{{ data.agent.role }}</roleTerm>
+		</role>
+  </name>{% else %}
+  {% for agent in data.agent %}
     <name>
         <namePart>{{ agent.value }}</namePart>
         <role>
 			<roleTerm valueURI="{{ agent.role_uri }}" authority= "marcrelator" type="text">{{ agent.role }}</roleTerm>
 		</role>
-    </name>
-    {% endfor %}
-     {% else %}
-    <name>
-        <namePart>{{ data.agent.value }}</namePart>
-        <role>
-			<roleTerm valueURI="{{ data.agent.role_uri }}" authority= "marcrelator" type="text">{{ data.agent.role }}</roleTerm>
-		</role>
-    </name>
+    </name>  
+  {% endfor %}
 {% endif %}
-{% endif %}
-{% if data.agent_linked_data %}
-{% if data.agent_linked_data is iterable %}
+
+{% if data.agent_linked_data.value is defined %}
+  <name valueURI="{{ data.agent_linked_data.uri }}">
+      <namePart>{{ data.agent_linked_data.value }}</namePart>
+      <role>
+        <roleTerm valueURI="{{ data.agent_linked_data.role_uri }}" authority="marcrelator" type="text">{{ data.agent_linked_data.role }}</roleTerm>
+      </role>
+    </name>{% else %}
   {% for agent in data.agent_linked_data %}
     <name valueURI="{{ agent.uri }}">
       <namePart>{{ agent.value }}</namePart>
       <role>
         <roleTerm valueURI="{{ agent.role_uri }}" authority="marcrelator" type="text">{{ agent.role }}</roleTerm>
       </role>
-    </name>
-  {% endfor %}
-  {% else %}
-  <name valueURI="{{ data.agent_linked_data.uri }}">
-      <namePart>{{ data.agent_linked_data.value }}</namePart>
-      <role>
-        <roleTerm valueURI="{{ data.agent_linked_data.role_uri }}" authority="marcrelator" type="text">{{ data.agent_linked_data.role }}</roleTerm>
-      </role>
-    </name>
-  {% endif %}  
+    </name>  {% endfor %}
 {% endif %}
-{% if data.creator_linked_data %}
-{% if data.creator_linked_data is iterable %}
-  {% for creator in data.creator_linked_data %}
-    <name valueURI="{{ creator.uri }}">
-      <namePart>{{ creator.value }}</namePart>
-      <role>
-        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
-      </role>
-    </name>
-  {% endfor %}
-  {% else %}
+
+{% if data.creator_linked_data.value is defined %}
   <name valueURI="{{ data.creator_linked_data.uri }}">
       <namePart>{{ data.creator_linked_data.value }}</namePart>
       <role>
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
       </role>
-    </name>
+    </name>{% else %}
+  {% for creator in data.agent_linked_data %}
+    <name valueURI="{{ creator.uri }}">
+      <namePart>{{ creator.value }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
+      </role>
+    </name>  
+  {% endfor %}
 {% endif %}
-{% endif %}
-{% if data.contributor_linked_data %}
-{% if data.contributor_linked_data is iterable %}
+
+{% if data.contributor_linked_data.value is defined %}
+  <name valueURI="{{ data.contributor_linked_data.uri }}">
+      <namePart>{{ data.contributor_linked_data.value }}</namePart>
+      <role>
+        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
+      </role>
+    </name>{% else %}
   {% for contributor in data.contributor_linked_data %}
     <name valueURI="{{ contributor.uri }}">
       <namePart>{{ contributor.value }}</namePart>
       <role>
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
       </role>
-    </name>
+    </name>  
   {% endfor %}
-  {% else %}
-  <name valueURI="{{ data.contributor_linked_data.uri }}">
-      <namePart>{{ data.contributor_linked_data.value }}</namePart>
-      <role>
-        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
-      </role>
-    </name>
 {% endif %}
-{% endif %}
+
 {% if data.local_department %}
 {% if data.local_department is iterable %}
   {% for item in data.local_department %}
@@ -231,14 +223,12 @@
 </physicalDescription>
 
 {# Identifier #}
-{% if data.identifier %}
-{% if data.identifier is iterable %}
+{% if data.identifier.authority is defined %}
+  <identifier type="{{ data.identifier.authority }}">{{ data.identifier.value }}</identifier>
+{% else %}
   {% for item in data.identifier %}
     <identifier type="{{ item.authority }}">{{ item.value }}</identifier>
   {% endfor %}
-  {% else %}
-  <identifier type="{{ data.identifier.authority }}">{{ data.identifier.value }}</identifier>
-{% endif %}
 {% endif %}
 
 {# Genre #}
@@ -251,17 +241,16 @@
   <genre>{{ data.genre_form }}</genre>
 {% endif %}
 {% endif %}
-{% if data.genre_form_linked_data %}
-{% if data.genre_form_linked_data is iterable %}
-  {% for item in data.genre_form_linked_data %}
-    <genre valueURI="{{ item.uri }}">{{ item.value }}</genre>
-  {% endfor %}
-  {% else %}
+{% if data.genre_form_linked_data.value is defined %}
   <genre valueURI="{{ data.genre_form.uri }}">{{ data.genre_form.value }}</genre>
-{% endif %}
+{% else %}
+  {% for genre in data.genre_form_linked_data %}
+    <genre valueURI="{{ item.uri }}">{{ genre.value }}</genre>
+  {% endfor %}
 {% endif %}
 
 {# Subject #}
+
 {% if data.geographic_subject %}
 {% if data.geographic_subject is iterable %}
 {% for item in data.geographic_subject %}
@@ -271,14 +260,12 @@
   <subject><geographic>{{ data.geographic_subject }}</geographic></subject>
 {% endif %}
 {% endif %}
-{% if data.geographic_subject_linked_data %}
-{% if data.geographic_subject_linked_data is iterable %}
-  {% for item in data.geographic_subject_linked_data %}
-    <subject><geographic valueURI="{{ item.uri }}">{{ item.value }}</geographic></subject>
-  {% endfor %}
-  {% else %}
+{% if data.geographic_subject_linked_data.value is defined %}
   <subject><geographic valueURI="{{ data.geographic_subject_linked_data.uri }}">{{ data.geographic_subject_linked_data.value }}</geographic></subject>
-{% endif %}  
+{% else %}
+  {% for subject in data.geographic_subject_linked_data %}
+    <subject><geographic valueURI="{{ subject.uri }}">{{ subject.value }}</geographic></subject>
+  {% endfor %}
 {% endif %}
 {% if data.subject %}
 {% if data.subject is iterable %}
@@ -289,14 +276,12 @@
       <subject><topic>{{ data.subject }}</topic></subject>
 {% endif %}
 {% endif %}
-{% if data.subject_linked_data %}
-{% if data.subject_linked_data is iterable %}
-{% for item in data.subject_linked_data %}
-    <subject><topic valueURI="{{ item.uri }}">{{ item.value }}</topic></subject>
+{% if data.subject_linked_data.value is defined %}
+  <subject><topical valueURI="{{ data.subject_linked_data.uri }}">{{ data.subject_linked_data.value }}</topical></subject>
+{% else %}
+  {% for subject in data.subject_linked_data %}
+    <subject><topical valueURI="{{ subject.uri }}">{{ subject.value }}</topical></subject>
   {% endfor %}
-   {% else %}
-       <subject><topic valueURI="{{ data.subject_linked_data.uri }}">{{ data.subject_linked_data.value }}</topic></subject>
-{% endif %}
 {% endif %}
 {% if data.temporal_subject %}
 {% if data.temporal_subject is iterable %}
@@ -307,14 +292,12 @@
   <subject><temporal>{{ data.temporal_subject }}</temporal></subject>
 {% endif %}
 {% endif %}
-{% if data.temporal_subject_linked_data %}
-{% if data.temporal_subject_linked_data is iterable %}
-  {% for item in data.temporal_subject_linked_data %}
-    <subject><temporal valueURI="{{ item.uri }}">{{ item.value }}</temporal></subject>
+{% if data.temporal_subject_linked_data.value is defined %}
+  <subject><temporal valueURI="{{ data.temporal_subject_linked_data.uri }}">{{ data.temporal_subject_linked_data.value }}</temporal></subject>
+{% else %}
+  {% for subject in data.temporal_subject_linked_data %}
+    <subject><temporal valueURI="{{ subject.uri }}">{{ subject.value }}</temporal></subject>
   {% endfor %}
-  {% else %}
-      <subject><temporal valueURI="{{ data.temporal_subject_linked_data.uri }}">{{ data.temporal_subject_linked_data.value }}</temporal></subject>
-{% endif %}
 {% endif %}
 {% if data.coordinates %}
 {% if data.coordinates is iterable %}
@@ -389,18 +372,12 @@
 {% endif %}
 
 {# Classification #}
-{% if data.classification %}
-{% if data.classification is iterable %}
-{% for classification in data.classification %}
-<classification authority="{{ classification.authority }}">
-    {{ classification.value }}
-</classification>
+{% if data.classification.authority is defined %}
+  <classification authority="{{ data.classification.authority }}">{{ data.classification.value }}</classification>
+{% else %}
+  {% for item in data.classification %}
+    <classification authority="{{ item.authority }}">{{ item.value }}</classification>
   {% endfor %}
-   {% else %}
-  <classification authority="{{ data.classification.authority }}">
-    {{ data.classification.value }}
-</classification>
-{% endif %}
 {% endif %}
 
 {# Language #}
@@ -505,23 +482,22 @@
     </relatedItem>
 {% endif %}
 {% endif %}
-{% if data.digital_exhibit %}
-{% if data.digital_exhibit is iterable %}
+
+{% if data.digital_exhibit.value is defined %}
+  <relatedItem type="host">
+      <titleInfo>
+        <title>{{ data.digital_exhibit.value }}</title>
+      </titleInfo>
+    </relatedItem>
+{% else %}
   {% for item in data.digital_exhibit %}
     <relatedItem type="host">
       <titleInfo>
         <title>{{ item.value }}</title>
       </titleInfo>
-    </relatedItem>
-  {% endfor %}
-    {% else %}
-    <relatedItem type="host">
-      <titleInfo>
-        <title>{{ data.digital_exhibit.value }}</title>
-      </titleInfo>
-    </relatedItem>
+    </relatedItem>  {% endfor %}
 {% endif %}
-{% endif %}
+
 {% if data.original_publication %}
 {% if data.original_publication is iterable %}
   {% for item in data.original_publication %}
