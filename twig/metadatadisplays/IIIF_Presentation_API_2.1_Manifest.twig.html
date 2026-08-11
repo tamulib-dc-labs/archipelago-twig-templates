@@ -1,6 +1,9 @@
 {# This Template generates IIIF 2.1 Presentation API Manifest from a Strawberry Field
 JSON.
 
+Updated 08/07/2026. Removed the Date Available (date_available), Related URL (Historic)
+(related_url_historic) and navDate metadata entries.
+
 Structures passed from Archipelago are
 - node
   The full Node entity
@@ -101,12 +104,6 @@ Updated Dec 14th 2020
     {
       "label": "Coordinates",
       "value": {{ data.coordinates|json_encode|raw }}
-    },
-    {% endif %}
-    {% if data.date_available %}
-    {
-      "label": "Date Available",
-      "value": {{ data.date_available|json_encode|raw }}
     },
     {% endif %}
     {% if data.date_built %}
@@ -273,12 +270,6 @@ Updated Dec 14th 2020
       "value": {{ data.related_url|json_encode|raw }}
     },
     {% endif %}
-    {% if data.related_url_historic %}
-    {
-      "label": "Related URL (Historic)",
-      "value": {{ data.related_url_historic|json_encode|raw }}
-    },
-    {% endif %}
     {% if data.rights_details %}
     {
       "label": "Rights Details",
@@ -335,10 +326,6 @@ Updated Dec 14th 2020
       "value": {{ data.title_alternative|json_encode|raw }}
     },
     {% endif %}
-    {
-      "label": "navDate",
-      "value": "{{ "now"|date("F jS \\a\\t g:ia") }}"
-    },
     {
       "label": "license",
       "value": {{ data.rights|json_encode|raw }}

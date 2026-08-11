@@ -1,4 +1,5 @@
 {#-
+Updated 08/07/2026. Removed the navDate metadata entry.
 Updated 05/12/2025 for 1.6.0. IIIF Presentation API 3 Series Manifest Unified 
 - Uses a single Search API Views, paged, bringing children up to two level downs. -
 Sorts by more far away Sequence id, then lowering to its own.
@@ -132,18 +133,6 @@ Without Double quotes.
 {{ data.description|json_encode|raw }}
 ]
 }
-},
-{
-"label": {
-"{{ len }}": [
-"navDate"
-]
-},
-"value":  {
-"{{ len }}": [
-   "{{ node.getChangedTime|date("F jS \\a\\t g:ia") }}"
-    ]
-  }
 },
 {
 "label": {
