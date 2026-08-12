@@ -54,6 +54,7 @@
 {% endif %}
 {% endif %}
 
+{% if data.agent}
 {% if data.agent.value is defined %}
   <name>
     <namePart>{{ data.agent.value }}</namePart>
@@ -70,7 +71,9 @@
     </name>  
   {% endfor %}
 {% endif %}
+{% endif %}
 
+{% if data.agent_linked_data %}
 {% if data.agent_linked_data.value is defined %}
   <name valueURI="{{ data.agent_linked_data.uri }}">
       <namePart>{{ data.agent_linked_data.value }}</namePart>
@@ -86,7 +89,9 @@
       </role>
     </name>  {% endfor %}
 {% endif %}
+{% endif %}
 
+{% if data.creator_linked_data %}
 {% if data.creator_linked_data.value is defined %}
   <name valueURI="{{ data.creator_linked_data.uri }}">
       <namePart>{{ data.creator_linked_data.value }}</namePart>
@@ -94,7 +99,7 @@
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
       </role>
     </name>{% else %}
-  {% for creator in data.agent_linked_data %}
+  {% for creator in data.creator_linked_data %}
     <name valueURI="{{ creator.uri }}">
       <namePart>{{ creator.value }}</namePart>
       <role>
@@ -103,7 +108,9 @@
     </name>  
   {% endfor %}
 {% endif %}
+{% endif %}
 
+{% if data.contributor_linked_data %}
 {% if data.contributor_linked_data.value is defined %}
   <name valueURI="{{ data.contributor_linked_data.uri }}">
       <namePart>{{ data.contributor_linked_data.value }}</namePart>
@@ -119,6 +126,7 @@
       </role>
     </name>  
   {% endfor %}
+{% endif %}
 {% endif %}
 
 {% if data.local_department %}
@@ -225,12 +233,14 @@
 </physicalDescription>
 
 {# Identifier #}
+{% if data.identifier %}
 {% if data.identifier.authority is defined %}
   <identifier type="{{ data.identifier.authority }}">{{ data.identifier.value }}</identifier>
 {% else %}
   {% for item in data.identifier %}
     <identifier type="{{ item.authority }}">{{ item.value }}</identifier>
   {% endfor %}
+{% endif %}
 {% endif %}
 
 {# Genre #}
@@ -243,12 +253,14 @@
   <genre>{{ data.genre_form }}</genre>
 {% endif %}
 {% endif %}
+{% if data.genre_form_linked_data %}
 {% if data.genre_form_linked_data.value is defined %}
-  <genre valueURI="{{ data.genre_form.uri }}">{{ data.genre_form.value }}</genre>
+  <genre valueURI="{{ data.genre_form_linked_data.uri }}">{{ data.genre_form_linked_data.value }}</genre>
 {% else %}
   {% for genre in data.genre_form_linked_data %}
-    <genre valueURI="{{ item.uri }}">{{ genre.value }}</genre>
+    <genre valueURI="{{ genre.uri }}">{{ genre.value }}</genre>
   {% endfor %}
+{% endif %}
 {% endif %}
 
 {# Subject #}
@@ -262,6 +274,7 @@
   <subject><geographic>{{ data.geographic_subject }}</geographic></subject>
 {% endif %}
 {% endif %}
+{% if data.geographic_subject_linked_data %}
 {% if data.geographic_subject_linked_data.value is defined %}
   <subject><geographic valueURI="{{ data.geographic_subject_linked_data.uri }}">{{ data.geographic_subject_linked_data.value }}</geographic></subject>
 {% else %}
@@ -269,6 +282,8 @@
     <subject><geographic valueURI="{{ subject.uri }}">{{ subject.value }}</geographic></subject>
   {% endfor %}
 {% endif %}
+{% endif %}
+
 {% if data.subject %}
 {% if data.subject is iterable %}
   {% for item in data.subject %}
@@ -278,6 +293,7 @@
       <subject><topic>{{ data.subject }}</topic></subject>
 {% endif %}
 {% endif %}
+{% if data.subject_linked_data %}
 {% if data.subject_linked_data.value is defined %}
   <subject><topical valueURI="{{ data.subject_linked_data.uri }}">{{ data.subject_linked_data.value }}</topical></subject>
 {% else %}
@@ -285,6 +301,8 @@
     <subject><topical valueURI="{{ subject.uri }}">{{ subject.value }}</topical></subject>
   {% endfor %}
 {% endif %}
+{% endif %}
+
 {% if data.temporal_subject %}
 {% if data.temporal_subject is iterable %}
   {% for item in data.temporal_subject %}
@@ -294,6 +312,7 @@
   <subject><temporal>{{ data.temporal_subject }}</temporal></subject>
 {% endif %}
 {% endif %}
+{% if data.temporal_subject_linked_data %}
 {% if data.temporal_subject_linked_data.value is defined %}
   <subject><temporal valueURI="{{ data.temporal_subject_linked_data.uri }}">{{ data.temporal_subject_linked_data.value }}</temporal></subject>
 {% else %}
@@ -301,6 +320,8 @@
     <subject><temporal valueURI="{{ subject.uri }}">{{ subject.value }}</temporal></subject>
   {% endfor %}
 {% endif %}
+{% endif %}
+
 {% if data.coordinates %}
 {% if data.coordinates is iterable %}
 {% for coordinates in data.coordinates %}
@@ -374,12 +395,14 @@
 {% endif %}
 
 {# Classification #}
+{% if data.classification %}
 {% if data.classification.authority is defined %}
   <classification authority="{{ data.classification.authority }}">{{ data.classification.value }}</classification>
 {% else %}
   {% for item in data.classification %}
     <classification authority="{{ item.authority }}">{{ item.value }}</classification>
   {% endfor %}
+{% endif %}
 {% endif %}
 
 {# Language #}
@@ -485,6 +508,7 @@
 {% endif %}
 {% endif %}
 
+{% if data.digital_exhibit %}
 {% if data.digital_exhibit.value is defined %}
   <relatedItem type="host">
       <titleInfo>
@@ -498,6 +522,7 @@
         <title>{{ item.value }}</title>
       </titleInfo>
     </relatedItem>  {% endfor %}
+{% endif %}
 {% endif %}
 
 {% if data.original_publication %}

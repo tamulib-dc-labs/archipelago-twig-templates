@@ -103,7 +103,7 @@ Without Double quotes.
 {% if data.attribution %}
 "requiredStatement": {
     "label": { "en": [ "Attribution" ] },
-    "value": { "en": [ {{ data.attribution|json_endcode_raw }} ] }
+    "value": { "en": [ {{ data.attribution|json_encode|raw }} ] }
 },
 {% endif %}
 "rights": {{ computed_rights|json_encode|raw }},

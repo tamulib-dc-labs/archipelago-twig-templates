@@ -58,12 +58,14 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
      	<dc:creator>{{ data.creator }}</dc:creator>
 	{% endif %} 
 {% endif %}
+{% if data.creator_linked_data %}
 {% if data.creator_linked_data.value is defined %}
     <dc:creator>{{ data.creator_linked_data.value }}</dc:creator>
   {% else %}
   {% for creator in data.creator_linked_data %}
     <dc:creator>{{ creator.value }}</dc:creator>
   {% endfor %}
+{% endif %}
 {% endif %}
 {% if data.contributor|length > 0  %}
 	{% if data.contributor is iterable %}
@@ -74,6 +76,7 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
      	<dc:contributor>{{ data.contributor }}</dc:contributor>
 	{% endif %} 
 {% endif %}
+{% if data.contributor_linked_data %}
 {% if data.contributor_linked_data.value is defined %}
     <dc:contributor>{{ data.contributor_linked_data.value }}</dc:contributor>
   {% else %}
@@ -81,6 +84,8 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
     <dc:contributor>{{ contributor.value }}</dc:contributor>
   {% endfor %}
 {% endif %}
+{% endif %}
+{% if data.agent %}
 {% if data.agent.value is defined %}
     <dc:contributor>{{ data.agent.value }}</dc:contributor>
   {% else %}
@@ -88,12 +93,15 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
     			<dc:contributor>{{ agent.value }}</dc:contributor>
   {% endfor %}
 {% endif %}
+{% endif %}
+{% if data.agent_linked_data %}
 {% if data.agent_linked_data.value is defined %}
     <dc:contributor>{{ data.agent_linked_data.value }}</dc:contributor>
   {% else %}
   {% for agent in data.agent_linked_data %}
     <dc:contributor>{{ agent.value }}</dc:contributor>
   {% endfor %}
+{% endif %}
 {% endif %}
 {% if data.sponsorship|length > 0  %}
 	{% if data.sponsorship is iterable %}
@@ -124,12 +132,14 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
      	<dc:coverage>{{ data.geographic_subject }}</dc:coverage>
 	{% endif %} 
 {% endif %}
+{% if data.geographic_subject_linked_data %}
 {% if data.geographic_subject_linked_data.value is defined %}
      	<dc:coverage>{{ data.geographic_subject_linked_data.value }}</dc:coverage>
 {% else %}
   {% for subject in data.geographic_subject_linked_data %}
 			<dc:coverage>{{ subject.value }}</dc:coverage>
   {% endfor %}
+{% endif %}
 {% endif %}
 {% if data.temporal_subject|length > 0  %}
 	{% if data.temporal_subject is iterable %}
@@ -140,12 +150,14 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
      	<dc:coverage>{{ data.temporal_subject }}</dc:coverage>
 	{% endif %} 
 {% endif %}
+{% if data.temporal_subject_linked_data %}
 {% if data.temporal_subject_linked_data.value is defined %}
      	<dc:coverage>{{ data.temporal_subject_linked_data.value }}</dc:coverage>
 {% else %}
   {% for subject in data.temporal_subject_linked_data %}
 			<dc:coverage>{{ subject.value }}</dc:coverage>
   {% endfor %}
+{% endif %}
 {% endif %}
 {% if data.coordinates|length > 0  %}
 	{% if data.coordinates is iterable %}
@@ -243,6 +255,7 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
      		<dc:subject>{{ data.subject }}</dc:subject>
      {% endif %} 
 {% endif %}
+{% if data.subject_linked_data %}
 {% if data.subject_linked_data.value is defined %}
      	<dc:subject>{{ data.subject_linked_data.value }}</dc:subject>
 {% else %}
@@ -250,12 +263,15 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 			<dc:subject>{{ subject.value }}</dc:subject>
   {% endfor %}
 {% endif %}
+{% endif %}
+{% if data.classification %}
 {% if data.classification.authority is defined %}
      	<dc:subject>{{ data.classification.value }}</dc:subject>
 {% else %}
   {% for classification in data.classification %}
       <dc:subject>{{ classification.value }}</dc:subject>
   {% endfor %}
+{% endif %}
 {% endif %}
 
 {# Publisher #}
@@ -311,12 +327,14 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
      		<dc:type>{{ data.genre_form }}</dc:type>
      {% endif %} 
 {% endif %}
+{% if data.genre_form_linked_data %}
 {% if data.genre_form_linked_data.value is defined %}
   <dc:type>{{ data.genre_form_linked_data.value }}</dc:type>
 {% else %}
   {% for genre in data.genre_form_linked_data %}
   <dc:type>{{ genre.value }}</dc:type>
   {% endfor %}
+{% endif %}
 {% endif %}
 
 {# Format #}
@@ -346,12 +364,14 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% endif %}
 
 {# Identifier #}
+{% if data.identifier %}
 {% if data.identifier.authority is defined %}
   <dc:identifier>{{ data.identifier.value }}</dc:identifier>
 {% else %}
   {% for identifier in data.identifier %}
 	<dc:identifier>{{ identifier.value }}</dc:identifier>
   {% endfor %}
+{% endif %}
 {% endif %}
 
 {# Source #}
@@ -388,12 +408,14 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
      		<dc:relation>{{ data.collecting_area }}</dc:relation>
      {% endif %} 
 {% endif %}
+{% if data.digital_exhibit %}
 {% if data.digital_exhibit.value is defined %}
     <dc:relation>{{ data.digital_exhibit.value }}</dc:relation>
     <dc:relation>{{ data.digital_exhibit.uri }}</dc:relation>{% else %}
   {% for digital_exhibit in data.digital_exhibit %}
     <dc:relation>{{ digital_exhibit.value }}</dc:relation>
     <dc:relation>{{ digital_exhibit.uri }}</dc:relation>  {% endfor %}
+{% endif %}
 {% endif %}
 {% if data.original_publication|length > 0 %}
      {% if data.original_publication is iterable %}

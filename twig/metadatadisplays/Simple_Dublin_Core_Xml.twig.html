@@ -23,12 +23,14 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      	<dc:creator>{{ data.creator }}</dc:creator>
 	{% endif %} 
 {% endif %}
+{% if data.creator_linked_data %}
 {% if data.creator_linked_data.value is defined %}
     <dc:creator>{{ data.creator_linked_data.value }}</dc:creator>
   {% else %}
   {% for creator in data.creator_linked_data %}
     <dc:creator>{{ creator.value }}</dc:creator>
   {% endfor %}
+{% endif %}
 {% endif %}
 {% if data.contributor|length > 0  %}
 	{% if data.contributor is iterable %}
@@ -39,6 +41,7 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      	<dc:contributor>{{ data.contributor }}</dc:contributor>
 	{% endif %} 
 {% endif %}
+{% if data.contributor_linked_data %}
 {% if data.contributor_linked_data.value is defined %}
     <dc:contributor>{{ data.contributor_linked_data.value }}</dc:contributor>
   {% else %}
@@ -46,6 +49,8 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
     <dc:contributor>{{ contributor.value }}</dc:contributor>
   {% endfor %}
 {% endif %}
+{% endif %}
+{% if data.agent %}
 {% if data.agent.value is defined %}
     <dc:contributor>{{ data.agent.value }}</dc:contributor>
   {% else %}
@@ -53,12 +58,15 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
     			<dc:contributor>{{ agent.value }}</dc:contributor>
   {% endfor %}
 {% endif %}
+{% endif %}
+{% if data.agent_linked_data %}
 {% if data.agent_linked_data.value is defined %}
     <dc:contributor>{{ data.agent_linked_data.value }}</dc:contributor>
   {% else %}
   {% for agent in data.agent_linked_data %}
     <dc:contributor>{{ agent.value }}</dc:contributor>
   {% endfor %}
+{% endif %}
 {% endif %}
 {% if data.sponsorship|length > 0  %}
 	{% if data.sponsorship is iterable %}
@@ -88,12 +96,14 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      	<dc:coverage>{{ data.geographic_subject }}</dc:coverage>
 	{% endif %} 
 {% endif %}
+{% if data.geographic_subject_linked_data %}
 {% if data.geographic_subject_linked_data.value is defined %}
      	<dc:coverage>{{ data.geographic_subject_linked_data.value }}</dc:coverage>
 {% else %}
   {% for subject in data.geographic_subject_linked_data %}
 			<dc:coverage>{{ subject.value }}</dc:coverage>
   {% endfor %}
+{% endif %}
 {% endif %}
 {% if data.temporal_subject|length > 0  %}
 	{% if data.temporal_subject is iterable %}
@@ -104,12 +114,14 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      	<dc:coverage>{{ data.temporal_subject }}</dc:coverage>
 	{% endif %} 
 {% endif %}
+{% if data.temporal_subject_linked_data %}
 {% if data.temporal_subject_linked_data.value is defined %}
      	<dc:coverage>{{ data.temporal_subject_linked_data.value }}</dc:coverage>
 {% else %}
   {% for subject in data.temporal_subject_linked_data %}
 			<dc:coverage>{{ subject.value }}</dc:coverage>
   {% endfor %}
+{% endif %}
 {% endif %}
 {% if data.coordinates|length > 0  %}
 	{% if data.coordinates is iterable %}
@@ -258,6 +270,7 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      		<dc:subject>{{ data.subject }}</dc:subject>
      {% endif %} 
 {% endif %}
+{% if data.subject_linked_data %}
 {% if data.subject_linked_data.value is defined %}
      	<dc:subject>{{ data.subject_linked_data.value }}</dc:subject>
 {% else %}
@@ -265,6 +278,8 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
 			<dc:subject>{{ subject.value }}</dc:subject>
   {% endfor %}
 {% endif %}
+{% endif %}
+{% if data.classification %}
 {% if data.classification.authority is defined %}
      	<dc:subject>{{ data.classification.value }}</dc:subject>
 {% else %}
@@ -272,6 +287,8 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
       <dc:subject>{{ classification.value }}</dc:subject>
   {% endfor %}
 {% endif %}
+{% endif %}
+
 {# Type #}
 {% if data.type|length > 0 %}
 	<dc:type>{{ data.type }}</dc:type>
@@ -294,6 +311,7 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      		<dc:type>{{ data.genre_form }}</dc:type>
      {% endif %} 
 {% endif %}
+{% if data.genre_form_linked_data %}
 {% if data.genre_form_linked_data.value is defined %}
   <dc:type>{{ data.genre_form_linked_data.value }}</dc:type>
 {% else %}
@@ -301,14 +319,17 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
   <dc:type>{{ genre.value }}</dc:type>
   {% endfor %}
 {% endif %}
+{% endif %}
 
 {# Identifier #}
+{% if data.identifier %}
 {% if data.identifier.authority is defined %}
-     		<dc:identifier>{{ data.identifier.value }}</dc:identifier>
+  <dc:identifier>{{ data.identifier.value }}</dc:identifier>
 {% else %}
   {% for identifier in data.identifier %}
-			<dc:identifier>{{ identifier.value }}</dc:identifier>
+	<dc:identifier>{{ identifier.value }}</dc:identifier>
   {% endfor %}
+{% endif %}
 {% endif %}
 
 {# Relation #}
@@ -321,12 +342,14 @@ Simple Dublin Core XML --Contributor, Coverage, and Format elements unmapped #}
      		<dc:relation>{{ data.collecting_area }}</dc:relation>
      {% endif %} 
 {% endif %}
+{% if data.digital_exhibit %}
 {% if data.digital_exhibit.value is defined %}
     <dc:relation>{{ data.digital_exhibit.value }}</dc:relation>
     <dc:relation>{{ data.digital_exhibit.uri }}</dc:relation>{% else %}
   {% for digital_exhibit in data.digital_exhibit %}
     <dc:relation>{{ digital_exhibit.value }}</dc:relation>
     <dc:relation>{{ digital_exhibit.uri }}</dc:relation>  {% endfor %}
+{% endif %}
 {% endif %}
 {% if data.original_publication|length > 0 %}
      {% if data.original_publication is iterable %}
