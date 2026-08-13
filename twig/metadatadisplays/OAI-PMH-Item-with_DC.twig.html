@@ -458,15 +458,6 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% if data.rights|length > 0 %} 
   <dc:rights>{{ data.rights }}</dc:rights>
 {% endif %}
-{% if data.rights_details|length > 0 %}
-     {% if data.rights_details is iterable %}
-     	{% for rights in data.rights_details %}
-       		<dc:rights>{{ rights }}</dc:rights>
-     	{% endfor %}
-     {% else %}
-     		<dc:rights>{{ data.rights_details }}</dc:rights>
-     {% endif %} 
-{% endif %}
 {% if data.access_rights|length > 0 %}
      {% if data.access_rights is iterable %}
      	{% for rights in data.access_rights %}
