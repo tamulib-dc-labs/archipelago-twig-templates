@@ -99,6 +99,7 @@ Updated Dec 14th 2020
       "label": {{ (creator.role ? creator.role : 'Creator/Contributor')|json_encode|raw }},
       "value": {{ creator.value|json_encode|raw }}
     },
+    {% endfor %}
     {% for contributor in attribute(data, 'contributor') %}
     {
       "label": "Contributor",
@@ -110,6 +111,7 @@ Updated Dec 14th 2020
       "label": {{ (contributor.role ? contributor.role : 'Creator/Contributor')|json_encode|raw }},
       "value": {{ contributor.value|json_encode|raw }}
     },
+    {% endfor %}
     {% if data.coordinates %}
     {
       "label": "Coordinates",

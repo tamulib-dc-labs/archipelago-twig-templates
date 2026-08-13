@@ -106,6 +106,7 @@
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
       </role>
     </name>
+    {% endif %}
     {% else %}
   {% for creator in data.creator_linked_data %}
   {% if creator.role is defined %}
@@ -122,6 +123,7 @@
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
       </role>
     </name>
+    {% endif %}
   {% endfor %}
 {% endif %}
 {% endif %}
@@ -141,6 +143,7 @@
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
       </role>
     </name>
+  {% endif %}
   {% else %}
   {% for contributor in data.contributor_linked_data %}
     {% if contributor.role is defined %}
@@ -157,6 +160,7 @@
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
       </role>
     </name> 
+  {% endif %}
   {% endfor %}
 {% endif %}
 {% endif %}
@@ -211,7 +215,7 @@
 {# Origin Info #}
 <originInfo>
 {% if data.date_created|length > 0 %}
-	<dateCreated>{{ data.date_created|date("Y-m-d") }}</dateCreated>
+	<dateCreated>{{ data.date_created }}</dateCreated>
 {% endif %}
 {% if data.date_issued %}
 	<dateIssued>{{ data.date_issued }}</dateIssued>
