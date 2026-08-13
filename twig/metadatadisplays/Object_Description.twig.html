@@ -321,9 +321,6 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {# -- END Custom Viewers and Controllers 1.6.0 -#}
 <dl>
 
-{# -- Related URL -#}
-
-
 {# Abstract #}
   {{ _self.html_output('Abstract', data.abstract) }}
 
@@ -397,7 +394,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     {% endfor %}
     {% for label, uris in creator_grouped %}
       <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>{% if creator.role is defined and creator.role|length > 0 %} ({{ creator.role }}){% endif %}
         {% for uri in uris %}
           <a href="{{ uri }}" target="_blank">🔗</a>
         {% endfor %}
@@ -416,7 +413,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     {% endfor %}
     {% for label, uris in contributor_grouped %}
       <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>{% if contributor.role is defined and contributor.role|length > 0 %} ({{ contributor.role }}){% endif %}
         {% for uri in uris %}
           <a href="{{ uri }}" target="_blank">🔗</a>
         {% endfor %}

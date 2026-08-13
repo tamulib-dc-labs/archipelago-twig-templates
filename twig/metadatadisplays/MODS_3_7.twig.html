@@ -93,38 +93,70 @@
 
 {% if data.creator_linked_data %}
 {% if data.creator_linked_data.value is defined %}
+{% if data.creator_linked_data.role is defined %}
   <name valueURI="{{ data.creator_linked_data.uri }}">
+      <namePart>{{ data.creator_linked_data.value }}</namePart>
+      <role>
+        <roleTerm valueURI="{{ data.creator_linked_data.role_uri }}" authority="marcrelator" type="text">{{ data.creator_linked_data.role }}</roleTerm>
+      </role>
+    </name>{% else %}
+    <name valueURI="{{ data.creator_linked_data.uri }}">
       <namePart>{{ data.creator_linked_data.value }}</namePart>
       <role>
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
       </role>
-    </name>{% else %}
+    </name>
+    {% else %}
   {% for creator in data.creator_linked_data %}
+  {% if creator.role is defined %}
+    <name valueURI="{{ creator.uri }}">
+      <namePart>{{ creator.value }}</namePart>
+      <role>
+        <roleTerm valueURI="{{ creator.role_uri }}" authority="marcrelator" type="text">{{ creator.role }}</roleTerm>
+      </role>
+    </name>
+    {% else %}
     <name valueURI="{{ creator.uri }}">
       <namePart>{{ creator.value }}</namePart>
       <role>
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
       </role>
-    </name>  
+    </name>
   {% endfor %}
 {% endif %}
 {% endif %}
 
 {% if data.contributor_linked_data %}
 {% if data.contributor_linked_data.value is defined %}
+{% if data.contributor_linked_data.role is defined %}
+  <name valueURI="{{ data.contributor_linked_data.uri }}">
+      <namePart>{{ data.contributor_linked_data.value }}</namePart>
+      <role>
+        <roleTerm valueURI="{{ data.contributor_linked_data.role_uri }}" authority="marcrelator" type="text">{{ data.contributor_linked_data.role }}</roleTerm>
+      </role>
+    </name>{% else %}
   <name valueURI="{{ data.contributor_linked_data.uri }}">
       <namePart>{{ data.contributor_linked_data.value }}</namePart>
       <role>
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
       </role>
-    </name>{% else %}
+    </name>
+  {% else %}
   {% for contributor in data.contributor_linked_data %}
+    {% if contributor.role is defined %}
+    <name valueURI="{{ contributor.uri }}">
+      <namePart>{{ contributor.value }}</namePart>
+      <role>
+        <roleTerm valueURI="{{ contributor.role_uri }}" authority="marcrelator" type="text">{{ contributor.role }}</roleTerm>
+      </role>
+    </name> 
+    {% else %} 
     <name valueURI="{{ contributor.uri }}">
       <namePart>{{ contributor.value }}</namePart>
       <role>
         <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
       </role>
-    </name>  
+    </name> 
   {% endfor %}
 {% endif %}
 {% endif %}
