@@ -210,6 +210,12 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 </nav>
 <div class="tab-content">
 <div class="tab-pane fade show active" id="nav-en" role="tabpanel" aria-labelledby="nav-en-tab">
+
+{# Title #}
+{% if data.label %}
+{{ _self.html_output('Title', data.label) }}
+{% endif %}
+
 {# Collection, Part of membership section #}
 {% if attribute(data, 'ismemberof') or attribute(data, 'ispartof') %}
 <dl>
@@ -315,14 +321,8 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {# -- END Custom Viewers and Controllers 1.6.0 -#}
 <dl>
 
-{# -- Website URL -#}
-{% if data.website_url|length > 0 %}
-    {{ _self.html_output(
-    "URL of Original Website",
-    "[Visit Website](" ~ data.website_url ~ ")",
-    true
-    ) }}
-{% endif %}
+{# -- Related URL -#}
+
 
 {# Abstract #}
   {{ _self.html_output('Abstract', data.abstract) }}
@@ -728,7 +728,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {# Related resources #}
 {{ _self.html_output('Related Item', data.related_record) }}
 {{ _self.html_output('Related URL', data.related_url) }}
-{{ _self.html_output('Original Publication', data.original_publication) }}
+{{ _self.html_output('Original Publication', data.original_publication) }}{% if data.related_url|length > 0 %}
 
 {# Notes and contents #}
 {{ _self.html_output('Note', data.note) }}
