@@ -105,7 +105,7 @@ Updated Dec 14th 2020
       "value": {{ contributor|json_encode|raw }}
     },
     {% endfor %}
-    {% for contributor in attribute(data, 'creator_linked_data') %}
+    {% for contributor in attribute(data, 'contributor_linked_data') %}
     {
       "label": {{ (contributor.role ? contributor.role : 'Creator/Contributor')|json_encode|raw }},
       "value": {{ contributor.value|json_encode|raw }}
