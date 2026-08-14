@@ -91,78 +91,29 @@
 {% endif %}
 {% endif %}
 
+{% import _self as m %}
+{% macro name_with_role(item, default_role_uri, default_role) %}
+{% set has_role = item.role is defined and item.role and item.role_uri is defined and item.role_uri %}
+    <name valueURI="{{ item.uri }}">
+      <namePart>{{ item.value }}</namePart>
+      <role>
+        <roleTerm valueURI="{{ has_role ? item.role_uri : default_role_uri }}" authority="marcrelator" type="text">{{ has_role ? item.role : default_role }}</roleTerm>
+      </role>
+    </name>
+{% endmacro %}
+
 {% if data.creator_linked_data %}
-{% if data.creator_linked_data.value is defined %}
-{% if data.creator_linked_data.role is defined %}
-  <name valueURI="{{ data.creator_linked_data.uri }}">
-      <namePart>{{ data.creator_linked_data.value }}</namePart>
-      <role>
-        <roleTerm valueURI="{{ data.creator_linked_data.role_uri }}" authority="marcrelator" type="text">{{ data.creator_linked_data.role }}</roleTerm>
-      </role>
-    </name>{% else %}
-    <name valueURI="{{ data.creator_linked_data.uri }}">
-      <namePart>{{ data.creator_linked_data.value }}</namePart>
-      <role>
-        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
-      </role>
-    </name>
-    {% endif %}
-    {% else %}
-  {% for creator in data.creator_linked_data %}
-  {% if creator.role is defined %}
-    <name valueURI="{{ creator.uri }}">
-      <namePart>{{ creator.value }}</namePart>
-      <role>
-        <roleTerm valueURI="{{ creator.role_uri }}" authority="marcrelator" type="text">{{ creator.role }}</roleTerm>
-      </role>
-    </name>
-    {% else %}
-    <name valueURI="{{ creator.uri }}">
-      <namePart>{{ creator.value }}</namePart>
-      <role>
-        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/cre" authority="marcrelator" type="text">creator</roleTerm>
-      </role>
-    </name>
-    {% endif %}
+  {% set creators = data.creator_linked_data.value is defined ? [data.creator_linked_data] : data.creator_linked_data %}
+  {% for creator in creators %}
+{{ m.name_with_role(creator, 'http://id.loc.gov/vocabulary/relators/cre', 'creator') }}
   {% endfor %}
-{% endif %}
 {% endif %}
 
 {% if data.contributor_linked_data %}
-{% if data.contributor_linked_data.value is defined %}
-{% if data.contributor_linked_data.role is defined %}
-  <name valueURI="{{ data.contributor_linked_data.uri }}">
-      <namePart>{{ data.contributor_linked_data.value }}</namePart>
-      <role>
-        <roleTerm valueURI="{{ data.contributor_linked_data.role_uri }}" authority="marcrelator" type="text">{{ data.contributor_linked_data.role }}</roleTerm>
-      </role>
-    </name>{% else %}
-  <name valueURI="{{ data.contributor_linked_data.uri }}">
-      <namePart>{{ data.contributor_linked_data.value }}</namePart>
-      <role>
-        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
-      </role>
-    </name>
-  {% endif %}
-  {% else %}
-  {% for contributor in data.contributor_linked_data %}
-    {% if contributor.role is defined %}
-    <name valueURI="{{ contributor.uri }}">
-      <namePart>{{ contributor.value }}</namePart>
-      <role>
-        <roleTerm valueURI="{{ contributor.role_uri }}" authority="marcrelator" type="text">{{ contributor.role }}</roleTerm>
-      </role>
-    </name> 
-    {% else %} 
-    <name valueURI="{{ contributor.uri }}">
-      <namePart>{{ contributor.value }}</namePart>
-      <role>
-        <roleTerm valueURI="http://id.loc.gov/vocabulary/relators/ctb" authority="marcrelator" type="text">contributor</roleTerm>
-      </role>
-    </name> 
-  {% endif %}
+  {% set contributors = data.contributor_linked_data.value is defined ? [data.contributor_linked_data] : data.contributor_linked_data %}
+  {% for contributor in contributors %}
+{{ m.name_with_role(contributor, 'http://id.loc.gov/vocabulary/relators/ctb', 'contributor') }}
   {% endfor %}
-{% endif %}
 {% endif %}
 
 {% if data.local_department %}
