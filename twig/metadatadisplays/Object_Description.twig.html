@@ -175,15 +175,15 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 <nav>
   <ul class="nav nav-tabs" id="nav-tab" role="tablist">
 
-{# Add About tab if the source record provides pre-rendered about_collection HTML #}
+{# Add About tab if the source record provides pre-rendered about_collection HTML. About becomes the default tab when present, otherwise Description stays default. #}
 {% if data.about_collection %}
   <li class="nav-item">
-    <button class="nav-link" id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about" type="button" role="tab" aria-controls="nav-about" aria-selected="false">About</button>
+    <button class="nav-link active" id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about" type="button" role="tab" aria-controls="nav-about" aria-selected="true">About</button>
   </li>
 {% endif %}
 
   <li class="nav-item">
-    <button class="nav-link active" id="nav-en-tab" data-bs-toggle="tab" data-bs-target="#nav-en" type="button" role="tab" aria-controls="nav-en" aria-selected="false">Description</button>
+    <button class="nav-link{{ data.about_collection ? '' : ' active' }}" id="nav-en-tab" data-bs-toggle="tab" data-bs-target="#nav-en" type="button" role="tab" aria-controls="nav-en" aria-selected="{{ data.about_collection ? 'false' : 'true' }}">Description</button>
   </li>
 
 
@@ -219,12 +219,12 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 <div class="tab-content">
 
 {% if data.about_collection %}
-<div class="tab-pane fade" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab">
+<div class="tab-pane fade show active" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab">
 {{ data.about_collection|raw }}
 </div>
 {% endif %}
 
-<div class="tab-pane fade show active" id="nav-en" role="tabpanel" aria-labelledby="nav-en-tab">
+<div class="tab-pane fade{{ data.about_collection ? '' : ' show active' }}" id="nav-en" role="tabpanel" aria-labelledby="nav-en-tab">
 
 <dl>
 {# Title #}
