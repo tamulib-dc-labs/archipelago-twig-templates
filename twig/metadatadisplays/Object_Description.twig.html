@@ -216,12 +216,9 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% if data.label %}
 {{ _self.html_output('Title', data.label) }}
 {% endif %}
-</dl>
-
 
 {# Collection, Part of membership section #}
 {% if attribute(data, 'ismemberof') or attribute(data, 'ispartof') %}
-<dl>
 
 {% if attribute(data, 'ismemberof') %}
 <dt>Part of Collection</dt>
