@@ -43,31 +43,47 @@ Updated 31/10/2023 for 1.3.0
 
       {# agent #}
       {% if data.agent %}
-        {% for agent in data.agent %}
-          <li>{{ agent.value }}</li>
-        {% endfor %}
-      {% endif %}
+          {% if data.agent.value is defined %}
+            <li>{{ data.agent.value }}</li>
+            {% else %}
+              {% for agent in data.agent %}
+              <li>{{ agent.value }}</li>
+              {% endfor %}
+          {% endif %}
+        {% endif %}
 
       {# agent_linked_data #}
       {% if data.agent_linked_data %}
-        {% for agent_ld in data.agent_linked_data %}
-          <li>{{ agent_ld.value }}</li>
-        {% endfor %}
-      {% endif %}
+      {% if data.agent_linked_data.value is defined %}
+            <li>{{ data.agent_linked_data.value }}</li>
+            {% else %}
+              {% for agent in data.agent_linked_data %}
+              <li>{{ agent.value }}</li>
+              {% endfor %}
+          {% endif %}
+        {% endif %}
       
        {# creator_linked_data #}
       {% if data.creator_linked_data %}
-        {% for creator_ld in data.creator_linked_data %}
-          <li>{{ creator_ld.value }}</li>
-        {% endfor %}
-      {% endif %}
+      {% if data.creator_linked_data.value is defined %}
+            <li>{{ data.creator_linked_data.value }}</li>
+            {% else %}
+              {% for creator in data.creator_linked_data %}
+              <li>{{ creator.value }}</li>
+              {% endfor %}
+          {% endif %}
+        {% endif %}
       
       {# contributor_linked_data #}
       {% if data.contributor_linked_data %}
-        {% for contributor_ld in data.contributor_linked_data %}
-          <li>{{ contributor_ld.value }}</li>
-        {% endfor %}
-      {% endif %}
+      {% if data.contributor_linked_data.value is defined %}
+            <li>{{ data.contributor_linked_data.value }}</li>
+            {% else %}
+              {% for contributor in data.contributor_linked_data %}
+              <li>{{ contributor.value }}</li>
+              {% endfor %}
+          {% endif %}
+        {% endif %}
     </ul>
   </div>
   {% endif %}

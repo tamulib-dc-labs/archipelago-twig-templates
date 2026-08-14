@@ -225,9 +225,15 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endif %}
 
 <div class="tab-pane fade show active" id="nav-en" role="tabpanel" aria-labelledby="nav-en-tab">
+
+<dl>
+{# Title #}
+{% if data.label %}
+{{ _self.html_output('Title', data.label) }}
+{% endif %}
+
 {# Collection, Part of membership section #}
 {% if attribute(data, 'ismemberof') or attribute(data, 'ispartof') %}
-<dl>
 
 {% if attribute(data, 'ismemberof') %}
 <dt>Part of Collection</dt>
@@ -329,15 +335,6 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {%- endif -%}
 {# -- END Custom Viewers and Controllers 1.6.0 -#}
 <dl>
-
-{# -- Website URL -#}
-{% if data.website_url|length > 0 %}
-    {{ _self.html_output(
-    "URL of Original Website",
-    "[Visit Website](" ~ data.website_url ~ ")",
-    true
-    ) }}
-{% endif %}
 
 {# Abstract #}
   {{ _self.html_output('Abstract', data.abstract) }}

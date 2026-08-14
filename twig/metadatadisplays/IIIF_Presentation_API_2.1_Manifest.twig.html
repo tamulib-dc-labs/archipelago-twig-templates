@@ -54,14 +54,14 @@ Updated Dec 14th 2020
     {% endif %}
     {% for item in attribute(data, 'agent') %}
     {
-      "label": {{ (item.role_label ? item.role_label : 'Creator/Contributor')|json_encode|raw }},
-      "value": {{ item.name_label|json_encode|raw }}
+      "label": {{ (item.role ? item.role : 'Creator/Contributor')|json_encode|raw }},
+      "value": {{ item.value|json_encode|raw }}
     },
     {% endfor %}
     {% for item in attribute(data, 'agent_linked_data') %}
     {
-      "label": {{ (item.role_label ? item.role_label : 'Creator/Contributor')|json_encode|raw }},
-      "value": {{ item.name_label|json_encode|raw }}
+      "label": {{ (item.role ? item.role : 'Creator/Contributor')|json_encode|raw }},
+      "value": {{ item.value|json_encode|raw }}
     },
     {% endfor %}
     {% if data.audience %}
@@ -94,10 +94,22 @@ Updated Dec 14th 2020
       "value": {{ creator|json_encode|raw }}
     },
     {% endfor %}
+    {% for creator in attribute(data, 'creator_linked_data') %}
+    {
+      "label": {{ (creator.role ? creator.role : 'Creator/Contributor')|json_encode|raw }},
+      "value": {{ creator.value|json_encode|raw }}
+    },
+    {% endfor %}
     {% for contributor in attribute(data, 'contributor') %}
     {
       "label": "Contributor",
       "value": {{ contributor|json_encode|raw }}
+    },
+    {% endfor %}
+    {% for contributor in attribute(data, 'contributor_linked_data') %}
+    {
+      "label": {{ (contributor.role ? contributor.role : 'Creator/Contributor')|json_encode|raw }},
+      "value": {{ contributor.value|json_encode|raw }}
     },
     {% endfor %}
     {% if data.coordinates %}
