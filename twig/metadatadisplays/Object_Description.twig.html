@@ -524,14 +524,6 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
         {% set geo_grouped = geo_grouped|merge({(subject_item.value): geo_grouped[subject_item.value]|merge([subject_item.uri])}) %}
       {% endif %}
     {% endfor %}
-    {% for label, uris in geo_grouped %}
-      <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_subjects%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
-        {% for uri in uris %}
-          <a href="{{ uri }}" target="_blank">🔗</a>
-        {% endfor %}
-      </li>
-    {% endfor %}
     {% for subject_item in data.spatial_linked_data %}
       {% if geo_grouped[subject_item.value] is not defined %}
         {% set geo_grouped = geo_grouped|merge({(subject_item.value): []}) %}
