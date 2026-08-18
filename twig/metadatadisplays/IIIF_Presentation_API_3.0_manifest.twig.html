@@ -144,20 +144,11 @@ Without Double quotes.
     {
       "id": "{{ nodeurl }}",
       "type": "Text",
-      "label": { "en": [ "View in Texas A&M Digital Collections" ] },
-      "format": "text/html",
-      "language": [ "en" ]
+      "label": { "en": [ "Explore {{ node.label }} from Texas A&M Libraries" ] },
+      "format": "text/html"
     }
   ],
   "rights": {{ computed_rights|json_encode|raw }},
-  "homepage": [
-    {
-    "id": "{{nodeurl}}",
-    "type": "Text",
-    "label": { "en": [ "Explore {{node.label}} from Texas A&M Libraries" ] },
-    "format": "text/html"
-    }
-  ],
   "behavior": ["individuals"],
   "requiredStatement": {
     "label": { "en": [ "Attribution" ] },

@@ -190,7 +190,7 @@ Without Double quotes.
         {% if data.collecting_area %}
         {
         "label": { "{{ len }}": ["Collecting Area"] },
-        "value": { "{{ len }}": [{{ data.collecting_area|json_encode|raw }}] }
+        "value": { "{{ len }}": {{ (data.collecting_area is iterable ? data.collecting_area : [data.collecting_area])|json_encode|raw }} }
         },
         {% endif %}
         {% if data.content_type %}
