@@ -110,6 +110,17 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% set annotation_url = allmaps_annotation_url(manifest_url) %}
 {# End AllMaps #}
 
+{# -- Remix or Share / IIIF Manifest URL (type-aware, matches Downloads section logic) -- #}
+{% if data.type not in ['Collection','CreativeWorkSeries'] %}
+  {% set iiif_manifest_href = '/do/' ~ node.uuid.value ~ '/metadata/iiifmanifest/default.jsonld' %}
+{% elseif data.type == 'CreativeWorkSeries' %}
+  {% set iiif_manifest_href = '/do/' ~ node.uuid.value ~ '/metadata/iiifmanifest3cws/default.jsonld' %}
+{% else %}
+  {% set iiif_manifest_href = '/do/' ~ node.uuid.value ~ '/metadata/iiifmanifest3collection/default.jsonld' %}
+{% endif %}
+{% set iiif_manifest_absolute = 'https://digitalcollections.library.tamu.edu' ~ iiif_manifest_href %}
+{# End Remix or Share / IIIF Manifest URL #}
+
 {# -- File Downloads Section -- #}
   {% set download_label = "Download" %}
   {% set download_metadata_label = "Metadata" %}
@@ -213,6 +224,32 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     </ul>
   </li>
 {# End evaluate download restriction here #}
+
+{# Remix or Share tab: IIIF viewer links #}
+{% if not file_download_restricted %}
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Share</a>
+    <ul class="dropdown-menu">
+      <li><h2 class="dropdown-header">IIIF</h2></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a target="_blank" rel="nofollow" class="dropdown-item" href="{{ iiif_manifest_href }}">{{ _self.iiif_icon() }} View IIIF Manifest</a></li>
+      <li><a target="_blank" class="dropdown-item" href="https://samvera-labs.github.io/clover-iiif?iiif-content={{ iiif_manifest_absolute|url_encode }}">Open in Clover</a></li>
+      <li><a target="_blank" class="dropdown-item" href="https://theseusviewer.org/?iiif-content={{ iiif_manifest_absolute|url_encode }}">Open in Theseus</a></li>
+      <li><a target="_blank" class="dropdown-item" href="https://projectmirador.org/embed/?iiif-content={{ iiif_manifest_absolute|url_encode }}">Open in Mirador</a></li>
+      {% if data.type in ['Map','Image','Book','CreativeWorkSeries','Manuscript'] %}
+      <li><a target="_blank" class="dropdown-item" href="https://liiive.now/?iiif-content={{ iiif_manifest_absolute|url_encode }}">Annotate in Liiive</a></li>
+      <li><a target="_blank" class="dropdown-item" href="https://manifest-editor-site.netlify.app/share?iiif-content={{ iiif_manifest_absolute|url_encode }}">Edit in Manifest Editor</a></li>
+      {% endif %}
+      <li><a target="_blank" class="dropdown-item" href="https://iiif.io/get-started/why-iiif/">What is IIIF?</a></li>
+      {% if data.type == 'Map' %}
+      <li><hr class="dropdown-divider"></li>
+      <li><h2 class="dropdown-header">Georeferencing</h2></li>
+      <li><a target="_blank" class="dropdown-item" href="https://editor.allmaps.org/#/collection?url={{ iiif_manifest_absolute|url_encode }}">Edit in AllMaps</a></li>
+      {% endif %}
+    </ul>
+  </li>
+{% endif %}
+{# End Remix or Share tab #}
 
 </ul>
 </nav>
@@ -709,20 +746,6 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     <li>{{ data.classification }}</li>
   {% endif %}
 </ul></dd>
-{% endif %}
-
-{# IIIF Manifest #}
-{% if not file_download_restricted %}
-<dt>IIIF Manifest</dt>
-<dd>
-    {% if data.type not in ['Collection','CreativeWorkSeries'] %}
-    <a target="_blank" href="/do/{{ node.uuid.value }}/metadata/iiifmanifest/default.jsonld">{{ _self.iiif_icon() }} View IIIF Presentation Manifest</a>
-    {% elseif data.type == 'CreativeWorkSeries' %}
-    <a  target="_blank" href="/do/{{ node.uuid.value }}/metadata/iiifmanifest3cws/default.jsonld">{{ _self.iiif_icon() }} View IIIF Presentation Manifest</a>
-    {% else %}
-    <a target="_blank" href="/do/{{ node.uuid.value }}/metadata/iiifmanifest3collection/default.jsonld">{{ _self.iiif_icon() }} View IIIF Presentation Manifest</a>
-    {% endif %}
-</dd>
 {% endif %}
 
 {% macro iiif_icon() %}
