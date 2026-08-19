@@ -1,4 +1,6 @@
 {
+{#- Updated 08/18/2026. Added the embargo_ip_bypass key so AMI can flag objects that should only be
+viewable from campus IP ranges. CSV column values: 1 = campus only, 0 or blank = public. -#}
 {#- Updated 08/07/2026. Removed the date_available and related_url_historic keys, so
 AMI ingest no longer writes them into the ADO JSON.
 - Updated for 1.6.0 to handle DOI events from CSV
@@ -79,6 +81,10 @@ if all is valid based on previously known state #}
     "provenance": {{ data.provenance|json_encode|raw }},
     "related_record": {{ data.related_record|json_encode|raw }},
     "related_url": {{ data.related_url|json_encode|raw }},
+    {# bare 1/null - do NOT use |json_encode|raw here like the keys around it. A quoted string is
+       passed to IpUtils::checkIp4(), fails to parse, and embargoes the object for everyone including
+       on campus. CSV column: 1 = campus only, 0 or blank = public. #}
+    "embargo_ip_bypass": {{ data.embargo_ip_bypass|default('')|trim == '1' ? '1' : 'null' }},
     "rights_holder": {{ data.rights_holder|json_encode|raw }},
     "rights_details": {{ data.rights_details|json_encode|raw }},
     "sponsorship": {{ data.sponsorship|json_encode|raw }},

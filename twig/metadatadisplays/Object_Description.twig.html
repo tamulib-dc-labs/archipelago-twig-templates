@@ -1,4 +1,5 @@
 {#-
+Last updated 08/18/2026. Added a campus-only access notice shown when an object is IP embargoed.
 Last updated 08/07/2026. Removed the Date Available (date_available) and
 Related URL (Historic) (related_url_historic) rows from the description list.
 Previously updated March 18th, 2026 by Mark Baggett. Rewrote description dl block to align with TAMU Archipelago field schema v0.2.
@@ -253,6 +254,16 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 
 </ul>
 </nav>
+{# -- Campus-only access notice for IP embargoed objects -- #}
+{% if data_embargo.embargoed %}
+<div class="alert alert-warning d-flex gap-2 mt-3" role="alert">
+  <i class="fas fa-lock mt-1" aria-hidden="true"></i>
+  <div>
+    <strong>Available on campus only.</strong>
+    <p class="mb-0">Access to this item's files is limited to the Texas A&amp;M campus network. The full description below is available to everyone. If you are on campus and still see this message, please contact the Library.</p>
+  </div>
+</div>
+{% endif %}
 <div class="tab-content">
 
 {% if data.about_collection %}
