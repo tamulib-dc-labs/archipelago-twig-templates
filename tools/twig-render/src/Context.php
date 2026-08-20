@@ -109,8 +109,18 @@ final class Context
     public function build(array $data, string $fixtureName): array
     {
         $uuid = (string) ($data['dr:uuid'] ?? '00000000-0000-4000-8000-000000000000');
-        $label = (string) ($data['label'] ?? $data['title'] ?? $fixtureName);
         $nid = (int) ($data['dr:nid'] ?? 1);
+
+        // Strawberryfield stores repeatable fields as either a scalar or an
+        // array depending on how the record was created, and label is one of
+        // them. Casting an array straight to string emits a PHP warning and
+        // yields "Array", which then shows up inside the rendered document as
+        // if it were real metadata.
+        $label = $data['label'] ?? $data['title'] ?? $fixtureName;
+        if (is_array($label)) {
+            $label = $label === [] ? $fixtureName : reset($label);
+        }
+        $label = is_scalar($label) ? (string) $label : $fixtureName;
 
         $node = new NodeStub($uuid, $label, $nid, $this->baseUrl);
 
