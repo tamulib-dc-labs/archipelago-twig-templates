@@ -1,2 +1,3 @@
 .idea/**
 .claude/
+tools/iiif-validate/vendor/
