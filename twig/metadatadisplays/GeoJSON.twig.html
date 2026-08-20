@@ -4,36 +4,36 @@
 {% if data.geographic_location %}
   {% if data.geographic_location.type == 'Polygon' and data.geographic_location.coordinates %}
     {% set feature = {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": data.geographic_location.coordinates
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: data.geographic_location.coordinates,
       },
-      "properties": {
-        "id": node.uuid.value,
-        "name": data.geographic_location.display_name|default('Polygon')
-      }
+      properties: {
+        id: node.uuid.value,
+        name: data.geographic_location.display_name|default('Polygon'),
+      },
     } %}
   {% elseif data.geographic_location.lng and data.geographic_location.lat %}
     {% set feature = {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [data.geographic_location.lng|number_format(6), data.geographic_location.lat|number_format(6)]
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [data.geographic_location.lng|number_format(6), data.geographic_location.lat|number_format(6)],
       },
-      "properties": {
-        "id": node.uuid.value,
-        "name": data.geographic_location.display_name
-      }
+      properties: {
+        id: node.uuid.value,
+        name: data.geographic_location.display_name,
+      },
     } %}
   {% endif %}
 {% endif %}
 
 {# 2. Construct the final Collection #}
 {% set collection = {
-  "type": "FeatureCollection",
-  "features": [ data.geojson_feature ] ? : []
+  type: 'FeatureCollection',
+  features: [data.geojson_feature] ? : [],
 } %}
 
 {# 3. Output as clean JSON #}
-{{ (data.geojson ? data.geojson : collection) | json_encode | raw }}
+{{ (data.geojson ? data.geojson : collection)|json_encode|raw }}

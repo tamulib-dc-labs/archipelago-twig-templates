@@ -15,7 +15,7 @@ if all is valid based on previously known state #}
 {% set ap_tasks = null %}
 {#-
 {%- if datacite_enabled %}
-  {% set doi_event = data.doi_datacite_action|default(null) %} 
+  {% set doi_event = data.doi_datacite_action|default(null) %}
   {% set doi_ap_tasks = sbf_datacite(dataOriginal|default([]), doi_event) %}
   {% set ap_tasks = doi_ap_tasks["ap:tasks"]|default([]) %}
   {% if dataOriginal["ap:tasks"] is defined and dataOriginal["ap:tasks"] is not empty %}
@@ -23,7 +23,7 @@ if all is valid based on previously known state #}
        {% set ap_fragaria = dataOriginal["ap:tasks"]["ap:fragaria"]|merge(ap_tasks["ap:fragaria"]) %}
        {% set ap_tasks = {"ap:fragaria": ap_fragaria } %}
     {% endif %}
-	{% set ap_tasks = dataOriginal["ap:tasks"]|merge(ap_tasks) %} 
+    {% set ap_tasks = dataOriginal["ap:tasks"]|merge(ap_tasks) %}
   {% endif %}
 {% endif -%}
 -#}
@@ -40,7 +40,7 @@ if all is valid based on previously known state #}
     "language": {{ data.language|json_encode|raw }},
     "ismemberof": [],
     "ispartof": [],
-    "sequence_id": {{ data.sequence_id|json_encode|raw }},  
+    "sequence_id": {{ data.sequence_id|json_encode|raw }},
     "identifier": {{ data.identifier|json_encode|raw }},
     "note": {{ data.note|json_encode|raw }},
     "physical_location": {{ data.physical_location|json_encode|raw }},
@@ -107,7 +107,7 @@ if all is valid based on previously known state #}
             "name": "ami",
             "type": "Service"
         },
-        "endTime": "{{"now"|date("c")}}",
+        "endTime": "{{ 'now'|date('c') }}",
         "summary": "Generator",
         "@context": "https:\/\/www.w3.org\/ns\/activitystreams"
     },
@@ -115,5 +115,5 @@ if all is valid based on previously known state #}
     "ap:tasks": {{ ap_tasks|json_encode|raw }},
     {% endif %}
     "upload_associated_warcs": []
-   
+
 }
