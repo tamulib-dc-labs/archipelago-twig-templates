@@ -18,37 +18,74 @@ and parsing what comes out.
 
 ## How it works
 
-Each template is rendered against committed Strawberryfield fixtures, then the
-output is judged by the mimetype its Metadata Display declares:
+Two stages, split by language because each side uses the best tool available.
+
+**1. PHP renders** each template against the committed fixtures and checks the
+output is well formed for the mimetype its Metadata Display declares:
 
 | mimetype | check |
 |---|---|
-| `application/ld+json` + `iiif: true` | JSON parse, then [`schema/iiif_3_0.json`][schema] |
-| `application/json`, other `ld+json` | JSON parse |
+| any `json` / `ld+json` | parses as JSON |
 | `application/xml` | XML well-formedness |
 | anything else | rendered non-empty |
 
-IIIF validation is scoped to the class the document claims to be. The schema's
-root is a `oneOf` across manifest/collection/annotation, so validating a
-Manifest against the root reports every failed branch — `/type — The string
-should match pattern: ^Collection` is true, useless, and buries the real error.
-Reading the document's own `type` and validating against just that class keeps
-the output actionable.
+**2. Python validates the IIIF documents** with [`iiif-prezi3`][prezi], parsing
+each into the model for the class it declares — `Manifest`, `Collection` or
+`AnnotationPage`.
+
+`iiif-prezi3` rather than a vendored copy of [`iiif_3_0.json`][schema]: the
+library is generated from that schema, its pydantic errors name the offending
+field and the type it expected, and a defect found here is reportable upstream
+against the library consumers actually use.
+
+The two stages are joined by `index.json`, written by the render step, which
+carries each rendered document's template and fixture through so a failure is
+reported against the template someone can fix rather than a temp file nobody
+recognises.
 
 ## Running it
 
 ```bash
 composer install -d tools/twig-render
+pip install -r tools/twig-render/requirements.txt
 
-php tools/twig-render/bin/render-check.php                    # everything covered
-php tools/twig-render/bin/render-check.php GeoJSON.twig.html  # one template
-php tools/twig-render/bin/render-check.php --write=/tmp/out   # dump the documents
-php tools/twig-render/selftest.php                            # check the harness
+# stage 1 — render and check well-formedness
+php tools/twig-render/bin/render-check.php
+php tools/twig-render/bin/render-check.php GeoJSON.twig.html   # one template
+php tools/twig-render/bin/render-check.php --write=/tmp/out    # dump documents
+
+# stage 2 — IIIF conformance
+python3 tools/twig-render/bin/validate_iiif.py /tmp/out/index.json
+
+# check the harnesses themselves
+php tools/twig-render/selftest.php
+python3 tools/twig-render/bin/validate_iiif.py --selftest
 ```
 
-No PHP locally? `docker run --rm -v "$PWD":/app -w /app php:8.3-cli php tools/twig-render/bin/render-check.php`
+Exit 0 = everything valid, 1 = at least one document is not, 2 = could not run.
 
-Exit 0 = every rendered document valid, 1 = at least one is not, 2 = could not run.
+## Twig coding standards
+
+Separately, [Twig-CS-Fixer][fixer] checks coding standards — spacing, quote
+style, delimiter placement. It never executes a template, so it cannot see that
+one emits invalid JSON; the two checks are complementary and neither substitutes
+for the other.
+
+```bash
+tools/twig-render/vendor/bin/twig-cs-fixer lint --config=.twig-cs-fixer.php
+tools/twig-render/vendor/bin/twig-cs-fixer fix  --config=.twig-cs-fixer.php
+```
+
+The config's finder is load bearing: these files are named `<name>.twig.html`
+rather than Drupal's `<name>.html.twig`, so the default `*.twig` pattern matches
+nothing and the run reports `Files linted: 0` and passes.
+
+It currently reports **~4,384 violations** across the 26 templates —
+overwhelmingly trailing whitespace, tabs and double-quoted strings, none of
+which affects rendered output. The CI job is therefore **report-only**
+(`continue-on-error`), so it does not block every PR on pre-existing style debt.
+Run `fix` in a dedicated PR, review the diff, then drop that line to make it a
+real gate.
 
 ## The renderer is real, not stubbed
 
@@ -79,7 +116,7 @@ papering over.
 
 `url()` returns a configured base rather than a real Drupal route, and
 `edtf_2_iso_date` covers EDTF level 0/1 rather than the full grammar. For
-**structural** validity this does not matter — the schema cares that a value is
+**structural** validity this does not matter — the model cares that a value is
 a string of the right shape, not what the string says. It would matter for
 asserting exact output, which this harness does not do.
 
@@ -99,8 +136,8 @@ The three IIIF ones aggregate child objects, so no amount of fixture data makes
 them renderable — they need a database. Covering them means a live site.
 
 `IIIF_Presentation_API_2.1_Manifest` renders and is checked for JSON validity
-only: the vendored schema is 3.0, and validating a 2.1 manifest against it would
-fail for the wrong reason.
+only: iiif-prezi3 models Presentation 3, and parsing a 2.1 manifest with it
+would fail for the wrong reason.
 
 ## Fixtures are the ground truth
 
@@ -126,21 +163,26 @@ can never pass as success.
 
 Both ways this harness can rot look exactly like success:
 
-1. The validator is loosened, or the schema is swapped for a permissive one, and
+1. A dependency bump loosens validation, or a stub starts accepting anything, and
    everything reports green forever.
 2. An unimplemented filter starts returning null instead of throwing, so
    templates needing Drupal render empty and "validate" fine.
 
-`selftest.php` asserts that a trailing comma is rejected, a bare-string IIIF
-metadata value is rejected, a `drupal_view` template throws, a valid manifest
-passes, and at least one fixture exists. It runs before the real check in CI.
+`selftest.php` asserts a trailing comma is caught, a `drupal_view` template
+throws rather than rendering, and at least one fixture exists.
+`validate_iiif.py --selftest` asserts iiif-prezi3 still rejects a bare-string
+metadata value — the exact defect this pipeline found in `main`. Both run
+before the real checks in CI.
 
 ## What this still does not check
 
-- **Semantic correctness.** A manifest can be schema-valid and still describe
-  the wrong thing. Valid ≠ right.
+- **Semantic correctness.** A manifest can parse cleanly and still describe the
+  wrong thing. Valid ≠ right.
 - **The aggregate manifests**, per above.
 - **Whether the deployed site matches this repo.** These files are copies of
   database rows; nothing here compares them to what is live.
 
 [schema]: https://github.com/IIIF/presentation-validator/blob/main/schema/iiif_3_0.json
+
+[prezi]: https://github.com/iiif-prezi/iiif-prezi3
+[fixer]: https://github.com/VincentLanglet/Twig-CS-Fixer

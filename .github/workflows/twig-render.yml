@@ -1,35 +1,40 @@
 name: Render and validate
 
 # Renders each Metadata Display template against committed Strawberryfield
-# fixtures and checks that what comes out is actually valid -- parseable JSON,
-# parseable XML, and for IIIF Presentation 3.0, valid against the schema from
-# IIIF/presentation-validator.
+# fixtures and checks what comes out.
+#
+# Two stages, deliberately split by language:
+#
+#   1. PHP renders the templates and checks the output is well formed JSON/XML.
+#   2. Python validates the IIIF documents with iiif-prezi3, the library
+#      maintained alongside the Presentation API specification.
+#
+# iiif-prezi3 rather than a vendored copy of the JSON Schema: it is generated
+# from that schema, its pydantic errors name the offending field and the type
+# it expected, and a defect found here is reportable upstream against the
+# library consumers actually use.
 #
 # This is a DIFFERENT question from the `Twig lint` job. That one asks whether
-# Archipelago would ACCEPT the template, which is decided at parse time. It
-# cannot see that a template emits
+# Archipelago would ACCEPT the template, decided at parse time. It cannot see
+# that a template emits
 #
 #     {"items":[{"n":1},{"n":2},]}
 #
-# which parses perfectly as Twig, saves into Archipelago without complaint, and
-# breaks every consumer downstream. Only rendering and parsing the result
-# catches that -- and that is the failure mode that has been reaching viewers.
+# which parses perfectly, saves into Archipelago without complaint, and breaks
+# every consumer downstream. Only rendering and parsing the result catches it.
 #
-# Runs fully offline: no Drupal, no network, no credentials, no self-hosted
-# runner. Templates that genuinely need a database (the collection and series
-# manifests, which query for child objects) are declared with a reason in
-# tools/twig-render/templates.json rather than silently omitted. If one reaches
-# for such a filter anyway, the renderer throws instead of emitting output
-# nobody should trust.
-#
-# NO MARKETPLACE ACTIONS, matching the other workflows here. actions/checkout is
-# published by GitHub itself; PHP and Composer ship on the runner image.
+# Runs fully offline: no Drupal, no credentials, no self-hosted runner. The
+# GitHub-hosted image already ships PHP, Composer and Python 3, so no toolchain
+# setup actions are needed and the repo's no-marketplace-actions convention
+# holds -- actions/checkout and actions/upload-artifact are both published by
+# GitHub itself.
 
 on:
   pull_request:
     paths:
       - 'twig/**'
       - 'tools/twig-render/**'
+      - '.twig-cs-fixer.php'
       - '.github/workflows/twig-render.yml'
   push:
     branches: [main]
@@ -47,6 +52,9 @@ jobs:
     name: Output is valid
     runs-on: ubuntu-latest
 
+    env:
+      RENDERED: ${{ github.workspace }}/rendered
+
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -55,31 +63,73 @@ jobs:
         run: |
           php -v
           composer --version
+          python3 --version
 
-      - name: Install dependencies
+      - name: Install the render harness
         working-directory: tools/twig-render
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      # Runs FIRST, because both ways this harness can rot look exactly like
-      # success: a loosened validator that accepts anything, or an unimplemented
-      # filter returning null so templates render empty and "validate" fine.
-      - name: Self-test the harness
+      - name: Install iiif-prezi3
+        run: python3 -m pip install --quiet --break-system-packages -r tools/twig-render/requirements.txt
+
+      # Both self-tests run FIRST, because every way these harnesses can rot
+      # looks exactly like success: a loosened validator, a stub returning null
+      # so templates render empty and "validate" fine, or a dependency bump that
+      # quietly stops rejecting anything.
+      - name: Self-test the renderer
         run: php tools/twig-render/selftest.php
 
-      - name: Render every covered template and validate the output
+      - name: Self-test the IIIF validator
+        run: python3 tools/twig-render/bin/validate_iiif.py --selftest
+
+      - name: Render every covered template
         run: |
           php tools/twig-render/bin/render-check.php \
             --format=github \
             --summary="$GITHUB_STEP_SUMMARY" \
-            --write="${RUNNER_TEMP}/rendered"
+            --write="$RENDERED"
 
-      # Makes a failure diagnosable without re-running anything locally: the
-      # exact document the validator rejected is right there.
+      - name: Validate the IIIF documents with iiif-prezi3
+        run: python3 tools/twig-render/bin/validate_iiif.py --format=github "$RENDERED/index.json"
+
+      # Makes a failure diagnosable without reproducing anything locally: the
+      # exact document the validator rejected is attached to the run.
       - name: Upload the rendered documents
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: rendered-output
-          path: ${{ runner.temp }}/rendered
+          path: ${{ env.RENDERED }}
           retention-days: 14
           if-no-files-found: warn
+
+  coding-standards:
+    name: Twig coding standards
+    runs-on: ubuntu-latest
+    # REPORT ONLY, on purpose. Twig-CS-Fixer currently finds ~4,384 violations
+    # across these 26 files -- overwhelmingly trailing whitespace, tabs and
+    # double-quoted strings. None of it affects rendered output, and gating on
+    # it would block every PR on pre-existing style debt rather than on the
+    # change under review.
+    #
+    # To act on it: run `twig-cs-fixer fix` in a dedicated PR, review the diff
+    # (it should be whitespace and quote style only), then delete this line and
+    # the job becomes a real gate.
+    continue-on-error: true
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Install the fixer
+        working-directory: tools/twig-render
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      # The finder in .twig-cs-fixer.php is load bearing: these files are named
+      # <name>.twig.html, not <name>.html.twig, so the default *.twig pattern
+      # matches nothing and the job would report "Files linted: 0" and pass.
+      - name: Lint Twig coding standards
+        run: |
+          tools/twig-render/vendor/bin/twig-cs-fixer lint \
+            --config=.twig-cs-fixer.php \
+            --report=github

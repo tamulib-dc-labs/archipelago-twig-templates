@@ -97,13 +97,14 @@ if ($fixtures === []) {
 }
 
 $renderer = new Renderer(new Context());
-$validator = new Validator($root . '/schema/iiif_3_0.json');
+$validator = new Validator();
 
 if ($options['write'] !== null && !is_dir($options['write'])) {
     mkdir($options['write'], 0o777, true);
 }
 
 $results = [];
+$index = [];
 $skipped = [];
 
 foreach ($config['templates'] as $entry) {
@@ -146,19 +147,29 @@ foreach ($config['templates'] as $entry) {
 
         if ($options['write'] !== null) {
             $extension = str_contains((string) $entry['mimetype'], 'xml') ? 'xml' : 'json';
-            file_put_contents(
-                rtrim($options['write'], '/') . '/' . pathinfo($file, PATHINFO_FILENAME) . '--' . $name . '.' . $extension,
-                $output,
-            );
+            $written = rtrim($options['write'], '/') . '/' . pathinfo($file, PATHINFO_FILENAME) . '--' . $name . '.' . $extension;
+            file_put_contents($written, $output);
+
+            // Documents flagged iiif are handed to bin/validate_iiif.py, which
+            // parses them with iiif-prezi3. Carrying the template and fixture
+            // names through means a failure is reported against the template
+            // someone can fix, not a temp file nobody recognises.
+            if (($entry['iiif'] ?? false) === true) {
+                $index[] = ['output' => $written, 'template' => $file, 'fixture' => (string) $name];
+            }
         }
 
         $results[] = result(
             $file,
             (string) $name,
-            $validator->validate($output, (string) ($entry['mimetype'] ?? 'text/plain'), (bool) ($entry['iiif'] ?? false)),
+            $validator->validate($output, (string) ($entry['mimetype'] ?? 'text/plain')),
             strlen($output),
         );
     }
+}
+
+if ($options['write'] !== null) {
+    file_put_contents(rtrim($options['write'], '/') . '/index.json', json_encode($index, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 }
 
 $options['format'] === 'github' ? reportGithub($results, $skipped) : reportPretty($results, $skipped);

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Tamu\ArchipelagoTwigRender;
 
-use Opis\JsonSchema\Errors\ErrorFormatter;
-use Opis\JsonSchema\Validator as JsonSchemaValidator;
-
 /**
  * One rendered string, checked against what its mimetype promises.
  */
@@ -21,28 +18,29 @@ final class Problem
 }
 
 /**
- * Validates rendered output according to the Metadata Display's mimetype.
+ * Checks rendered output is well formed for the mimetype it claims.
+ *
+ * Deliberately stops short of IIIF. Documents flagged `iiif` in templates.json
+ * are listed in the render index and validated by bin/validate_iiif.py using
+ * iiif-prezi3 -- the library maintained alongside the specification, whose
+ * errors name the offending field and whose findings are reportable upstream.
+ * Duplicating that here in PHP would mean two definitions of "valid IIIF"
+ * drifting apart.
  *
  * The mimetype is not a guess: every Metadata Display entity declares one, and
- * that is what Archipelago serves the document as. If a display says
- * application/ld+json and emits something json_decode rejects, every consumer
- * downstream breaks -- which is the failure this whole tier exists for.
+ * that is what Archipelago serves the document as. A display promising
+ * application/ld+json that emits something json_decode rejects breaks every
+ * consumer downstream, which is the failure this tier exists for.
  */
 final class Validator
 {
-    private ?object $iiifSchema = null;
-
-    public function __construct(private readonly string $schemaPath)
-    {
-    }
-
     /**
      * @return list<Problem>
      */
-    public function validate(string $output, string $mimetype, bool $iiif): array
+    public function validate(string $output, string $mimetype): array
     {
         return match (true) {
-            str_contains($mimetype, 'json') => $this->validateJson($output, $iiif),
+            str_contains($mimetype, 'json') => $this->validateJson($output),
             str_contains($mimetype, 'xml') => $this->validateXml($output),
             default => $this->validateNonEmpty($output),
         };
@@ -51,14 +49,14 @@ final class Validator
     /**
      * @return list<Problem>
      */
-    private function validateJson(string $output, bool $iiif): array
+    private function validateJson(string $output): array
     {
         $trimmed = trim($output);
         if ($trimmed === '') {
             return [new Problem('empty', 'Rendered to an empty document.')];
         }
 
-        $decoded = json_decode($trimmed);
+        json_decode($trimmed);
         if (json_last_error() !== JSON_ERROR_NONE) {
             return [new Problem(
                 'invalid-json',
@@ -66,87 +64,7 @@ final class Validator
             )];
         }
 
-        if (!$iiif) {
-            return [];
-        }
-
-        return $this->validateIiif($decoded);
-    }
-
-    /**
-     * @return list<Problem>
-     */
-    private function validateIiif(mixed $decoded): array
-    {
-        if (!is_object($decoded) && !is_array($decoded)) {
-            return [new Problem('iiif', 'IIIF documents must be a JSON object.')];
-        }
-
-        $this->iiifSchema ??= json_decode((string) file_get_contents($this->schemaPath));
-
-        $validator = new JsonSchemaValidator();
-        $result = $validator->validate($decoded, $this->schemaFor($decoded));
-
-        if ($result->isValid()) {
-            return [];
-        }
-
-        $error = $result->error();
-        if ($error === null) {
-            return [new Problem('iiif', 'Failed IIIF schema validation.')];
-        }
-
-        $problems = [];
-        $formatted = (new ErrorFormatter())->format($error, false);
-        foreach ($formatted as $pointer => $messages) {
-            foreach ((array) $messages as $message) {
-                $problems[] = new Problem('iiif', (string) $message, $pointer === '' ? '/' : $pointer);
-            }
-        }
-
-        return array_slice($problems, 0, 12);
-    }
-
-    /**
-     * Validate against the ONE class the document claims to be.
-     *
-     * The schema's root is a oneOf across manifest / collection /
-     * annotationCollection / annotationPage / annotation. Validating a
-     * Manifest against that root reports every failed branch, so a perfectly
-     * good manifest still produces
-     *
-     *     /type — The string should match pattern: ^Collection
-     *
-     * which is true, useless, and buries the real errors. Reading the
-     * document's own "type" and validating against just that class keeps the
-     * output to problems someone can act on.
-     */
-    private function schemaFor(mixed $decoded): object
-    {
-        $classes = [
-            'Manifest' => 'manifest',
-            'Collection' => 'collection',
-            'AnnotationCollection' => 'annotationCollection',
-            'AnnotationPage' => 'annotationPage',
-            'Annotation' => 'annotation',
-        ];
-
-        $type = is_object($decoded) ? ($decoded->type ?? null) : null;
-        $class = is_string($type) ? ($classes[$type] ?? null) : null;
-
-        if ($class === null) {
-            // No usable type: fall back to the root oneOf and accept the noise,
-            // because "which of these is it" is genuinely unanswerable.
-            return $this->iiifSchema;
-        }
-
-        // draft-07: a $ref beside other keywords wins, and the rest of the
-        // document stays available so #/classes/... still resolves.
-        $scoped = clone $this->iiifSchema;
-        unset($scoped->oneOf);
-        $scoped->{'$ref'} = '#/classes/' . $class;
-
-        return $scoped;
+        return [];
     }
 
     /**

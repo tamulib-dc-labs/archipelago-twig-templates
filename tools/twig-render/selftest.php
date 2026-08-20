@@ -31,14 +31,17 @@ if (!is_file($autoload)) {
 require $autoload;
 
 $renderer = new Renderer(new Context());
-$validator = new Validator(__DIR__ . '/schema/iiif_3_0.json');
+$validator = new Validator();
 
-/** @var array<string, array{expect:string, iiif:bool}> $expectations */
+// IIIF conformance is bin/validate_iiif.py's job now, guarded by its own
+// --selftest. What is asserted here is everything the PHP half owns: that
+// broken JSON is caught, that a template needing Drupal refuses to render
+// rather than emitting something, and that ground truth exists at all.
+/** @var array<string, array{expect:string}> $expectations */
 $expectations = [
-    'bad_trailing_comma' => ['expect' => 'invalid', 'iiif' => false],
-    'bad_iiif_value_string' => ['expect' => 'invalid', 'iiif' => true],
-    'bad_needs_drupal' => ['expect' => 'throws', 'iiif' => false],
-    'good_minimal_manifest' => ['expect' => 'valid', 'iiif' => true],
+    'bad_trailing_comma' => ['expect' => 'invalid'],
+    'bad_needs_drupal' => ['expect' => 'throws'],
+    'good_minimal_manifest' => ['expect' => 'valid'],
 ];
 
 $fixture = ['label' => 'Selftest Object', 'dr:uuid' => '11111111-2222-4333-8444-555555555555'];
@@ -56,7 +59,7 @@ foreach ($expectations as $name => $spec) {
 
     try {
         $output = $renderer->render($source, $fixture, 'selftest');
-        $problems = $validator->validate($output, 'application/ld+json', $spec['iiif']);
+        $problems = $validator->validate($output, 'application/ld+json');
         $actual = $problems === [] ? 'valid' : 'invalid';
         $detail = $problems === [] ? '' : $problems[0]->message;
     } catch (UnsupportedByRendererException $e) {
