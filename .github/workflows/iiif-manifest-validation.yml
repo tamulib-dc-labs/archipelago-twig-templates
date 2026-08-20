@@ -1,0 +1,79 @@
+name: IIIF Manifest Twig Validation
+
+on:
+  push:
+    paths:
+      - "twig/metadatadisplays/IIIF_Presentation_API_3.0_manifest.twig.html"
+      - "fixtures/**"
+      - "tools/iiif-validate/**"
+      - ".github/workflows/iiif-manifest-validation.yml"
+  pull_request:
+    paths:
+      - "twig/metadatadisplays/IIIF_Presentation_API_3.0_manifest.twig.html"
+      - "fixtures/**"
+      - "tools/iiif-validate/**"
+      - ".github/workflows/iiif-manifest-validation.yml"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      TEMPLATE: twig/metadatadisplays/IIIF_Presentation_API_3.0_manifest.twig.html
+      OUT_DIR: /tmp/rendered-manifests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PHP render harness dependencies
+        working-directory: tools/iiif-validate
+        run: composer install --no-interaction --no-progress
+
+      - name: Install Python validator dependencies
+        run: pip install -r tools/iiif-validate/requirements.txt
+
+      - name: Render each fixture through the IIIF 3 manifest Twig template
+        run: |
+          set -euo pipefail
+          mkdir -p "$OUT_DIR"
+          shopt -s nullglob
+          fixtures=(fixtures/*.json)
+          if [ ${#fixtures[@]} -eq 0 ]; then
+            echo "::warning::No fixtures found in fixtures/*.json -- nothing to validate."
+            exit 0
+          fi
+          for fixture in "${fixtures[@]}"; do
+            name="$(basename "$fixture" .json)"
+            php tools/iiif-validate/render.php \
+              "$fixture" \
+              "$TEMPLATE" \
+              "$OUT_DIR/$name.manifest.json"
+          done
+
+      - name: Validate rendered manifests against the IIIF Presentation 3 model
+        run: |
+          shopt -s nullglob
+          rendered=("$OUT_DIR"/*.manifest.json)
+          if [ ${#rendered[@]} -eq 0 ]; then
+            echo "::warning::No rendered manifests to validate."
+            exit 0
+          fi
+          python tools/iiif-validate/validate_manifest.py "${rendered[@]}"
+
+      - name: Upload rendered manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-manifests
+          path: /tmp/rendered-manifests/*.json
+          if-no-files-found: ignore
