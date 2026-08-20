@@ -1,16 +1,16 @@
 {#- Simple card thumbnail — plain img, no IIIF viewer scripts -#}
-{% set iiif_size = 'pct:25' %}
-{% set IIIFserverurl = iiif_server ? iiif_server ~ '/' : '' %}
-{% set source = '' %}
-{% if attribute(data, 'as:image')|length > 0 %}
-{% set document = data['as:image']|first %}
-{% set cantaloupeid = IIIFserverurl ~ document['url']|replace({'s3://': ''})|replace({'private://': ''})|url_encode %}
-{% set source = cantaloupeid ~ '/full/' ~ iiif_size ~ '/0/default.jpg' %}
-{% elseif attribute(data, 'as:document')|length > 0 %}
-{% for document in data['as:document'] %}
-{% if source == '' and document['flv:exif'].MIMEType == 'application/pdf' %}
-{% set cantaloupeid = IIIFserverurl ~ document['url']|replace({'s3://': ''})|replace({'private://': ''})|url_encode %}
-{% set source = cantaloupeid ~ ';1/full/' ~ iiif_size ~ '/0/default.jpg' %}
+{% set iiif_size = "pct:25" %}
+{% set IIIFserverurl = iiif_server ? iiif_server ~ "/" : "" %}
+{% set source = "" %}
+{% if attribute(data, "as:image")|length > 0 %}
+{% set document = data["as:image"]|first %}
+{% set cantaloupeid = IIIFserverurl ~ document["url"]|replace({"s3://":""})|replace({"private://":""})|url_encode %}
+{% set source = cantaloupeid ~ "/full/" ~ iiif_size ~ "/0/default.jpg" %}
+{% elseif attribute(data, "as:document")|length > 0 %}
+{% for document in data["as:document"] %}
+{% if source == "" and document["flv:exif"].MIMEType == "application/pdf" %}
+{% set cantaloupeid = IIIFserverurl ~ document["url"]|replace({"s3://":""})|replace({"private://":""})|url_encode %}
+{% set source = cantaloupeid ~ ";1/full/" ~ iiif_size ~ "/0/default.jpg" %}
 {% endif %}
 {% endfor %}
 {% endif %}

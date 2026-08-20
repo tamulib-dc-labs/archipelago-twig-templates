@@ -4,59 +4,59 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {%- set oai_id = 'oai:fake:test' -%}
 {%- if node.uuid.value -%}
 {%- set oai_id = node.uuid.value -%}
-{%- set changed = node.changed.value|date('Y-m-d') -%}
+{%- set changed = node.changed.value|date("Y-m-d") -%}
 {%- endif -%}
 <header>
       <identifier>oai:localhost:{{ oai_id }}</identifier>
       <datestamp>{{ changed }}</datestamp>
-{%- if attribute(data, 'ismemberof') -%}
-  {%- if attribute(data, 'ismemberof') is iterable -%}
-    {%- for collection in attribute(data, 'ismemberof') -%}
-      {%- set parentnode = bamboo_load_entity('node', collection) -%}
-      {%- if parentnode -%}
+{%- if attribute(data, 'ismemberof') -%} 
+  {%- if attribute(data, 'ismemberof') is iterable -%} 
+    {%- for collection in attribute(data, 'ismemberof') -%} 
+      {%- set parentnode = bamboo_load_entity('node', collection) -%} 
+      {%- if parentnode -%} 
       <setSpec>{{ parentnode.uuid.value }}</setSpec>
-      {%- endif -%}
-    {%- endfor -%}
-  {% else %}
-     {% set parentnode = bamboo_load_entity('node', attribute(data, 'ismemberof')) %}
-     {% if parentnode %}
-        <setSpec>{{ parentnode.uuid.value }}</setSpec>
-     {% endif %}
-  {% endif %}
-{% endif %}
+      {%- endif -%} 
+    {%- endfor -%} 
+  {% else %} 
+	 {% set parentnode = bamboo_load_entity('node', attribute(data, 'ismemberof')) %} 
+     {% if parentnode %} 
+		<setSpec>{{ parentnode.uuid.value }}</setSpec>
+     {% endif %} 
+  {% endif %} 
+{% endif %} 
     </header>
-{% if data_api.query.verb == 'ListRecords' or data_api.query.verb == 'GetRecord' %}
+{% if data_api.query.verb == "ListRecords" or data_api.query.verb == "GetRecord" %}    
 <metadata>
 {% if data_api.query.metadataPrefix == 'oai_dc' %}
 
-<oai_dc:dc
-         xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-         xmlns:dc="http://purl.org/dc/elements/1.1/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/
+<oai_dc:dc 
+         xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
+         xmlns:dc="http://purl.org/dc/elements/1.1/" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ 
          http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
 
 {# Title #}
 <dc:title>{{ data.label|escape('html') }}</dc:title>
-{% if data.title_alternative|length > 0 %}
-    {% if data.title_alternative is iterable %}
-        {% for title_alternative in data.title_alternative %}
-            <dc:title>{{ title_alternative }}</dc:title>
-        {% endfor %}
+{% if data.title_alternative|length > 0  %}
+	{% if data.title_alternative is iterable %}
+		{% for title_alternative in data.title_alternative %}
+			<dc:title>{{ title_alternative }}</dc:title>
+		{% endfor %}
      {% else %}
-         <dc:title>{{ data.title_alternative }}</dc:title>
-    {% endif %}
+     	<dc:title>{{ data.title_alternative }}</dc:title>
+	{% endif %} 
 {% endif %}
 
 {# Creators and Contributors #}
-{% if data.creator|length > 0 %}
-    {% if data.creator is iterable %}
-        {% for creator in data.creator %}
-            <dc:creator>{{ creator }}</dc:creator>
-        {% endfor %}
+{% if data.creator|length > 0  %}
+	{% if data.creator is iterable %}
+		{% for creator in data.creator %}
+			<dc:creator>{{ creator }}</dc:creator>
+		{% endfor %}
      {% else %}
-         <dc:creator>{{ data.creator }}</dc:creator>
-    {% endif %}
+     	<dc:creator>{{ data.creator }}</dc:creator>
+	{% endif %} 
 {% endif %}
 {% if data.creator_linked_data %}
 {% if data.creator_linked_data.value is defined %}
@@ -67,14 +67,14 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
   {% endfor %}
 {% endif %}
 {% endif %}
-{% if data.contributor|length > 0 %}
-    {% if data.contributor is iterable %}
-        {% for contributor in data.contributor %}
-            <dc:contributor>{{ contributor }}</dc:contributor>
-        {% endfor %}
+{% if data.contributor|length > 0  %}
+	{% if data.contributor is iterable %}
+		{% for contributor in data.contributor %}
+			<dc:contributor>{{ contributor }}</dc:contributor>
+		{% endfor %}
      {% else %}
-         <dc:contributor>{{ data.contributor }}</dc:contributor>
-    {% endif %}
+     	<dc:contributor>{{ data.contributor }}</dc:contributor>
+	{% endif %} 
 {% endif %}
 {% if data.contributor_linked_data %}
 {% if data.contributor_linked_data.value is defined %}
@@ -90,7 +90,7 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
     <dc:contributor>{{ data.agent.value }}</dc:contributor>
   {% else %}
   {% for agent in data.agent %}
-                <dc:contributor>{{ agent.value }}</dc:contributor>
+    			<dc:contributor>{{ agent.value }}</dc:contributor>
   {% endfor %}
 {% endif %}
 {% endif %}
@@ -103,170 +103,170 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
   {% endfor %}
 {% endif %}
 {% endif %}
-{% if data.sponsorship|length > 0 %}
-    {% if data.sponsorship is iterable %}
-        {% for sponsorship in data.sponsorship %}
-            <dc:contributor>{{ sponsorship }}</dc:contributor>
-        {% endfor %}
+{% if data.sponsorship|length > 0  %}
+	{% if data.sponsorship is iterable %}
+		{% for sponsorship in data.sponsorship %}
+			<dc:contributor>{{ sponsorship }}</dc:contributor>
+		{% endfor %}
      {% else %}
-         <dc:contributor>{{ data.sponsorship }}</dc:contributor>
-    {% endif %}
+     	<dc:contributor>{{ data.sponsorship }}</dc:contributor>
+	{% endif %} 
 {% endif %}
-{% if data.local_department|length > 0 %}
-    {% if data.local_department is iterable %}
-        {% for local_department in data.local_department %}
-            <dc:contributor>{{ local_department }}</dc:contributor>
-        {% endfor %}
+{% if data.local_department|length > 0  %}
+	{% if data.local_department is iterable %}
+		{% for local_department in data.local_department %}
+			<dc:contributor>{{ local_department }}</dc:contributor>
+		{% endfor %}
      {% else %}
-         <dc:contributor>{{ data.local_department }}</dc:contributor>
-    {% endif %}
+     	<dc:contributor>{{ data.local_department }}</dc:contributor>
+	{% endif %} 
 {% endif %}
 
 {# Coverage #}
-{% if data.geographic_subject|length > 0 %}
-    {% if data.geographic_subject is iterable %}
-        {% for subject in data.geographic_subject %}
-            <dc:coverage>{{ subject }}</dc:coverage>
-        {% endfor %}
+{% if data.geographic_subject|length > 0  %}
+	{% if data.geographic_subject is iterable %}
+		{% for subject in data.geographic_subject %}
+			<dc:coverage>{{ subject }}</dc:coverage>
+		{% endfor %}
      {% else %}
-         <dc:coverage>{{ data.geographic_subject }}</dc:coverage>
-    {% endif %}
+     	<dc:coverage>{{ data.geographic_subject }}</dc:coverage>
+	{% endif %} 
 {% endif %}
 {% if data.geographic_subject_linked_data %}
 {% if data.geographic_subject_linked_data.value is defined %}
-         <dc:coverage>{{ data.geographic_subject_linked_data.value }}</dc:coverage>
+     	<dc:coverage>{{ data.geographic_subject_linked_data.value }}</dc:coverage>
 {% else %}
   {% for subject in data.geographic_subject_linked_data %}
-            <dc:coverage>{{ subject.value }}</dc:coverage>
+			<dc:coverage>{{ subject.value }}</dc:coverage>
   {% endfor %}
 {% endif %}
 {% endif %}
-{% if data.temporal_subject|length > 0 %}
-    {% if data.temporal_subject is iterable %}
-        {% for subject in data.temporal_subject %}
-            <dc:coverage>{{ subject }}</dc:coverage>
-        {% endfor %}
+{% if data.temporal_subject|length > 0  %}
+	{% if data.temporal_subject is iterable %}
+		{% for subject in data.temporal_subject %}
+			<dc:coverage>{{ subject }}</dc:coverage>
+		{% endfor %}
      {% else %}
-         <dc:coverage>{{ data.temporal_subject }}</dc:coverage>
-    {% endif %}
+     	<dc:coverage>{{ data.temporal_subject }}</dc:coverage>
+	{% endif %} 
 {% endif %}
 {% if data.temporal_subject_linked_data %}
 {% if data.temporal_subject_linked_data.value is defined %}
-         <dc:coverage>{{ data.temporal_subject_linked_data.value }}</dc:coverage>
+     	<dc:coverage>{{ data.temporal_subject_linked_data.value }}</dc:coverage>
 {% else %}
   {% for subject in data.temporal_subject_linked_data %}
-            <dc:coverage>{{ subject.value }}</dc:coverage>
+			<dc:coverage>{{ subject.value }}</dc:coverage>
   {% endfor %}
 {% endif %}
 {% endif %}
-{% if data.coordinates|length > 0 %}
-    {% if data.coordinates is iterable %}
-        {% for coordinates in data.coordinates %}
-            <dc:coverage>{{ coordinates }}</dc:coverage>
-        {% endfor %}
+{% if data.coordinates|length > 0  %}
+	{% if data.coordinates is iterable %}
+		{% for coordinates in data.coordinates %}
+			<dc:coverage>{{ coordinates }}</dc:coverage>
+		{% endfor %}
      {% else %}
-         <dc:coverage>{{ data.coordinates }}</dc:coverage>
-    {% endif %}
+     	<dc:coverage>{{ data.coordinates }}</dc:coverage>
+	{% endif %} 
 {% endif %}
 
 {# Date #}
 {% if data.date_created|length > 0 %}
-    <dc:date>{{ data.date_created }}</dc:date>
+	<dc:date>{{ data.date_created }}</dc:date>
 {% endif %}
 {% if data.date_issued|length > 0 %}
-    <dc:date>{{ data.date_issued }}</dc:date>
+	<dc:date>{{ data.date_issued }}</dc:date>
 {% endif %}
 
 {# Description #}
 {% if data.description|length > 0 %}
-    {% if data.description is iterable %}
-        {% for description in data.description %}
-            <dc:description>{{ description|escape('html_attr') }}</dc:description>
-        {% endfor %}
+	{% if data.description is iterable %}
+		{% for description in data.description %}
+			<dc:description>{{ description|escape('html_attr') }}</dc:description>
+		{% endfor %}
      {% else %}
-    <dc:description>{{ data.description|escape('html_attr') }}</dc:description>
-    {% endif %}
+	<dc:description>{{ data.description|escape('html_attr') }}</dc:description>
+	{% endif %} 
 {% endif %}
 {% if data.abstract|length > 0 %}
-    <dc:description>{{ data.abstract }}</dc:description>
-{% endif %}
+	<dc:description>{{ data.abstract }}</dc:description>
+{% endif %} 
 {% if data.note|length > 0 %}
      {% if data.note is iterable %}
-         {% for note in data.note %}
-               <dc:description>{{ note }}</dc:description>
-         {% endfor %}
+     	{% for note in data.note %}
+       		<dc:description>{{ note }}</dc:description>
+     	{% endfor %}
      {% else %}
-             <dc:description>{{ data.note }}</dc:description>
-     {% endif %}
+     		<dc:description>{{ data.note }}</dc:description>
+     {% endif %} 
 {% endif %}
 {% if data.physical_location|length > 0 %}
      {% if data.physical_location is iterable %}
-         {% for physical_location in data.physical_location %}
-               <dc:description>{{ physical_location }}</dc:description>
-         {% endfor %}
+     	{% for physical_location in data.physical_location %}
+       		<dc:description>{{ physical_location }}</dc:description>
+     	{% endfor %}
      {% else %}
-             <dc:description>{{ data.physical_location }}</dc:description>
-     {% endif %}
+     		<dc:description>{{ data.physical_location }}</dc:description>
+     {% endif %} 
 {% endif %}
 {% if data.projection|length > 0 %}
      {% if data.projection is iterable %}
-         {% for projection in data.projection %}
-               <dc:description>{{ projection }}</dc:description>
-         {% endfor %}
+     	{% for projection in data.projection %}
+       		<dc:description>{{ projection }}</dc:description>
+     	{% endfor %}
      {% else %}
-             <dc:description>{{ data.projection }}</dc:description>
-     {% endif %}
+     		<dc:description>{{ data.projection }}</dc:description>
+     {% endif %} 
 {% endif %}
 {% if data.provenance|length > 0 %}
      {% if data.provenance is iterable %}
-         {% for provenance in data.provenance %}
-               <dc:description>{{ provenance }}</dc:description>
-         {% endfor %}
+     	{% for provenance in data.provenance %}
+       		<dc:description>{{ provenance }}</dc:description>
+     	{% endfor %}
      {% else %}
-             <dc:description>{{ data.provenance }}</dc:description>
-     {% endif %}
+     		<dc:description>{{ data.provenance }}</dc:description>
+     {% endif %} 
 {% endif %}
 {% if data.state_edition|length > 0 %}
      {% if data.state_edition is iterable %}
-         {% for state_edition in data.state_edition %}
-               <dc:description>{{ state_edition }}</dc:description>
-         {% endfor %}
+     	{% for state_edition in data.state_edition %}
+       		<dc:description>{{ state_edition }}</dc:description>
+     	{% endfor %}
      {% else %}
-             <dc:description>{{ data.state_edition }}</dc:description>
-     {% endif %}
+     		<dc:description>{{ data.state_edition }}</dc:description>
+     {% endif %} 
 {% endif %}
 {% if data.table_of_contents|length > 0 %}
      {% if data.table_of_contents is iterable %}
-         {% for table_of_contents in data.table_of_contents %}
-               <dc:description>{{ table_of_contents }}</dc:description>
-         {% endfor %}
+     	{% for table_of_contents in data.table_of_contents %}
+       		<dc:description>{{ table_of_contents }}</dc:description>
+     	{% endfor %}
      {% else %}
-             <dc:description>{{ data.table_of_contents }}</dc:description>
-     {% endif %}
+     		<dc:description>{{ data.table_of_contents }}</dc:description>
+     {% endif %} 
 {% endif %}
 
 {# Subject #}
 {% if data.subject|length > 0 %}
      {% if data.subject is iterable %}
-         {% for subject in data.subject %}
-               <dc:subject>{{ subject }}</dc:subject>
-         {% endfor %}
+     	{% for subject in data.subject %}
+       		<dc:subject>{{ subject }}</dc:subject>
+     	{% endfor %}
      {% else %}
-             <dc:subject>{{ data.subject }}</dc:subject>
-     {% endif %}
+     		<dc:subject>{{ data.subject }}</dc:subject>
+     {% endif %} 
 {% endif %}
 {% if data.subject_linked_data %}
 {% if data.subject_linked_data.value is defined %}
-         <dc:subject>{{ data.subject_linked_data.value }}</dc:subject>
+     	<dc:subject>{{ data.subject_linked_data.value }}</dc:subject>
 {% else %}
   {% for subject in data.subject_linked_data %}
-            <dc:subject>{{ subject.value }}</dc:subject>
+			<dc:subject>{{ subject.value }}</dc:subject>
   {% endfor %}
 {% endif %}
 {% endif %}
 {% if data.classification %}
 {% if data.classification.authority is defined %}
-         <dc:subject>{{ data.classification.value }}</dc:subject>
+     	<dc:subject>{{ data.classification.value }}</dc:subject>
 {% else %}
   {% for classification in data.classification %}
       <dc:subject>{{ classification.value }}</dc:subject>
@@ -277,55 +277,55 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {# Publisher #}
 {% if data.digital_publisher|length > 0 %}
      {% if data.digital_publisher is iterable %}
-         {% for digital_publisher in data.digital_publisher %}
-               <dc:publisher>{{ digital_publisher }}</dc:publisher>
-         {% endfor %}
+     	{% for digital_publisher in data.digital_publisher %}
+       		<dc:publisher>{{ digital_publisher }}</dc:publisher>
+     	{% endfor %}
      {% else %}
-             <dc:publisher>{{ data.digital_publisher }}</dc:publisher>
-     {% endif %}
+     		<dc:publisher>{{ data.digital_publisher }}</dc:publisher>
+     {% endif %} 
 {% endif %}
 {% if data.original_publisher|length > 0 %}
      {% if data.original_publisher is iterable %}
-         {% for original_publisher in data.original_publisher %}
-               <dc:publisher>{{ original_publisher }}</dc:publisher>
-         {% endfor %}
+     	{% for original_publisher in data.original_publisher %}
+       		<dc:publisher>{{ original_publisher }}</dc:publisher>
+     	{% endfor %}
      {% else %}
-             <dc:publisher>{{ data.original_publisher }}</dc:publisher>
-     {% endif %}
+     		<dc:publisher>{{ data.original_publisher }}</dc:publisher>
+     {% endif %} 
 {% endif %}
 
 {# Language #}
 {% if data.language|length > 0 %}
      {% if data.language is iterable %}
-         {% for language in data.language %}
-               <dc:language>{{ language }}</dc:language>
-         {% endfor %}
+     	{% for language in data.language %}
+       		<dc:language>{{ language }}</dc:language>
+     	{% endfor %}
      {% else %}
-             <dc:language>{{ data.language }}</dc:language>
-     {% endif %}
+     		<dc:language>{{ data.language }}</dc:language>
+     {% endif %} 
 {% endif %}
 
 {# Type #}
 {% if data.type|length > 0 %}
-    <dc:type>{{ data.type }}</dc:type>
-{% endif %}
+	<dc:type>{{ data.type }}</dc:type>
+{% endif %}    
 {% if data.content_type|length > 0 %}
      {% if data.content_type is iterable %}
-         {% for type in data.content_type %}
-               <dc:type>{{ type }}</dc:type>
-         {% endfor %}
+     	{% for type in data.content_type %}
+       		<dc:type>{{ type }}</dc:type>
+     	{% endfor %}
      {% else %}
-             <dc:type>{{ data.content_type }}</dc:type>
-     {% endif %}
+     		<dc:type>{{ data.content_type }}</dc:type>
+     {% endif %} 
 {% endif %}
 {% if data.genre_form|length > 0 %}
      {% if data.genre_form is iterable %}
-         {% for genre in data.genre_form %}
-               <dc:type>{{ genre }}</dc:type>
-         {% endfor %}
+     	{% for genre in data.genre_form %}
+       		<dc:type>{{ genre }}</dc:type>
+     	{% endfor %}
      {% else %}
-             <dc:type>{{ data.genre_form }}</dc:type>
-     {% endif %}
+     		<dc:type>{{ data.genre_form }}</dc:type>
+     {% endif %} 
 {% endif %}
 {% if data.genre_form_linked_data %}
 {% if data.genre_form_linked_data.value is defined %}
@@ -338,29 +338,29 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% endif %}
 
 {# Format #}
-{% if data.digital_origin|length > 0 %}
+{% if data.digital_origin|length > 0 %} 
   <dc:format>{{ data.digital_origin }}</dc:format>
 {% endif %}
 {% if data.extent|length > 0 %}
      {% if data.extent is iterable %}
-         {% for extent in data.extent %}
-               <dc:format>{{ extent }}</dc:format>
-         {% endfor %}
+     	{% for extent in data.extent %}
+       		<dc:format>{{ extent }}</dc:format>
+     	{% endfor %}
      {% else %}
-             <dc:format>{{ data.extent }}</dc:format>
-     {% endif %}
+     		<dc:format>{{ data.extent }}</dc:format>
+     {% endif %} 
 {% endif %}
-{% if data.format|length > 0 %}
+{% if data.format|length > 0 %} 
   <dc:format>{{ data.format }}</dc:format>
 {% endif %}
 {% if data.medium|length > 0 %}
      {% if data.medium is iterable %}
-         {% for medium in data.medium %}
-               <dc:format>{{ medium }}</dc:format>
-         {% endfor %}
+     	{% for medium in data.medium %}
+       		<dc:format>{{ medium }}</dc:format>
+     	{% endfor %}
      {% else %}
-             <dc:format>{{ data.medium }}</dc:format>
-     {% endif %}
+     		<dc:format>{{ data.medium }}</dc:format>
+     {% endif %} 
 {% endif %}
 
 {# Identifier #}
@@ -369,44 +369,44 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
   <dc:identifier>{{ data.identifier.value }}</dc:identifier>
 {% else %}
   {% for identifier in data.identifier %}
-    <dc:identifier>{{ identifier.value }}</dc:identifier>
+	<dc:identifier>{{ identifier.value }}</dc:identifier>
   {% endfor %}
 {% endif %}
 {% endif %}
 
 {# Source #}
 {% if data.owner|length > 0 %}
-    <dc:source>{{ data.owner }}</dc:source>
+	<dc:source>{{ data.owner }}</dc:source>
 {% endif %}
 
 {# Relation #}
 {% if node.id %}
-    {% set nodeurl = url('entity.node.canonical', {node: node.id}, {absolute: true}) %}
+    {% set nodeurl = url('entity.node.canonical', {'node': node.id}, {'absolute': true}) %}
 {% else %}
     {% set nodeurl = '<current>' ~ '/iiif/manifest' %}
-{% endif %}
+{% endif%}
  {% if attribute(data, 'ismemberof') %}
  {% if attribute(data, 'ismemberof') is iterable %}
- {% for collection in attribute(data, 'ismemberof') %}
+ {% for collection in attribute(data, 'ismemberof')%}
    {% set parentnode = bamboo_load_entity('node', collection) %}
-   {% set parentnodeurl = url('entity.node.canonical', {node: collection}, {absolute: true}) %}
+   {% set parentnodeurl = url('entity.node.canonical', {'node': collection}, {'absolute': true}) %}
 <dc:relation>{{ parentnode.title.value }}</dc:relation>
 {% endfor %}
 {% else %}
   {% set parentnode = bamboo_load_entity('node', attribute(data, 'ismemberof')) %}
-  {% set parentnodeurl = url('entity.node.canonical', {node: attribute(data, 'ismemberof')}, {absolute: true}) %}
+  {% set parentnodeurl = url('entity.node.canonical', {'node': attribute(data, 'ismemberof')}, {'absolute': true}) %}
   <dc:relation>{{ parentnode.title.value }}</dc:relation>
   {% endif %}
 {% endif %}
 
 {% if data.collecting_area|length > 0 %}
      {% if data.collecting_area is iterable %}
-         {% for collecting_area in data.collecting_area %}
-               <dc:relation>{{ collecting_area }}</dc:relation>
-         {% endfor %}
+     	{% for collecting_area in data.collecting_area %}
+       		<dc:relation>{{ collecting_area }}</dc:relation>
+     	{% endfor %}
      {% else %}
-             <dc:relation>{{ data.collecting_area }}</dc:relation>
-     {% endif %}
+     		<dc:relation>{{ data.collecting_area }}</dc:relation>
+     {% endif %} 
 {% endif %}
 {% if data.digital_exhibit %}
 {% if data.digital_exhibit.value is defined %}
@@ -419,53 +419,53 @@ Uses Archipelago's default Simple Dublin Core XML template as base. #}
 {% endif %}
 {% if data.original_publication|length > 0 %}
      {% if data.original_publication is iterable %}
-         {% for original_publication in data.original_publication %}
-               <dc:relation>{{ original_publication }}</dc:relation>
-         {% endfor %}
+     	{% for original_publication in data.original_publication %}
+       		<dc:relation>{{ original_publication }}</dc:relation>
+     	{% endfor %}
      {% else %}
-             <dc:relation>{{ data.original_publication }}</dc:relation>
-     {% endif %}
+     		<dc:relation>{{ data.original_publication }}</dc:relation>
+     {% endif %} 
 {% endif %}
 {% if data.physical_collection|length > 0 %}
      {% if data.physical_collection is iterable %}
-         {% for physical_collection in data.physical_collection %}
-               <dc:relation>{{ physical_collection }}</dc:relation>
-         {% endfor %}
+     	{% for physical_collection in data.physical_collection %}
+       		<dc:relation>{{ physical_collection }}</dc:relation>
+     	{% endfor %}
      {% else %}
-             <dc:relation>{{ data.physical_collection }}</dc:relation>
-     {% endif %}
+     		<dc:relation>{{ data.physical_collection }}</dc:relation>
+     {% endif %} 
 {% endif %}
 {% if data.related_record|length > 0 %}
      {% if data.related_record is iterable %}
-         {% for related_record in data.related_record %}
-               <dc:relation>{{ related_record }}</dc:relation>
-         {% endfor %}
+     	{% for related_record in data.related_record %}
+       		<dc:relation>{{ related_record }}</dc:relation>
+     	{% endfor %}
      {% else %}
-             <dc:relation>{{ data.related_record }}</dc:relation>
-     {% endif %}
+     		<dc:relation>{{ data.related_record }}</dc:relation>
+     {% endif %} 
 {% endif %}
 {% if data.related_url|length > 0 %}
      {% if data.related_url is iterable %}
-         {% for related_url in data.related_url %}
-               <dc:relation>{{ related_url }}</dc:relation>
-         {% endfor %}
+     	{% for related_url in data.related_url %}
+       		<dc:relation>{{ related_url }}</dc:relation>
+     	{% endfor %}
      {% else %}
-             <dc:relation>{{ data.related_url }}</dc:relation>
-     {% endif %}
+     		<dc:relation>{{ data.related_url }}</dc:relation>
+     {% endif %} 
 {% endif %}
 
 {# Rights #}
-{% if data.rights|length > 0 %}
+{% if data.rights|length > 0 %} 
   <dc:rights>{{ data.rights }}</dc:rights>
 {% endif %}
 {% if data.access_rights|length > 0 %}
      {% if data.access_rights is iterable %}
-         {% for rights in data.access_rights %}
-               <dc:rights>{{ rights }}</dc:rights>
-         {% endfor %}
+     	{% for rights in data.access_rights %}
+       		<dc:rights>{{ rights }}</dc:rights>
+     	{% endfor %}
      {% else %}
-             <dc:rights>{{ data.access_rights }}</dc:rights>
-     {% endif %}
+     		<dc:rights>{{ data.access_rights }}</dc:rights>
+     {% endif %} 
 {% endif %}
 
 </oai_dc:dc>

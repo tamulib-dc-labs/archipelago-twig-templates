@@ -55,77 +55,77 @@ Without Double quotes.
 #}
 {%- set structureCanvasIds = [] %}
 {# with 150 being Cantaloupe's setup PDF rastering resolution and 72 what PDFINFO produces by default #}
-{%- set pdf_resolution = (150 / 72) %}
-{%- set baseurl = url('<front>')|render -%}
-{%- set Webserverurl = baseurl -%}
-{%- set IIIFserverurl = iiif_server ? iiif_server ~ '/' : Webserverurl -%}
+{%- set pdf_resolution = (150/72) %}
+{%- set baseurl =  url('<front>')|render -%}
+{%- set Webserverurl =  baseurl -%}
+{%- set IIIFserverurl = iiif_server ? iiif_server ~ '/': Webserverurl -%}
 {%- set currenturl = url('<current>')|render -%}
 {%- set parentcollectionurl = '' -%}
 {%- set itemCount = 0 -%}
 {%- if node.id %}
-    {%- set nodeurl = url('entity.node.canonical', {node: node.id}, {absolute: true}) -%}
+    {%- set nodeurl = url('entity.node.canonical', {'node': node.id}, {'absolute': true}) -%}
 {%- else -%}
     {%- set nodeurl = currenturl -%}
 {%- endif -%}
 {%- if attribute(data, 'ismemberof') %}
     {%- if attribute(data, 'ismemberof') is iterable -%}
-        {%- set parentcollection_id = attribute(data, 'ismemberof')|last -%}
+	    {%- set parentcollection_id = attribute(data, 'ismemberof')|last -%}
     {%- else -%}
         {%- set parentcollection_id = attribute(data, 'ismemberof') -%}
     {%- endif -%}
-    {%- set parentcollectionurl = url('entity.node.canonical', {node: parentcollection_id}, {absolute: true}) -%}
+    {%- set parentcollectionurl = url('entity.node.canonical', {'node': parentcollection_id}, {'absolute': true}) -%}
 {%- endif -%}
 {%- if attribute(data, 'ispartof') -%}
     {%- if attribute(data, 'ispartof') is iterable -%}
-    {%- set parentnode_id = attribute(data, 'ispartof')|last -%}
+	{%- set parentnode_id = attribute(data, 'ispartof')|last -%}
     {%- else -%}
         {%- set parentnode_id = attribute(data, 'ispartof') -%}
     {%- endif -%}
-    {%- set parentnodeurl = url('entity.node.canonical', {node: parentnode_id}, {absolute: true}) -%}
+    {%- set parentnodeurl = url('entity.node.canonical', {'node': parentnode_id}, {'absolute': true}) -%}
 {%- endif -%}
-{%- set len = language.getId() ? language.getId() : 'en' -%}
-{% set computed_rights = 'http://rightsstatements.org/vocab/InC-EDU/1.0/' %}
+{%- set len = language.getId() ? language.getId() : "en" -%}
+{% set computed_rights = "http://rightsstatements.org/vocab/InC-EDU/1.0/" %}
 {% if data.rights|length > 0 or data.rights_statements|length > 0 %}
-    {% if data.rights|length > 0 %}
-        {% set computed_rights = data.rights %}
-    {% endif %}
+	{% if data.rights|length > 0 %}
+		{% set computed_rights = data.rights %}
+	{% endif %}
 {% elseif data.rights_statements|length > 0 %}
-    {% if data.rights_statements in ['In Copyright'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/InC/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['In Copyright - EU Orphan Work'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/InC-OW-EU/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['In Copyright - Educational Use Permitted'] %}
-           {% set computed_rights = 'http://rightsstatements.org/vocab/InC-EDU/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['In Copyright - Non-Commercial Use Permitted'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/InC-NC/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['In Copyright - Rights-holder(s) Unlocatable or Unidentifiable'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/InC-RUU/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['No Copyright - Contractual Restrictions'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/NoC-CR/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['No Copyright - Non-Commercial Use Only'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/NoC-NC/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['No Copyright - Other Known Legal Restrictions'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/NoC-OKLR/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['No Copyright - United States'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/NoC-US/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['Copyright Not Evaluated'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/CNE/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['Copyright Undetermined'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/UND/1.0/' %}
-    {% endif %}
-    {% if data.rights_statements in ['No Known Copyright'] %}
-        {% set computed_rights = 'http://rightsstatements.org/vocab/NKC/1.0/' %}
-    {% endif %}
+	{% if data.rights_statements in ['In Copyright'] %}
+		{% set computed_rights = "http://rightsstatements.org/vocab/InC/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['In Copyright - EU Orphan Work'] %}
+    	{% set computed_rights = "http://rightsstatements.org/vocab/InC-OW-EU/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['In Copyright - Educational Use Permitted'] %}
+	   	{% set computed_rights = "http://rightsstatements.org/vocab/InC-EDU/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['In Copyright - Non-Commercial Use Permitted'] %}
+		{% set computed_rights = "http://rightsstatements.org/vocab/InC-NC/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['In Copyright - Rights-holder(s) Unlocatable or Unidentifiable'] %}
+		{% set computed_rights = "http://rightsstatements.org/vocab/InC-RUU/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['No Copyright - Contractual Restrictions'] %}
+		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-CR/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['No Copyright - Non-Commercial Use Only'] %}
+		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-NC/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['No Copyright - Other Known Legal Restrictions'] %}
+		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-OKLR/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['No Copyright - United States'] %}
+		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-US/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['Copyright Not Evaluated'] %}
+		{% set computed_rights = "http://rightsstatements.org/vocab/CNE/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['Copyright Undetermined'] %}
+		{% set computed_rights = "http://rightsstatements.org/vocab/UND/1.0/" %}
+	{% endif %}
+	{% if data.rights_statements in ['No Known Copyright'] %}
+		{% set computed_rights = "http://rightsstatements.org/vocab/NKC/1.0/" %}
+	{% endif %}
 {% endif %}
 {%- set max_thumb_width = 240 -%}{
   "@context": [
@@ -513,46 +513,46 @@ Without Double quotes.
   "id": "{{ nodeurl }}/iiif/navplace",
   "type": "FeatureCollection",
   "features": [
-    {% set navplace_feature = data.geojson_feature|merge({properties: {label: {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
   ]
 },
 {% endif %}
 "items": [
 {%- set document_count = attribute(data, 'as:document')|length -%}
 {%- set TotalpageCount = 0 -%}
-{%- for document in attribute(data, 'as:document') %}
+{%- for document in attribute(data, 'as:document')%}
 {#- WIZARDLY UPDATED BY ARCHIPELAGO -#}
-{% if document['flv:exif'].PageCount -%}
+{%  if document['flv:exif'].PageCount -%}
 {%- set TotalpageCount = (TotalpageCount + document['flv:exif'].PageCount) -%}
 {#- WIZARDLY UPDATED BY ARCHIPELAGO -#}
 {% endif %}
 {%- endfor -%}
-{% for document in attribute(data, 'as:document') %}
+{% for document in attribute(data, 'as:document')%}
 {#- WIZARDLY UPDATED BY ARCHIPELAGO -#}
-{% if document['flv:exif'].PageCount %}
-   {%- set pageCount = document['flv:exif'].PageCount -%}
-   {%- set cantaloupeid = IIIFserverurl ~ document['url']|replace({'s3://': ''})|replace({'private://': ''})|url_encode -%}
-   {% for pagenumber in 1..pageCount %}{
+{%  if document['flv:exif'].PageCount %}
+   {%- set pageCount =  document['flv:exif'].PageCount -%}
+   {%- set cantaloupeid  = IIIFserverurl ~ document['url']|replace({'s3://':''})|replace({'private://':''})|url_encode -%}
+   {%  for pagenumber in 1..pageCount %}{
         {%- set itemCount = itemCount + 1 -%}
-        {% if attribute(document['flv:pdfinfo'], pagenumber) %}
-            {% set width = attribute(document['flv:pdfinfo'], pagenumber).width ? (attribute(document['flv:pdfinfo'], pagenumber).width * pdf_resolution)|round : 600 %}
-            {% set height = attribute(document['flv:pdfinfo'], pagenumber).height ? (attribute(document['flv:pdfinfo'], pagenumber).height * pdf_resolution)|round : 450 %}
-         {% else %}
-            {% if attribute(document['flv:identify'], pagenumber) %}
-               {% set width = attribute(document['flv:identify'], pagenumber).width ? (attribute(document['flv:identify'], pagenumber).width * pdf_resolution)|round : 600 %}
-               {% set height = attribute(document['flv:identify'], pagenumber).height ? (attribute(document['flv:identify'], pagenumber).height * pdf_resolution)|round : 450 %}
-            {% else %}
+        {% if attribute(document["flv:pdfinfo"], pagenumber) %}
+            {% set width = attribute(document["flv:pdfinfo"], pagenumber).width ? (attribute(document["flv:pdfinfo"], pagenumber).width * pdf_resolution)|round : 600 %}
+            {% set height = attribute(document["flv:pdfinfo"], pagenumber).height ? (attribute(document["flv:pdfinfo"], pagenumber).height * pdf_resolution)|round : 450 %}
+         {% else  %}
+            {% if attribute(document["flv:identify"], pagenumber) %}
+               {% set width = attribute(document["flv:identify"], pagenumber).width ? (attribute(document["flv:identify"], pagenumber).width * pdf_resolution)|round : 600 %}
+               {% set height = attribute(document["flv:identify"], pagenumber).height ? (attribute(document["flv:identify"], pagenumber).height * pdf_resolution)|round : 450 %}
+            {% else  %}
                {% set width = 600 %}
                {% set height = 450 %}
             {% endif %}
          {% endif %}
-         {% set thumb_width = width < max_thumb_width ? width : max_thumb_width %}
-         {% set thumb_height = (thumb_width / width * height)|round() %}
+         {% set thumb_width = width < max_thumb_width ? width: max_thumb_width %}
+         {% set thumb_height = (thumb_width/width * height)|round() %}
          {% set canvasId = nodeurl|render ~ '/iiif/' ~ document['dr:uuid'] ~ '/canvas/p' ~ pagenumber %}
          {% set structureCanvasIds = structureCanvasIds|merge([canvasId]) %}
          {% set thumbnail %}
   "thumbnail": [{
-  "id": "{{ cantaloupeid }}/full/{{ thumb_width }},/0/default.jpg?page={{ pagenumber }}",
+  "id": "{{ cantaloupeid }}/full/{{thumb_width}},/0/default.jpg?page={{ pagenumber }}",
   "type": "Image",
   "format": "image/jpeg",
   "width": {{ thumb_width }},
@@ -575,7 +575,7 @@ Without Double quotes.
       "width": {{ width }},
       "items": [
         {
-          "id": "{{ nodeurl }}/iiif/{{ document['dr:uuid'] }}/page/p{{ pagenumber }}",
+          "id": "{{ nodeurl }}/iiif/{{ document['dr:uuid'] }}/page/p{{ pagenumber}}",
           "type": "AnnotationPage",
           "items": [
             {
@@ -584,21 +584,21 @@ Without Double quotes.
               "motivation": "painting",
               {{ thumbnail }}
               "body": {
-               "id": "{{ cantaloupeid ~ ';' ~ pagenumber }}/full/full/0/default.jpg",
+               "id": "{{ cantaloupeid ~ ';' ~  pagenumber }}/full/full/0/default.jpg",
                "type": "Image",
                "format": "image/jpeg",
                "service": [
                   {
-                  "id": "{{ cantaloupeid ~ ';' ~ pagenumber }}",
+                  "id": "{{ cantaloupeid ~ ';' ~  pagenumber }}",
                   "type": "ImageService2",
                   "profile": "level2"
                    }
                 ]
-                {% if data.type in ['Book', 'Document', 'ArchivalDescription', 'Page', 'Letter'] %}
+                {% if data.type in ['Book','Document','ArchivalDescription','Page','Letter'] %}
                 ,
                 "seeAlso": {
-                   "@id":  "{{ nodeurl }}/flavorsearch/{{ document['dr:uuid'] }}/ocr/originalocr/{{ pagenumber }}",
-                   {# "profile": "http://www.loc.gov/standards/alto/v3/alto.xsd", NOTE THIS CAN BE ANY URL YOU ARE GOING TO USE TO IDENTIFY/DISCERN between XML formats. Up to you #}
+                   "@id":  "{{ nodeurl }}/flavorsearch/{{ document['dr:uuid'] }}/ocr/originalocr/{{ pagenumber}}",
+                   {# "profile": "http://www.loc.gov/standards/alto/v3/alto.xsd", NOTE THIS CAN BE ANY URL YOU ARE GOING TO USE TO IDENTIFY/DISCERN between XML formats. Up to you#}
                    "format": "text/xml",
                    "label": "MINIOCR XML"
                 }
@@ -614,7 +614,7 @@ Without Double quotes.
   "id": "{{ nodeurl }}/iiif/{{ document['dr:uuid'] }}/canvas/p{{ pagenumber }}/navplace",
   "type": "FeatureCollection",
   "features": [
-    {% set navplace_feature = data.geojson_feature|merge({properties: {label: {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
   ]
 }
 {% endif %}
@@ -634,25 +634,25 @@ Without Double quotes.
 {% for page in attribute(data, 'as:image') %}
    {
    {%- set itemCount = itemCount + 1 %}
-   {%- set cantaloupeid = IIIFserverurl ~ page['url']|replace({'s3://': ''})|replace({'private://': ''})|url_encode -%}
-   {%- if page['flv:exif'] -%}
-      {%- set width = page['flv:exif'].ImageWidth -%}
-   {%- else -%}
+   {%- set cantaloupeid  = IIIFserverurl ~ page['url']|replace({'s3://':''})|replace({'private://':''})|url_encode -%}
+   {%- if page["flv:exif"] -%}
+      {%- set width = page["flv:exif"].ImageWidth -%}
+   {%- else  -%}
       {%- set width = 1200 -%}
   {%- endif -%}
-  {%- if page['flv:exif'] -%}
-    {%- set height = page['flv:exif'].ImageHeight -%}
-  {%- else -%}
+  {%- if page["flv:exif"] -%}
+    {%- set height = page["flv:exif"].ImageHeight -%}
+  {%- else  -%}
     {%- set height = 1600 -%}
   {%- endif -%}
-  {%- set thumb_width = width < max_thumb_width ? width : max_thumb_width -%}
-  {%- set thumb_height = (thumb_width / width * height)|round() -%}
+  {%- set thumb_width = width < max_thumb_width ? width: max_thumb_width -%}
+  {%- set thumb_height = (thumb_width/width * height)|round() -%}
   {% set canvasId = nodeurl|render ~ '/iiif/canvas/p' ~ itemCount %}
   {% set structureCanvasIds = structureCanvasIds|merge([canvasId]) %}
 {% set thumbnail -%}
 "thumbnail": [
         {
-          "id": "{{ cantaloupeid }}/full/{{ thumb_width }},/0/default.jpg",
+          "id": "{{ cantaloupeid }}/full/{{thumb_width}},/0/default.jpg",
           "type": "Image",
           "format": "image/jpeg",
           "width": {{ thumb_width }},
@@ -676,7 +676,7 @@ Without Double quotes.
       "width": {{ width }},
       "items": [
         {
-          "id": "{{ nodeurl }}/iiif/page/p{{ itemCount }}",
+          "id": "{{ nodeurl }}/iiif/page/p{{ itemCount}}",
           "type": "AnnotationPage",
           "items": [
             {
@@ -725,13 +725,13 @@ Without Double quotes.
         }
       ]
  #}
-{#- starts Pure Text annotation, transcriptions, and direct Image annotations -#}
+{#- starts Pure Text annotation, transcriptions, and direct Image annotations-#}
 {% set texts = [] %}
-{%- for text_uuid, text_file in data['as:text'] %}
+{%- for text_uuid, text_file in data["as:text"] %}
    {# only generate an annotation if text and image have the same sequence OR
    there is exactly a single Image #}
-  {% if (text_file.sequence == page.sequence or data['as:image']|length == 1) and text_file['dr:mimetype'] == 'text\/plain' %}
-    {% set texts = texts|merge([{'dr:uuid': text_file['dr:uuid'], name: text_file['name']}]) %}
+  {% if (text_file.sequence == page.sequence or data["as:image"]|length == 1) and text_file["dr:mimetype"] == "text\/plain" %}
+    {% set texts = texts|merge([{'dr:uuid': text_file['dr:uuid'], 'name': text_file['name']}]) %}
   {% endif %}
 {%- endfor %}
 {% set transcription = null %}
@@ -742,7 +742,7 @@ Without Double quotes.
 {% if data.annotations[0].reasoning[loop.index0] is defined %}
   {% set reasoning = data.annotations[0].reasoning[loop.index0] %}
 {% endif %}
-{% if texts|length > 0 or transcription or reasoning or data['ap:annotationCollection'][cantaloupeid ~ '/info.json'] is defined %}
+{% if texts|length > 0 or transcription or reasoning or data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
        ,
        "annotations": [
   {%- if texts|length > 0 -%}
@@ -756,17 +756,17 @@ Without Double quotes.
               "type": "Annotation",
               "motivation": "supplementing",
               "body": {
-                "id": "{{ Webserverurl }}do/{{ node.uuid.value }}/file/{{ text_file['dr:uuid'] }}/download/{{ text_file['name'] }}",
+                "id": "{{ Webserverurl }}do/{{ node.uuid.value }}/file/{{ text_file['dr:uuid'] }}/download/{{  text_file["name"] }}",
                 "type": "Text",
                 "format": "text/plain",
                 "label": {
                   "en": [
-                    "{{ text_file.name }}"
+                    "{{ text_file.name  }}"
                   ]
                 },
                 "language": "en"
               },
-              "target": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}#xywh=0,0,{{ width }},{{ height }}"
+              "target": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}#xywh=0,0,{{width}},{{height}}"
             }{{ not loop.last ? ',' : '' }}
     {% endfor -%}
            ]
@@ -814,13 +814,13 @@ Without Double quotes.
               ]
             }
   {% endif %}
-  {% if data['ap:annotationCollection'][cantaloupeid ~ '/info.json'] is defined %}
+  {% if data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] is defined %}
     {%- if texts|length > 0 or transcription or reasoning -%},{% endif %}
             {
               "id": "{{ nodeurl }}/iiif/comments/p{{ itemCount }}",
               "type": "AnnotationPage",
               "items": [
-       {% for annotation in data['ap:annotationCollection'][cantaloupeid ~ '/info.json'] %}
+       {% for annotation in data["ap:annotationCollection"][cantaloupeid ~ '/info.json'] %}
               {
               "id": "{{ nodeurl }}/iiif/comments/p{{ itemCount }}/{{ annotation.id }}",
                {# @TODO a single annotation might have multiple Bodies and multiple motivations #}
@@ -829,7 +829,7 @@ Without Double quotes.
               {# We need to enrich here, missing language and format #}
               {% if annotation.body is iterable %}
                 {% for body in annotation.body %}
-                  {% set annotation_body = body|merge({language: len, format: 'text/plain'}) %}
+                  {% set annotation_body = body|merge({'language': len, 'format': 'text/plain'}) %}
                   {% set temp_annotation_body = temp_annotation_body|merge([annotation_body]) %}
                 {% endfor %}
               {% else %}
@@ -837,23 +837,23 @@ Without Double quotes.
               "body": {{ temp_annotation_body|json_encode|raw }},
               "type": {{ annotation.type|json_encode(constant('JSON_FORCE_OBJECT'))|raw }}
               {# check target type: If polygon we need the selector, if a square, we need the xywh #}
-              {% if annotation.target.selector.type == 'FragmentSelector' %}
+              {% if annotation.target.selector.type == "FragmentSelector" %}
               {# MIRADOR does not know how to hande "pixel:" in the fragment coordinates selector #}
-                {% set target = nodeurl|render ~ '/iiif/canvas/p' ~ itemCount ~ '#' ~ annotation.target.selector.value|replace({'pixel:': ''}) %}
+                {% set target = nodeurl|render ~ "/iiif/canvas/p" ~ itemCount ~ '#' ~ annotation.target.selector.value|replace({"pixel:" : ""}) %}
               ,"target": {{ target|json_encode|raw }}
               {% else %}
               {# Parse our polygon point values into path for Mirador #}
                 {% if 'points="' in annotation.target.selector.value %}
-                  {% set mirador_path = annotation.target.selector.value|preg_replace('/.+?points="/', '')|preg_replace('/".*/', '') %}
-                  {% set mirador_path = 'M' ~ (mirador_path|split(' ')|join('L')) ~ ' z' %}
+                  {% set mirador_path = annotation.target.selector.value | preg_replace('/.+?points="/','') | preg_replace('/".*/','') %}
+                  {% set mirador_path = "M" ~ (mirador_path|split(" ")|join("L")) ~ " z" %}
                   {% set target = {
-                     source: nodeurl|render ~ '/iiif/canvas/p' ~ itemCount,
-                     selector: {
-                       type: annotation.target.selector.type,
-                       value: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="' ~ mirador_path ~ '"/></g></svg>',
+                     "source" : nodeurl|render ~ "/iiif/canvas/p" ~ itemCount,
+                     "selector": {
+                       "type":  annotation.target.selector.type,
+                       "value": '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="' ~ mirador_path ~ '"/></g></svg>'
                      },
-                     type: 'SpecificResource',
-                      }
+                     "type": "SpecificResource"
+               	   }
                  %}
               ,"target": {{ target|json_encode|raw }}
               {% endif %}
@@ -871,7 +871,7 @@ Without Double quotes.
   "id": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}/navplace",
   "type": "FeatureCollection",
   "features": [
-    {% set navplace_feature = data.geojson_feature|merge({properties: {label: {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
   ]
 }
 {% endif %}
@@ -886,23 +886,23 @@ Without Double quotes.
 {%- set video_count = attribute(data, 'as:video')|length -%}
 {% for video in attribute(data, 'as:video') %}
   {%- set itemCount = itemCount + 1 -%}
-  {%- set cantaloupeid = IIIFserverurl ~ video['url']|replace({'s3://': ''})|replace({'private://': ''})|url_encode -%}
-  {%- if video['flv:exif'] -%}
-    {%- set width = video['flv:mediainfo'].videos[0].width.absoluteValue|default(720) -%}
-  {% else %}
+  {%- set cantaloupeid  = IIIFserverurl ~ video['url']|replace({'s3://':''})|replace({'private://':''})|url_encode -%}
+  {%- if video["flv:exif"] -%}
+    {%- set width = video["flv:mediainfo"].videos[0].width.absoluteValue|default(720) -%}
+  {% else  %}
     {%- set width = 720 -%}
   {% endif %}
-  {%- if video['flv:mediainfo'] -%}
-    {%- set height = video['flv:mediainfo'].videos[0].height.absoluteValue -%}
-  {%- else -%}
+  {%- if video["flv:mediainfo"] -%}
+    {%- set height = video["flv:mediainfo"].videos[0].height.absoluteValue -%}
+  {%- else  -%}
     {%- set height = 480 -%}
   {%- endif -%}
-  {%- set thumb_width = width < max_thumb_width ? width : max_thumb_width -%}
-  {%- set thumb_height = (thumb_width / width * height)|round() -%}
+  {%- set thumb_width = width < max_thumb_width ? width: max_thumb_width -%}
+  {%- set thumb_height = (thumb_width/width * height)|round() -%}
   {% set thumbnail -%}
 "thumbnail": [
         {
-          "id": "{{ cantaloupeid }};1/full/{{ thumb_width }},/0/default.jpg",
+          "id": "{{ cantaloupeid }};1/full/{{thumb_width}},/0/default.jpg",
           "type": "Image",
           "format": "image/jpeg",
           "width": {{ thumb_width }},
@@ -919,13 +919,13 @@ Without Double quotes.
     {%- if (video_count > 1) -%}
       {{ (loop.index ~ ' of ' ~ video_count ~ ' videos: ' ~ data.label)|json_encode|raw }}
     {% else %}
-      {{ ('Video:' ~ data.label)|json_encode|raw }}
+      {{ ("Video:" ~ data.label)|json_encode|raw }}
     {%- endif -%}
     ]},
     {{ thumbnail }}
     "width": {{ width }},
     "height": {{ height }},
-    "duration": {{ video['flv:mediainfo'].videos[0].duration.milliseconds|default(1000) }},
+    "duration": {{ video["flv:mediainfo"].videos[0].duration.milliseconds|default(1000) }},
     "items": [
         {
           "id": "{{ nodeurl }}/iiif/page/p{{ itemCount }}",
@@ -937,10 +937,10 @@ Without Double quotes.
               "motivation": "painting",
               {{ thumbnail }}
               "body": [{
-                "id": "{{ Webserverurl }}do/{{ node.id }}/iiif/{{ video['dr:uuid'] }}/full/full/0/{{ video.name }}",
+                "id": "{{ Webserverurl }}do/{{ node.id }}/iiif/{{ video['dr:uuid'] }}/full/full/0/{{  video.name }}",
                 "type": "Video",
-                "format": "{{ video['flv:mediainfo'].general.internet_media_type }}",
-                "duration": {{ video['flv:mediainfo'].videos[0].duration.milliseconds|default(1000) }},
+                "format": "{{ video["flv:mediainfo"].general.internet_media_type }}",
+                "duration": {{ video["flv:mediainfo"].videos[0].duration.milliseconds|default(1000) }},
                 "height": {{ height }},
                 "width": {{ width }}
               }],
@@ -951,9 +951,9 @@ Without Double quotes.
       ]
     {#- starts subtitle annotation -#}
           {% set vtts = [] %}
-          {%- for text_uuid, subtitle_track in data['as:text'] %}
-              {% if subtitle_track['dr:for'] == video['dr:for'] and subtitle_track['dr:mimetype'] == 'text\/vtt' %}
-              {% set vtts = vtts|merge([{'dr:uuid': subtitle_track['dr:uuid'], name: subtitle_track['name']}]) %}
+          {%- for text_uuid, subtitle_track in data["as:text"] %}
+              {% if subtitle_track["dr:for"] == video["dr:for"] and subtitle_track["dr:mimetype"] == "text\/vtt" %}
+              {% set vtts = vtts|merge([{'dr:uuid': subtitle_track['dr:uuid'], 'name': subtitle_track['name']}]) %}
               {% endif %}
           {%- endfor %}
        {% if vtts|length > 0 %}
@@ -968,12 +968,12 @@ Without Double quotes.
               "type": "Annotation",
               "motivation": "supplementing",
               "body": {
-                "id": "{{ Webserverurl }}do/{{ node.uuid.value }}/file/{{ subtitle_track['dr:uuid'] }}/download/{{ subtitle_track['name'] }}",
+                "id": "{{ Webserverurl }}do/{{ node.uuid.value }}/file/{{ subtitle_track['dr:uuid'] }}/download/{{  subtitle_track["name"] }}",
                 "type": "Text",
                 "format": "text/vtt",
                 "label": {
                   "en": [
-                    "{{ subtitle_track.name }}"
+                    "{{ subtitle_track.name  }}"
                   ]
                 },
                 "language": "en"
@@ -990,7 +990,7 @@ Without Double quotes.
   "id": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}/navplace",
   "type": "FeatureCollection",
   "features": [
-    {% set navplace_feature = data.geojson_feature|merge({properties: {label: {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
   ]
 }
 {% endif %}
@@ -1015,10 +1015,10 @@ Without Double quotes.
       {%- if (audio_count > 1) -%}
         {{ (loop.index ~ ' of ' ~ audio_count ~ ' audios: ' ~ data.label)|json_encode|raw }}
       {% else %}
-        {{ ('Audio:' ~ data.label)|json_encode|raw }}
+        {{ ("Audio:" ~ data.label )|json_encode|raw }}
       {%- endif -%}
       ]},
-    "duration": {{ audio['flv:mediainfo'].audios[0].duration.milliseconds|default(1000) }},
+    "duration": {{ audio["flv:mediainfo"].audios[0].duration.milliseconds|default(1000) }},
     "items": [
         {
           "id": "{{ nodeurl }}/iiif/page/p{{ itemCount }}",
@@ -1030,10 +1030,10 @@ Without Double quotes.
               "motivation": "painting",
               {{ thumbnail }}
               "body": {
-                "id": "{{ Webserverurl }}do/{{ node.id }}/iiif/{{ audio['dr:uuid'] }}/full/full/0/{{ audio.name }}",
+                "id": "{{ Webserverurl }}do/{{ node.id }}/iiif/{{ audio['dr:uuid'] }}/full/full/0/{{  audio.name }}",
                 "type": "Sound",
-                "format": "{{ audio['flv:mediainfo'].general.internet_media_type }}",
-                "duration": {{ audio['flv:mediainfo'].audios[0].duration.milliseconds|default(1000) }}
+                "format": "{{ audio["flv:mediainfo"].general.internet_media_type }}",
+                "duration": {{ audio["flv:mediainfo"].audios[0].duration.milliseconds|default(1000) }}
               },
               "target": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}"
             }
@@ -1045,7 +1045,7 @@ Without Double quotes.
   "id": "{{ nodeurl }}/iiif/canvas/p{{ itemCount }}/navplace",
   "type": "FeatureCollection",
   "features": [
-    {% set navplace_feature = data.geojson_feature|merge({properties: {label: {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
   ]
 }
 {% endif %}
@@ -1059,7 +1059,7 @@ Without Double quotes.
       "type": "Range",
       "label": {
         "{{ len }}": [
-          {{ node.label|json_encode|raw }}
+          {{ node.label|json_encode|raw  }}
         ]
       },
       "items": [
