@@ -1,0 +1,232 @@
+{
+    "note": "Latin text on verso.",
+    "type": "Map",
+    "agent": "",
+    "image": [
+        3291,
+        3292
+    ],
+    "label": ["Ta. svperioris indiae et tartariæ maioris"],
+    "extent": [
+        "1 map : hand colored ; 29 x 46 cm, on sheet 38 x 52 cm"
+    ],
+    "format": "",
+    "rights": "http:\/\/rightsstatements.org\/vocab\/NoC-US\/1.0\/",
+    "creator": "Mark",
+    "subject": "testing",
+    "abstract": "",
+    "ap:tasks": {
+        "ap:sortfiles": "index"
+    },
+    "as:image": {
+        "urn:uuid:83b5cb0e-d85b-41de-91fb-d10e2fa64e52": {
+            "url": "s3:\/\/829\/image-g7800-1535-f75a-edit-83b5cb0e-d85b-41de-91fb-d10e2fa64e52.jp2",
+            "name": "G7800_1535_-F75a_edit.jp2",
+            "tags": [],
+            "type": "Image",
+            "dr:fid": 3291,
+            "dr:for": "image",
+            "dr:uuid": "83b5cb0e-d85b-41de-91fb-d10e2fa64e52",
+            "checksum": "829916460915676f5b7397d61f8e0df7",
+            "flv:exif": {
+                "FileSize": "190 MB",
+                "MIMEType": "image\/jp2",
+                "ImageSize": "8654x6348",
+                "ColorSpace": "sRGB",
+                "ImageWidth": 8654,
+                "ImageHeight": 6348
+            },
+            "sequence": 1,
+            "flv:pronom": {
+                "label": "JP2 (JPEG 2000 part 1)",
+                "mimetype": "image\/jp2",
+                "pronom_id": "info:pronom\/x-fmt\/392",
+                "detection_type": "signature"
+            },
+            "dr:filesize": 190351583,
+            "dr:mimetype": "image\/jp2",
+            "crypHashFunc": "md5",
+            "flv:identify": {
+                "1": {
+                    "width": "8654",
+                    "format": "JP2",
+                    "height": "6348",
+                    "orientation": "Undefined"
+                }
+            }
+        },
+        "urn:uuid:fc89fd06-2729-47ba-94cd-3f3ee39ac1f5": {
+            "url": "s3:\/\/5a6\/image-g7800-1535-f75b-edit-fc89fd06-2729-47ba-94cd-3f3ee39ac1f5.jp2",
+            "name": "G7800_1535_-F75b_edit.jp2",
+            "tags": [],
+            "type": "Image",
+            "dr:fid": 3292,
+            "dr:for": "image",
+            "dr:uuid": "fc89fd06-2729-47ba-94cd-3f3ee39ac1f5",
+            "checksum": "5a6fe4b13cd4206cff9bbc2e678a0a76",
+            "flv:exif": {
+                "FileSize": "191 MB",
+                "MIMEType": "image\/jp2",
+                "ImageSize": "8523x6176",
+                "ColorSpace": "sRGB",
+                "ImageWidth": 8523,
+                "ImageHeight": 6176
+            },
+            "sequence": 2,
+            "flv:pronom": {
+                "label": "JP2 (JPEG 2000 part 1)",
+                "mimetype": "image\/jp2",
+                "pronom_id": "info:pronom\/x-fmt\/392",
+                "detection_type": "signature"
+            },
+            "dr:filesize": 190673404,
+            "dr:mimetype": "image\/jp2",
+            "crypHashFunc": "md5",
+            "flv:identify": {
+                "1": {
+                    "width": "8523",
+                    "format": "JP2",
+                    "height": "6176",
+                    "orientation": "Undefined"
+                }
+            }
+        }
+    },
+    "language": [
+        "lat"
+    ],
+    "node_uuid": "979522ff-477d-4961-a4f7-80432ec5d783",
+    "genre_form": "",
+    "identifier": [
+        {
+            "value": "ocm45079623",
+            "authority": "OCoLC"
+        },
+        {
+            "value": "ocm45079623",
+            "authority": "OCoLC"
+        },
+        {
+            "value": "45079623",
+            "authority": "OCoLC"
+        },
+        {
+            "value": "in00005610993",
+            "authority": "local"
+        },
+        {
+            "value": 99999,
+            "authority": "local"
+        }
+    ],
+    "ismemberof": [
+        456
+    ],
+    "provenance": "",
+    "contributor": "",
+    "coordinates": [
+        "Scale not given (E 81°56ʹ00'--E 142°13ʹ00'\/N 56°05ʹ00'--N 7°34ʹ00')."
+    ],
+    "date_issued": "1535?",
+    "description": [
+        "Covers China, eastern India and Japan.",
+        "Relief shown pictorially.",
+        "Title from caption (right side) on verso.",
+        "Attributed to Lorenz Fries.",
+        "Likely detached from: Ptolemy's Geographicae enarrationis libri octo, 1535.",
+        "Some details derived from Waldseemüller's 1507 world map.",
+        "Woodblock print; trapezodal projection.",
+        "Includes image of Kublai Khan as King of the Tartars.",
+        "On verso: '43'."
+    ],
+    "content_type": [
+        "StillImage"
+    ],
+    "\"date_issued\"": "",
+    "canvas_labels": [
+        "Recto",
+        "Verso"
+    ],
+    "state_edition": "",
+    "classification": [
+        {
+            "value": "G7800 1535 .F75",
+            "authority": "lcc"
+        }
+    ],
+    "digital_origin": "reformatted digital",
+    "related_record": [
+        "Waldseemüller, Martin, 1470-1519. Cosmographiae introductio.",
+        "Contained in (work): Ptolemy, active 2nd century. Geographia.",
+        "has work: De providentia regis magni chan (CartographicMaterial) https:\/\/id.oclc.org\/worldcat\/entity\/E39PCFYRxtHK7qkHPf48hRcgKd"
+    ],
+    "rights_details": "No Copyright - United States",
+    "geojson_feature": {
+        "type": "Feature",
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [
+                        81.933333,
+                        7.566667
+                    ],
+                    [
+                        142.216667,
+                        7.566667
+                    ],
+                    [
+                        142.216667,
+                        56.083333
+                    ],
+                    [
+                        81.933333,
+                        56.083333
+                    ],
+                    [
+                        81.933333,
+                        7.566667
+                    ]
+                ]
+            ]
+        },
+        "properties": {
+            "label": "Ta. svperioris indiae et tartariæ maioris"
+        }
+    },
+    "place_of_origin": [
+        "Lyons?"
+    ],
+    "ap:entitymapping": {
+        "entity:file": [
+            "image"
+        ],
+        "entity:node": [
+            "ismemberof"
+        ]
+    },
+    "date_issued_edtf": "",
+    "agent_linked_data": [
+        {
+            "uri": "https:\/\/id.oclc.org\/worldcat\/entity\/E39PBJyGWKKCfWHX9qRffFQpfq",
+            "role": "cartographer",
+            "value": "Fries, Lorenz, approximately 1490-1531"
+        }
+    ],
+    "digital_publisher": [
+        "Texas A & M University. Libraries"
+    ],
+    "table_of_contents": "",
+    "title_alternative": [
+        "Tabula superioris indiae et tartariæ maioris"
+    ],
+    "geographic_subject": [
+        "East Asia--Maps--Early works to 1800"
+    ],
+    "original_publisher": "",
+    "physical_collection": {"place": ["Ronald L. and V. Jane Woellhof Rare Map Collection"]},
+    "subject_linked_data": "",
+    "original_publication": "",
+    "genre_form_linked_data": "[{\"value\": \"Early works\", \"uri\": \"http:\/\/id.worldcat.org\/fast\/1411636\"}, {\"value\": \"Maps\", \"uri\": \"http:\/\/id.worldcat.org\/fast\/1423704\"} | {\"value\": \"Early maps\", \"uri\": \"http:\/\/id.loc.gov\/authorities\/genreForms\/gf2011026218\"}]",
+    "geographic_subject_linked_data": ""
+}
