@@ -80,12 +80,15 @@ The config's finder is load bearing: these files are named `<name>.twig.html`
 rather than Drupal's `<name>.html.twig`, so the default `*.twig` pattern matches
 nothing and the run reports `Files linted: 0` and passes.
 
-It currently reports **~4,384 violations** across the 26 templates —
-overwhelmingly trailing whitespace, tabs and double-quoted strings, none of
-which affects rendered output. The CI job is therefore **report-only**
-(`continue-on-error`), so it does not block every PR on pre-existing style debt.
-Run `fix` in a dedicated PR, review the diff, then drop that line to make it a
-real gate.
+The ~4,384 pre-existing violations were cleared in a single mechanical commit,
+so the CI job is a **real gate** rather than a report — there is no legacy debt
+left for it to block on, only newly introduced drift. Every rule it enforces is
+auto-fixable, so `fix` resolves anything it reports.
+
+That reformat was verified output-equivalent before being committed: all 16
+rendered documents parse to identical JSON, and iiif-prezi3 reports the same
+defects in the same places. Byte-level output did shift for 11 of them, though,
+so it is not a no-op for anything string-comparing rendered output.
 
 ## The renderer is real, not stubbed
 

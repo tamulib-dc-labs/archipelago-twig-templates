@@ -53,20 +53,68 @@ def escape(value: str) -> str:
     return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
 
 
-def summarise(error: ValidationError, limit: int = 6) -> list[str]:
-    """Turn a pydantic ValidationError into short, pointed lines.
+def describe(value: object, width: int = 60) -> str:
+    """A short, honest rendering of what was actually found."""
+    kind = {str: "string", list: "array", dict: "object",
+            int: "number", float: "number", bool: "boolean"}.get(type(value), type(value).__name__)
+    if value is None:
+        return "null"
+    shown = json.dumps(value, ensure_ascii=False)
+    if len(shown) > width:
+        shown = shown[:width - 1] + "…"
+    return f"{kind} {shown}"
 
-    The raw exception is long and repeats a variant for every branch of a
-    union. The location and the expected type are the parts someone acts on.
+
+def summarise(error: ValidationError, limit: int = 6) -> list[str]:
+    """Turn a pydantic ValidationError into lines someone can act on.
+
+    Raw pydantic output is close to unreadable here, because a IIIF language
+    map is modelled as a union and every failure is reported once per branch:
+
+        metadata/15/value/dict[constrained-str,list[str]]/en — Input should be a valid list
+        metadata/15/value/dict[constrained-str,list[str]]/en/[key] — String should match pattern '^none$'
+        metadata/15/value/dict[constrained-str,list[str]]/en — Input should be a valid list
+
+    That is three lines for one defect, two of which are the model's internals
+    rather than anything about the document. The union type names are dropped,
+    the "did the key match ^none$" branch is dropped (it only fires because the
+    language-code branch already failed), duplicates are collapsed, and the
+    offending value is shown so the problem is self-evident.
     """
-    lines = []
-    for item in error.errors()[:limit]:
-        where = "/".join(str(part) for part in item.get("loc", ()))
-        lines.append(f"{where or '/'} — {item.get('msg', 'invalid')}")
-    remaining = len(error.errors()) - limit
+    seen: dict[str, str] = {}
+
+    for item in error.errors():
+        parts = [str(p) for p in item.get("loc", ())]
+
+        # "[key]" entries are the union's key-pattern branch complaining that a
+        # language code is not the literal "none". Never the real problem.
+        if parts and parts[-1] == "[key]":
+            continue
+
+        # Drop pydantic's synthetic union-variant segments, e.g.
+        # dict[constrained-str,list[str]] -- they name the model, not the data.
+        parts = [p for p in parts if not (("[" in p and "]" in p) or p.startswith("function-"))]
+
+        where = ".".join(parts) or "/"
+        message = item.get("msg", "invalid")
+
+        # Pydantic phrases these as instructions to itself; say what is wrong.
+        if "valid list" in message:
+            message = "must be an array of strings"
+        elif "valid string" in message:
+            message = "must be a string"
+
+        if "input" in item:
+            message = f"{message}, got {describe(item['input'])}"
+
+        seen.setdefault(f"{where} — {message}", "")
+
+    lines = list(seen)[:limit]
+    remaining = len(seen) - len(lines)
     if remaining > 0:
         lines.append(f"...and {remaining} more")
-    return lines
+
+    return lines or ["failed IIIF validation (no location reported)"]
 
 
 def validate(entry: dict, github: bool) -> bool:

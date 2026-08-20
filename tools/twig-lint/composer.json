@@ -3,15 +3,17 @@
     "description": "Offline parity check for Archipelago MetadataDisplayEntity::validateSource()",
     "type": "project",
     "license": "MIT",
-    "_pinning_note": [
+    "extra": {
+        "pinning_note": [
         "IDEALLY twig/twig would be pinned to exactly what the deployed Archipelago runs, because",
         "linting with a NEWER Twig is a false-pass risk: Twig 3.x keeps adding filters, so a template",
         "using one added in 3.20 lints clean here and is still rejected by a site on 3.14.",
         "We do NOT pin low, because every 3.14.x release is blocked by composer security advisories.",
-        "Residual risk is small (these templates use long-established idioms, and the whole 3.x line",
-        "is backward compatible) and the live-Archipelago tier catches what is left.",
+        "Residual risk is small: these templates use long-established idioms and the whole 3.x line",
+        "is backward compatible.",
         "Confirm the deployed version with: docker exec esmero-php composer show twig/twig"
-    ],
+        ]
+    },
     "require": {
         "php": ">=8.2",
         "twig/twig": "^3.14"

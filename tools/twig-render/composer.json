@@ -3,14 +3,16 @@
     "description": "Renders Archipelago metadata display templates against fixtures and validates the output",
     "type": "project",
     "license": "MIT",
-    "_note": [
+    "extra": {
+        "note": [
         "This tier answers a different question from tools/twig-lint. That one asks whether",
         "Archipelago would ACCEPT a template (parse time). This one asks whether the template",
         "PRODUCES VALID OUTPUT when fed known metadata -- the failure that breaks viewers.",
         "",
         "A template emitting {\"items\":[{...},]} parses perfectly and saves into Archipelago",
         "without complaint. Only rendering it and parsing the result catches that."
-    ],
+        ]
+    },
     "require": {
         "php": ">=8.2",
         "ext-json": "*",

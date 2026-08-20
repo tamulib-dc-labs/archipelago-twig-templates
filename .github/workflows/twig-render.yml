@@ -106,16 +106,13 @@ jobs:
   coding-standards:
     name: Twig coding standards
     runs-on: ubuntu-latest
-    # REPORT ONLY, on purpose. Twig-CS-Fixer currently finds ~4,384 violations
-    # across these 26 files -- overwhelmingly trailing whitespace, tabs and
-    # double-quoted strings. None of it affects rendered output, and gating on
-    # it would block every PR on pre-existing style debt rather than on the
-    # change under review.
+    # A real gate, not a report. The ~4,384 pre-existing violations were cleared
+    # by `twig-cs-fixer fix` in its own commit, verified output-equivalent
+    # against every fixture first, so there is no legacy debt left for this to
+    # block on -- only newly introduced drift.
     #
-    # To act on it: run `twig-cs-fixer fix` in a dedicated PR, review the diff
-    # (it should be whitespace and quote style only), then delete this line and
-    # the job becomes a real gate.
-    continue-on-error: true
+    # `twig-cs-fixer fix --config=.twig-cs-fixer.php` resolves anything this
+    # reports; every rule it enforces is auto-fixable.
 
     steps:
       - name: Check out
