@@ -1,0 +1,11 @@
+{
+    "name": "tamulib-dc-labs/iiif-twig-validate",
+    "description": "Standalone Twig render harness used to test IIIF manifest templates outside Drupal.",
+    "type": "project",
+    "require": {
+        "twig/twig": "^3.0"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
