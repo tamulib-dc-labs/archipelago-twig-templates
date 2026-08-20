@@ -1,0 +1,70 @@
+{
+    "_comment": [
+        "What gets rendered, against which fixtures, and how the output is judged.",
+        "",
+        "'mimetype' mirrors what the Metadata Display entity declares on the site, because",
+        "that is what Archipelago actually serves the document as. 'iiif': true additionally",
+        "validates against schema/iiif_3_0.json.",
+        "",
+        "A template with 'skip' is NOT covered here. Each one needs a running Drupal -- it",
+        "queries for child objects -- so no amount of fixture data makes it renderable",
+        "offline. The reason is recorded rather than left as a silent omission."
+    ],
+    "defaults": {
+        "fixtures": ["rich-image", "typical-image", "map"]
+    },
+    "templates": [
+        {
+            "file": "IIIF_Presentation_API_3.0_manifest.twig.html",
+            "mimetype": "application/ld+json",
+            "iiif": true,
+            "note": "The manifest viewers load most. Full Presentation 3.0 schema validation."
+        },
+        {
+            "file": "IIIF_Presentation_API_2.1_Manifest.twig.html",
+            "mimetype": "application/ld+json",
+            "iiif": false,
+            "note": "Presentation 2.1. The vendored schema covers 3.0 only, so this gets JSON validity alone. Validating 2.1 against a 3.0 schema would fail for the wrong reason."
+        },
+        {
+            "file": "IIIF_Presentation_API_3_Creative_Works_Series_Child_Canvases.twig.html",
+            "mimetype": "application/json",
+            "iiif": false,
+            "note": "Emits canvases for embedding, not a standalone IIIF resource, so the schema does not apply to it whole."
+        },
+        {
+            "file": "GeoJSON.twig.html",
+            "mimetype": "application/json",
+            "iiif": false,
+            "fixtures": ["map"],
+            "note": "Only meaningful for an object carrying coordinates."
+        },
+        {
+            "file": "schema_org.twig.html",
+            "mimetype": "application/json",
+            "iiif": false
+        },
+        {
+            "file": "DataCite_V4_Default_Template_for_1.6.0.twig.html",
+            "mimetype": "application/json",
+            "iiif": false
+        },
+
+        {
+            "file": "IIIF_Presentation_API_3_Collection_Manifest.twig.html",
+            "skip": "Calls drupal_view() to find member objects. Needs a database."
+        },
+        {
+            "file": "IIIF_Presentation_API_3_Creative_Works_Series_Manifest.twig.html",
+            "skip": "Calls drupal_view() and bamboo_load_entity(). Needs a database."
+        },
+        {
+            "file": "IIIF_Presenation_API_3_Series_Manifest_Unified.twig.html",
+            "skip": "Calls sbf_drupal_view_paged() and bamboo_load_entity(). Needs a database."
+        },
+        {
+            "file": "AMI_Ingest_JSON_Template.twig.html",
+            "skip": "An ingest payload template, not viewer output. Its sbf_datacite() call is inside a comment block, but the template describes a CSV-driven ingest rather than a rendered document."
+        }
+    ]
+}

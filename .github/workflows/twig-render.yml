@@ -1,0 +1,85 @@
+name: Render and validate
+
+# Renders each Metadata Display template against committed Strawberryfield
+# fixtures and checks that what comes out is actually valid -- parseable JSON,
+# parseable XML, and for IIIF Presentation 3.0, valid against the schema from
+# IIIF/presentation-validator.
+#
+# This is a DIFFERENT question from the `Twig lint` job. That one asks whether
+# Archipelago would ACCEPT the template, which is decided at parse time. It
+# cannot see that a template emits
+#
+#     {"items":[{"n":1},{"n":2},]}
+#
+# which parses perfectly as Twig, saves into Archipelago without complaint, and
+# breaks every consumer downstream. Only rendering and parsing the result
+# catches that -- and that is the failure mode that has been reaching viewers.
+#
+# Runs fully offline: no Drupal, no network, no credentials, no self-hosted
+# runner. Templates that genuinely need a database (the collection and series
+# manifests, which query for child objects) are declared with a reason in
+# tools/twig-render/templates.json rather than silently omitted. If one reaches
+# for such a filter anyway, the renderer throws instead of emitting output
+# nobody should trust.
+#
+# NO MARKETPLACE ACTIONS, matching the other workflows here. actions/checkout is
+# published by GitHub itself; PHP and Composer ship on the runner image.
+
+on:
+  pull_request:
+    paths:
+      - 'twig/**'
+      - 'tools/twig-render/**'
+      - '.github/workflows/twig-render.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: twig-render-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render-and-validate:
+    name: Output is valid
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          php -v
+          composer --version
+
+      - name: Install dependencies
+        working-directory: tools/twig-render
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      # Runs FIRST, because both ways this harness can rot look exactly like
+      # success: a loosened validator that accepts anything, or an unimplemented
+      # filter returning null so templates render empty and "validate" fine.
+      - name: Self-test the harness
+        run: php tools/twig-render/selftest.php
+
+      - name: Render every covered template and validate the output
+        run: |
+          php tools/twig-render/bin/render-check.php \
+            --format=github \
+            --summary="$GITHUB_STEP_SUMMARY" \
+            --write="${RUNNER_TEMP}/rendered"
+
+      # Makes a failure diagnosable without re-running anything locally: the
+      # exact document the validator rejected is right there.
+      - name: Upload the rendered documents
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-output
+          path: ${{ runner.temp }}/rendered
+          retention-days: 14
+          if-no-files-found: warn

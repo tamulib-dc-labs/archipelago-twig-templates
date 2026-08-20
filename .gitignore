@@ -1,3 +1,4 @@
 .idea/**
 .claude/
 tools/twig-lint/vendor/
+tools/twig-render/vendor/

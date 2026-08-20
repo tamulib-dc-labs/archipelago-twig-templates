@@ -1,0 +1,8 @@
+{# MUST FAIL: IIIF 3.0 requires metadata value language maps to hold ARRAYS of
+   strings. This emits a bare string, mirroring the real defect found in
+   IIIF_Presentation_API_3.0_manifest. #}
+{"@context":"http://iiif.io/api/presentation/3/context.json",
+ "id":"https://example.org/m/1","type":"Manifest",
+ "label":{"en":["Test"]},
+ "metadata":[{"label":{"en":["Publisher"]},"value":{"en":"a bare string"}}],
+ "items":[]}

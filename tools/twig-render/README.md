@@ -1,0 +1,146 @@
+# Render and validate
+
+Answers the question the linter cannot:
+
+> **Does this template produce a valid document?**
+
+[`tools/twig-lint`](../twig-lint/README.md) asks whether Archipelago would
+*accept* a template. That is decided at **parse** time, and it is blind to this:
+
+```twig
+{"items":[{% for x in [1,2,3] %}{"n": {{ x }}},{% endfor %}]}
+```
+
+That parses perfectly. Archipelago saves it without complaint. It emits
+`{"items":[{"n":1},{"n":2},{"n":3},]}` — a trailing comma, invalid JSON, and
+every viewer downstream breaks. Catching it requires **rendering** the template
+and parsing what comes out.
+
+## How it works
+
+Each template is rendered against committed Strawberryfield fixtures, then the
+output is judged by the mimetype its Metadata Display declares:
+
+| mimetype | check |
+|---|---|
+| `application/ld+json` + `iiif: true` | JSON parse, then [`schema/iiif_3_0.json`][schema] |
+| `application/json`, other `ld+json` | JSON parse |
+| `application/xml` | XML well-formedness |
+| anything else | rendered non-empty |
+
+IIIF validation is scoped to the class the document claims to be. The schema's
+root is a `oneOf` across manifest/collection/annotation, so validating a
+Manifest against the root reports every failed branch — `/type — The string
+should match pattern: ^Collection` is true, useless, and buries the real error.
+Reading the document's own `type` and validating against just that class keeps
+the output actionable.
+
+## Running it
+
+```bash
+composer install -d tools/twig-render
+
+php tools/twig-render/bin/render-check.php                    # everything covered
+php tools/twig-render/bin/render-check.php GeoJSON.twig.html  # one template
+php tools/twig-render/bin/render-check.php --write=/tmp/out   # dump the documents
+php tools/twig-render/selftest.php                            # check the harness
+```
+
+No PHP locally? `docker run --rm -v "$PWD":/app -w /app php:8.3-cli php tools/twig-render/bin/render-check.php`
+
+Exit 0 = every rendered document valid, 1 = at least one is not, 2 = could not run.
+
+## The renderer is real, not stubbed
+
+This is the important difference from the linter. `twig-lint` registers every
+Archipelago name as a **no-op**, which is right for parsing — Twig only needs
+the name to exist. Here we *execute*, so a no-op would produce empty output
+that then validates as meaningless and the whole job would report green over
+nothing.
+
+So `ArchipelagoExtension` has exactly two kinds of member:
+
+- **implemented** — `url`, `render`, `preg_replace`, `edtf_2_iso_date`,
+  `markdown_2_html`, and the safe-to-approximate Drupal filters
+- **unsupported** — registered, but **throws** when called
+
+Nothing silently returns null. A template reaching for `drupal_view`,
+`sbf_search_api` or anything else wanting a database fails loudly and names the
+filter.
+
+Autoescaping is left **on**, because Drupal renders Metadata Displays through an
+autoescaping environment — that is *why* these templates are full of `|raw` and
+`|json_encode|raw`. Turning it off would be more convenient and less faithful: a
+value emitted without `|raw` inside a JSON document escapes its quotes and
+breaks the JSON in production too, and that is a bug worth catching rather than
+papering over.
+
+### Fidelity limits
+
+`url()` returns a configured base rather than a real Drupal route, and
+`edtf_2_iso_date` covers EDTF level 0/1 rather than the full grammar. For
+**structural** validity this does not matter — the schema cares that a value is
+a string of the right shape, not what the string says. It would matter for
+asserting exact output, which this harness does not do.
+
+## What is covered
+
+Six templates render offline. Four cannot, and say why in `templates.json`
+rather than going quietly missing:
+
+| Not covered | Why |
+|---|---|
+| `IIIF_..._Collection_Manifest` | `drupal_view()` — queries for member objects |
+| `IIIF_..._Creative_Works_Series_Manifest` | `drupal_view()`, `bamboo_load_entity()` |
+| `IIIF_Presenation_..._Series_Manifest_Unified` | `sbf_drupal_view_paged()`, `bamboo_load_entity()` |
+| `AMI_Ingest_JSON_Template` | An ingest payload, not viewer output |
+
+The three IIIF ones aggregate child objects, so no amount of fixture data makes
+them renderable — they need a database. Covering them means a live site.
+
+`IIIF_Presentation_API_2.1_Manifest` renders and is checked for JSON validity
+only: the vendored schema is 3.0, and validating a 2.1 manifest against it would
+fail for the wrong reason.
+
+## Fixtures are the ground truth
+
+`fixtures/*.json` are real Strawberryfield records pulled from
+`archipelago-dev`, all open access.
+
+| Fixture | What it exercises |
+|---|---|
+| `rich-image` | 74 metadata keys — the widest branch coverage available |
+| `typical-image` | 22 keys — an ordinary production record |
+| `map` | Coordinates, georeferencing, `navPlace` |
+
+**This tier is only as good as these files.** Two known gaps: dev held no A/V or
+PDF objects, so the `as:video` and `as:document` branches are unexercised, and
+every fixture is a single object rather than a collection. Adding a fixture is
+the cheapest way to widen coverage — drop the raw `field_descriptive_metadata`
+value in as `<name>.json` and it is picked up automatically.
+
+The self-test fails if the fixtures directory is empty, so "0 documents checked"
+can never pass as success.
+
+## The self-test exists for a reason
+
+Both ways this harness can rot look exactly like success:
+
+1. The validator is loosened, or the schema is swapped for a permissive one, and
+   everything reports green forever.
+2. An unimplemented filter starts returning null instead of throwing, so
+   templates needing Drupal render empty and "validate" fine.
+
+`selftest.php` asserts that a trailing comma is rejected, a bare-string IIIF
+metadata value is rejected, a `drupal_view` template throws, a valid manifest
+passes, and at least one fixture exists. It runs before the real check in CI.
+
+## What this still does not check
+
+- **Semantic correctness.** A manifest can be schema-valid and still describe
+  the wrong thing. Valid ≠ right.
+- **The aggregate manifests**, per above.
+- **Whether the deployed site matches this repo.** These files are copies of
+  database rows; nothing here compares them to what is live.
+
+[schema]: https://github.com/IIIF/presentation-validator/blob/main/schema/iiif_3_0.json
