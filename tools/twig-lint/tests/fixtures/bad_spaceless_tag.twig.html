@@ -1,0 +1,7 @@
+{# Expected to FAIL: the spaceless TAG was removed in Twig 3 (only
+   "{% apply spaceless %}" survives). Copied from
+   iiif_manifest_3.0_thumbnail.twig.html, where this was still live as of
+   08/11/2026. #}
+{% spaceless %}
+  <span>{{ data.label }}</span>
+{% endspaceless %}

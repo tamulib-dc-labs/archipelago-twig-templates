@@ -1,0 +1,60 @@
+{# Expected to PASS.
+
+   Exercises every non-core name in registry/extensions.json that these
+   templates actually rely on. If someone trims the registry, this fixture
+   starts failing and the self-test says which name went missing -- which is
+   the whole point: a registry that has quietly lost an entry would otherwise
+   only show up as a false failure on a real template.
+
+   This is a PARSE fixture. It is never rendered, so the values are nonsense
+   and that is fine. #}
+
+{% apply spaceless %}
+
+{# -- Drupal core -- #}
+{% set front = url('<front>')|render %}
+{% set icon = file_url('public://media-icons/generic/no-thumbnail.png') %}
+{% set safe = data.label|drupal_escape('html') %}
+{% set joined = ['a', 'b']|safe_join(', ') %}
+{{ attach_library('format_strawberryfield/iiif_formatter_strawberry') }}
+{{ link('Home', '<front>') }}
+{{ 'Some string'|t }}
+{{ node.changed.value|format_date('short') }}
+
+{# -- format_strawberryfield -- #}
+{% set decoded = '{"a":1}'|sbf_json_decode %}
+{% set prose = data.description|markdown_2_html %}
+{% set human = data.date_created_edtf|edtf_2_human_date %}
+{% set iso = data.date_created_edtf|edtf_2_iso_date %}
+{% set md = data.description|html_2_markdown %}
+{% set cite = data.related_item|bibliography %}
+{% set rendered = data.note|sbf_render %}
+{% set esc = data.label|format_strawberry_safe_escape %}
+{% set paged = sbf_drupal_view_paged('data_creativeworks_series_multiple_levels', 'children_raw_json', 0, {'nid_ref_partof': node.id}, 'all')|render %}
+{% set ids = sbf_entity_ids_by_label('node', 'Some Label') %}
+{% set hits = sbf_search_api('default_index', 'query') %}
+{% set contents = sbf_file_content('s3://somewhere/file.txt') %}
+{{ clipboard_copy('copy me') }}
+{% if node is instanceof("Drupal\\node\\NodeInterface") %}{% endif %}
+
+{# -- twig_tweak -- #}
+{% set view = drupal_view('data_collection_manifest', 'children_ismemberof_manifest_rest', node.id)|render %}
+{% set cleaned = data.label|preg_replace('/\\s+/', ' ') %}
+
+{# -- bamboo_twig -- #}
+{% set parent = bamboo_load_entity('node', attribute(data, 'ismemberof')) %}
+
+{# -- site-local -- #}
+{% set annotation = allmaps_annotation_url('https://example.org/manifest') %}
+{% set doi = sbf_datacite(dataOriginal|default([]), 'publish') %}
+
+{# -- core Twig idioms this repo leans on heavily -- #}
+{% set images = attribute(data, 'as:image') %}
+{% for image in images %}
+  {{ image.url|replace({'s3://': '', 'private://': ''})|url_encode }}
+  {{ image['flv:exif'].ImageWidth|default(0)|round }}
+{% endfor %}
+{{ data.label|json_encode(constant('JSON_FORCE_OBJECT'))|raw }}
+{{ (data.subject is iterable ? data.subject|first : data.subject)|json_encode|raw }}
+
+{% endapply %}

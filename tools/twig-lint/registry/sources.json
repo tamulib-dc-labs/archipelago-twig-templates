@@ -1,0 +1,41 @@
+{
+    "_comment": [
+        "Where the code that declares Twig extension names actually lives.",
+        "bin/build-dump.php fetches these and scans them, producing the dump that",
+        "bin/compare-registry.php checks registry/extensions.json against.",
+        "",
+        "Refs are pinned to Archipelago 1.6.0, matching archipelago-deployment's",
+        "composer.json (strawberryfield/* at 1.6.0.x-dev -> branch 1.6.0).",
+        "When Archipelago is upgraded, bump these refs first, then re-run the check."
+    ],
+    "sources": {
+        "drupal-core": {
+            "files": [
+                "https://raw.githubusercontent.com/drupal/core/10.3.x/lib/Drupal/Core/Template/TwigExtension.php"
+            ],
+            "note": "A shallow clone of drupal/core is ~100 MB and the Twig extension is a single file, so we fetch just that file."
+        },
+        "format_strawberryfield": {
+            "repo": "https://github.com/esmero/format_strawberryfield",
+            "ref": "1.6.0"
+        },
+        "strawberryfield": {
+            "repo": "https://github.com/esmero/strawberryfield",
+            "ref": "1.6.0",
+            "note": "Not a registry source: as of 08/11/2026 this module declares ZERO Twig filters, functions or tests. Kept in the scan so that stays true, and so a name we cannot place (see allmaps_annotation_url) has a chance of turning up if it is ever added here."
+        },
+        "webform_strawberryfield": {
+            "repo": "https://github.com/esmero/webform_strawberryfield",
+            "ref": "1.6.0",
+            "note": "Same as strawberryfield: declares zero Twig names as of 08/11/2026. Scanned to keep confirming that."
+        },
+        "twig_tweak": {
+            "repo": "https://git.drupalcode.org/project/twig_tweak",
+            "ref": "3.x"
+        },
+        "bamboo_twig": {
+            "repo": "https://git.drupalcode.org/project/bamboo_twig",
+            "ref": "8.x-5.x"
+        }
+    }
+}
