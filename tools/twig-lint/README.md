@@ -26,15 +26,12 @@ output to the public**. Whoever pasted it in sees a working site. That is the
 failure mode this job exists to prevent, and it is why a red build here is
 never cosmetic.
 
-As of 08/11/2026 two templates in `main` fail this check:
-`IIIF_Presenation_API_3_Series_Manifest_Unified` and
-`iiif_manifest_3.0_thumbnail`. **They are not fixed here** — this tool only
-reports. Each failure is copied into `tests/fixtures/` so the linter keeps
-proving it can catch that bug class after the templates are eventually
-corrected.
-
-Because of that, the job is **red on `main` today**. Decide how to handle it
-before making it a required check — fix the two templates, or add a baseline.
+All 26 templates currently pass. Two did not when this tool was written —
+`IIIF_Presenation_API_3_Series_Manifest_Unified` (an unknown `json_endcode_raw`
+filter) and `iiif_manifest_3.0_thumbnail` (a Twig 2 `{% spaceless %}` tag and
+two inline `for … if` loops). Both have since been fixed. Every one of those
+failures is preserved in `tests/fixtures/` so the linter keeps proving it can
+catch that bug class now that the originals are gone.
 
 ## What it actually does
 
@@ -66,10 +63,6 @@ composer install -d tools/twig-lint
 php tools/twig-lint/lint.php                    # all templates
 php tools/twig-lint/lint.php twig/metadatadisplays/MODS_3_7.twig.html
 php tools/twig-lint/selftest.php                # check the linter itself
-
-# check the registry against real upstream module source
-php tools/twig-lint/bin/build-dump.php --out=dump.json
-php tools/twig-lint/bin/compare-registry.php dump.json
 ```
 
 No PHP on your machine? Everything above works in Docker:
@@ -123,53 +116,34 @@ speculative catalogue of everything Drupal might offer.
 
 1. Confirm it really exists in the deployed site — grep the module source, or
    check `/admin/reports/status`. Do not add it just to make CI pass.
-2. Put it under the source that provides it, so the drift check below stays
-   possible.
-3. Add it to `tests/fixtures/good_archipelago_idioms.twig.html`, so removing it
+2. Add it to `tests/fixtures/good_archipelago_idioms.twig.html`, so removing it
    later fails the self-test instead of silently weakening the check.
 
-### Drift — checked automatically
+### Nothing verifies this file
 
-`.github/workflows/registry-drift.yml` runs weekly. It fetches the module
-sources pinned in `registry/sources.json`, extracts every declared
-`TwigFilter` / `TwigFunction` / `TwigTest` using PHP's tokenizer, and confirms
-that every name the registry trusts really exists. Run it yourself with:
+Worth stating plainly, because it is the tool's one silent failure mode and
+there is now no automation behind it. The registry is maintained by hand and
+trusted as written. A name in here that the deployed site does not actually
+have makes the linter **accept templates Archipelago will reject** — a green
+build over a manifest that renders empty to the public.
 
-```bash
-php tools/twig-lint/bin/build-dump.php --out=dump.json
-php tools/twig-lint/bin/compare-registry.php dump.json
-```
+There were two checks against that and both have been removed at the
+maintainers' request: a weekly job comparing the registry to upstream module
+source, and a live check that asked the deployed site directly.
 
-As of 08/11/2026 that reports **37 registered names confirmed, 2 exempt, 0
-missing** against Archipelago 1.6.0 sources (114 names offered across 362
-files).
+**Two names are known to be wrong.** Measured against `archipelago-dev` on
+08/20/2026 by attempting to save a one-line template using each:
 
-Bump the refs in `registry/sources.json` when Archipelago is upgraded — that
-is the trigger for re-checking, and the job will tell you what moved.
-
-### The authoritative check
-
-`build-dump.php` can only see the upstream modules we thought to list. It
-cannot see a TAMU-local module. For the real answer, dump the names from a
-running site — read-only, touches no content, staging is fine:
-
-```bash
-docker cp tools/twig-lint/bin/dump-twig-names.php esmero-php:/tmp/
-docker exec esmero-php drush php:script /tmp/dump-twig-names.php > site-dump.json
-php tools/twig-lint/bin/compare-registry.php site-dump.json
-```
-
-That reads the live Twig service, so it covers every installed module plus
-Drupal core, and settles the two exempt names below.
-
-### Two names the upstream scan cannot confirm
-
-Both are marked `scan_exempt` in `registry/extensions.json`:
-
-| Name | Status |
+| Name | Status on archipelago-dev |
 |---|---|
-| `sbf_datacite` | Expected — comes from Fragaria, a separate subscription module not in `sources.json`. |
-| `allmaps_annotation_url` | **Unresolved.** Scanning `format_strawberryfield`, `strawberryfield`, `webform_strawberryfield`, `twig_tweak`, `bamboo_twig` and Drupal core found no such function anywhere. It is either a TAMU-local module or it does not exist — and if it does not, `Object_Description.twig.html` is already broken in production. The site dump above settles it. |
+| `sbf_datacite` | **Does not exist.** Comes from Fragaria, a subscription module not installed there. Harmless today: the only call site, in `AMI_Ingest_JSON_Template`, sits inside a `{#- … #}` comment block, so Twig never resolves it. |
+| `allmaps_annotation_url` | **Does not exist.** `Object_Description.twig.html` calls it live at line 111, so that template is rejected by the site while passing this linter. The single confirmed false pass. |
+
+Whether production also lacks them is unresolved — the measurement was against
+dev, and dev is not a faithful mirror. `Object_Description` hardcodes
+`digitalcollections.library.tamu.edu`, so it was written for production; if
+production has the function this is a dev-parity gap, and if it does not, that
+template renders empty to anonymous visitors today.
 
 ## What this does NOT check
 
@@ -177,9 +151,9 @@ This is tier 1 of a larger plan. It says a template is *syntactically
 acceptable to Archipelago*. It says nothing about whether the output is
 correct:
 
-- **Does it emit valid JSON / XML?** No. Trailing commas, broken manifests, and
-  malformed MODS all parse fine as Twig. Needs fixture rendering + `iiif-validator`
-  / `xmllint`.
+- **Does it emit valid JSON / XML?** No. Trailing commas, broken manifests and
+  malformed MODS all parse fine as Twig. That is what [`tools/twig-render`](../twig-render/README.md)
+  is for -- it renders each template against real fixtures and validates the result.
 - **Does it emit the right fields?** No. `item.name_label` on a field that has
   no `name_label` parses perfectly and renders `null`. Needs checking against
   [`archipelago-metadata-mappings`][mappings]`/mappings/main.yml`.

@@ -34,7 +34,6 @@ on:
     paths:
       - 'twig/**'
       - 'tools/twig-render/**'
-      - '.twig-cs-fixer.php'
       - '.github/workflows/twig-render.yml'
   push:
     branches: [main]
@@ -103,30 +102,3 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
-  coding-standards:
-    name: Twig coding standards
-    runs-on: ubuntu-latest
-    # A real gate, not a report. The ~4,384 pre-existing violations were cleared
-    # by `twig-cs-fixer fix` in its own commit, verified output-equivalent
-    # against every fixture first, so there is no legacy debt left for this to
-    # block on -- only newly introduced drift.
-    #
-    # `twig-cs-fixer fix --config=.twig-cs-fixer.php` resolves anything this
-    # reports; every rule it enforces is auto-fixable.
-
-    steps:
-      - name: Check out
-        uses: actions/checkout@v4
-
-      - name: Install the fixer
-        working-directory: tools/twig-render
-        run: composer install --no-interaction --no-progress --prefer-dist
-
-      # The finder in .twig-cs-fixer.php is load bearing: these files are named
-      # <name>.twig.html, not <name>.html.twig, so the default *.twig pattern
-      # matches nothing and the job would report "Files linted: 0" and pass.
-      - name: Lint Twig coding standards
-        run: |
-          tools/twig-render/vendor/bin/twig-cs-fixer lint \
-            --config=.twig-cs-fixer.php \
-            --report=github

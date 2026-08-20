@@ -64,32 +64,6 @@ python3 tools/twig-render/bin/validate_iiif.py --selftest
 
 Exit 0 = everything valid, 1 = at least one document is not, 2 = could not run.
 
-## Twig coding standards
-
-Separately, [Twig-CS-Fixer][fixer] checks coding standards — spacing, quote
-style, delimiter placement. It never executes a template, so it cannot see that
-one emits invalid JSON; the two checks are complementary and neither substitutes
-for the other.
-
-```bash
-tools/twig-render/vendor/bin/twig-cs-fixer lint --config=.twig-cs-fixer.php
-tools/twig-render/vendor/bin/twig-cs-fixer fix  --config=.twig-cs-fixer.php
-```
-
-The config's finder is load bearing: these files are named `<name>.twig.html`
-rather than Drupal's `<name>.html.twig`, so the default `*.twig` pattern matches
-nothing and the run reports `Files linted: 0` and passes.
-
-The ~4,384 pre-existing violations were cleared in a single mechanical commit,
-so the CI job is a **real gate** rather than a report — there is no legacy debt
-left for it to block on, only newly introduced drift. Every rule it enforces is
-auto-fixable, so `fix` resolves anything it reports.
-
-That reformat was verified output-equivalent before being committed: all 16
-rendered documents parse to identical JSON, and iiif-prezi3 reports the same
-defects in the same places. Byte-level output did shift for 11 of them, though,
-so it is not a no-op for anything string-comparing rendered output.
-
 ## The renderer is real, not stubbed
 
 This is the important difference from the linter. `twig-lint` registers every
@@ -188,4 +162,3 @@ before the real checks in CI.
 [schema]: https://github.com/IIIF/presentation-validator/blob/main/schema/iiif_3_0.json
 
 [prezi]: https://github.com/iiif-prezi/iiif-prezi3
-[fixer]: https://github.com/VincentLanglet/Twig-CS-Fixer

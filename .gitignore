@@ -2,4 +2,3 @@
 .claude/
 tools/twig-lint/vendor/
 tools/twig-render/vendor/
-.twig-cs-fixer.cache

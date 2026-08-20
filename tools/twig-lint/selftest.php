@@ -55,38 +55,7 @@ foreach ($fixtures as $path) {
     }
 }
 
-// The drift check has its own silent failure mode: if compare-registry.php
-// stopped reporting missing names, the registry could rot without anyone
-// noticing. These two synthetic dumps pin both outcomes.
-foreach ([
-    'dumps/dump_complete.json' => 0,
-    'dumps/dump_missing_name.json' => 1,
-] as $dump => $expectedExit) {
-    $command = sprintf(
-        '%s %s %s',
-        escapeshellarg(PHP_BINARY),
-        escapeshellarg(__DIR__ . '/bin/compare-registry.php'),
-        escapeshellarg(__DIR__ . '/tests/fixtures/' . $dump),
-    );
-
-    exec($command . ' 2>&1', $output, $actualExit);
-
-    if ($actualExit === $expectedExit) {
-        printf("  ok   %-36s compare exits %d as expected\n", basename($dump), $expectedExit);
-        continue;
-    }
-
-    $failures++;
-    printf(
-        "  FAIL %-36s compare exited %d, expected %d\n       %s\n",
-        basename($dump),
-        $actualExit,
-        $expectedExit,
-        implode("\n       ", $output),
-    );
-}
-
-$total = count($fixtures) + 2;
+$total = count($fixtures);
 printf("\n%d fixture%s, %d failure%s\n", $total, $total === 1 ? '' : 's', $failures, $failures === 1 ? '' : 's');
 
 exit($failures === 0 ? 0 : 1);

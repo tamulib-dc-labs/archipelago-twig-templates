@@ -29,8 +29,5 @@
         "platform": {
             "php": "8.2.0"
         }
-    },
-    "require-dev": {
-        "vincentlanglet/twig-cs-fixer": "^4.0"
     }
 }
