@@ -37,13 +37,76 @@ final class Validator
     /**
      * @return list<Problem>
      */
-    public function validate(string $output, string $mimetype): array
+    public function validate(string $output, string $mimetype, bool $geojson = false): array
     {
-        return match (true) {
+        $problems = match (true) {
             str_contains($mimetype, 'json') => $this->validateJson($output),
             str_contains($mimetype, 'xml') => $this->validateXml($output),
             default => $this->validateNonEmpty($output),
         };
+
+        if ($problems === [] && $geojson) {
+            $problems = $this->validateGeoJson($output);
+        }
+
+        return $problems;
+    }
+
+    /**
+     * Structural GeoJSON checks, per RFC 7946.
+     *
+     * Only the shapes a Twig-built document actually gets wrong. The specific
+     * reason this exists: GeoJSON.twig.html emitted
+     *
+     *     {"type":"FeatureCollection","features":[null]}
+     *
+     * whenever the record had no geojson_feature. That is well formed JSON, so
+     * the ordinary check passed it, and it is not GeoJSON at all -- a consumer
+     * iterating features gets a null and breaks.
+     *
+     * @return list<Problem>
+     */
+    private function validateGeoJson(string $output): array
+    {
+        $document = json_decode(trim($output), true);
+        if (!is_array($document)) {
+            return [];
+        }
+
+        $type = $document['type'] ?? null;
+
+        if ($type === 'FeatureCollection') {
+            if (!array_key_exists('features', $document) || !is_array($document['features'])) {
+                return [new Problem('invalid-geojson', 'A FeatureCollection must have a "features" array.', '/features')];
+            }
+
+            $problems = [];
+            foreach ($document['features'] as $i => $feature) {
+                if (!is_array($feature)) {
+                    $problems[] = new Problem(
+                        'invalid-geojson',
+                        sprintf('features must be Feature objects, got %s', $feature === null ? 'null' : gettype($feature)),
+                        "/features/{$i}",
+                    );
+                    continue;
+                }
+                if (($feature['type'] ?? null) !== 'Feature') {
+                    $problems[] = new Problem(
+                        'invalid-geojson',
+                        sprintf('expected "type": "Feature", got %s', json_encode($feature['type'] ?? null)),
+                        "/features/{$i}/type",
+                    );
+                }
+            }
+
+            return array_slice($problems, 0, 8);
+        }
+
+        if ($type === 'Feature' && !array_key_exists('geometry', $document)) {
+            return [new Problem('invalid-geojson', 'A Feature must have a "geometry" member.', '/geometry')];
+        }
+
+        return [];
     }
 
     /**

@@ -36,8 +36,8 @@
             "file": "GeoJSON.twig.html",
             "mimetype": "application/json",
             "iiif": false,
-            "fixtures": ["map"],
-            "note": "Only meaningful for an object carrying coordinates."
+            "geojson": true,
+            "note": "Run against every fixture on purpose. Records WITHOUT coordinates are the interesting case: the template has to emit an empty feature list rather than a list containing null."
         },
         {
             "file": "schema_org.twig.html",

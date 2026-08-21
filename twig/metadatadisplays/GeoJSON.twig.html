@@ -30,9 +30,13 @@
 {% endif %}
 
 {# 2. Construct the final Collection #}
+{# Test geojson_feature itself, not the array wrapping it. `[x] ?: []` always
+   takes the left branch, because a one-element array is truthy even when that
+   element is null -- so a record without coordinates produced
+   {"features":[null]}, which is well formed JSON and not GeoJSON. #}
 {% set collection = {
   "type": "FeatureCollection",
-  "features": [ data.geojson_feature ] ? : []
+  "features": data.geojson_feature ? [ data.geojson_feature ] : []
 } %}
 
 {# 3. Output as clean JSON #}

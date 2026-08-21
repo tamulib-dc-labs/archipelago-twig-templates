@@ -162,7 +162,7 @@ foreach ($config['templates'] as $entry) {
         $results[] = result(
             $file,
             (string) $name,
-            $validator->validate($output, (string) ($entry['mimetype'] ?? 'text/plain')),
+            $validator->validate($output, (string) ($entry['mimetype'] ?? 'text/plain'), (bool) ($entry['geojson'] ?? false)),
             strlen($output),
         );
     }
