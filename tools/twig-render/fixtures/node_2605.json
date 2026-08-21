@@ -1,0 +1,206 @@
+{
+    "note": "",
+    "type": "Map",
+    "agent": [
+        {
+            "role": "cartographer",
+            "value": "Merian, Matthaeus, 1593-1650"
+        }
+    ],
+    "image": [
+        3206,
+        3207
+    ],
+    "label": "Siege of the fortress of Benfeld in the name of the Majesty of Sweden etc. by his Excellency Field Marshal Gustav Horn, from 10 to 20 September 1632",
+    "extent": [
+        "1 view ; 23 x 32 cm"
+    ],
+    "format": "",
+    "rights": "http:\/\/rightsstatements.org\/vocab\/NoC-US\/1.0\/",
+    "creator": "",
+    "subject": [
+        "Thirty Years' War, 1618-1648--Campaigns--France--Aerial views--Early works to 1800"
+    ],
+    "abstract": "",
+    "ap:tasks": {
+        "ap:sortfiles": "index"
+    },
+    "as:image": {
+        "urn:uuid:a3006231-24ff-4c1b-8e8a-6ad159715a8e": {
+            "url": "s3:\/\/fea\/image-g5833-b2s5-1632-m47-1650-w-edit-a3006231-24ff-4c1b-8e8a-6ad159715a8e.jp2",
+            "name": "G5833-B2S5_1632_-M47_1650_w_edit.jp2",
+            "tags": [],
+            "type": "Image",
+            "dr:fid": 3207,
+            "dr:for": "image",
+            "dr:uuid": "a3006231-24ff-4c1b-8e8a-6ad159715a8e",
+            "checksum": "feaca4b6cf503ce649700b0560baf18f",
+            "flv:exif": {
+                "FileSize": "192 MB",
+                "MIMEType": "image\/jp2",
+                "ImageSize": "8109x6083",
+                "ColorSpace": "sRGB",
+                "ImageWidth": 8109,
+                "ImageHeight": 6083
+            },
+            "sequence": 2,
+            "flv:pronom": {
+                "label": "JP2 (JPEG 2000 part 1)",
+                "mimetype": "image\/jp2",
+                "pronom_id": "info:pronom\/x-fmt\/392",
+                "detection_type": "signature"
+            },
+            "dr:filesize": 192467197,
+            "dr:mimetype": "image\/jp2",
+            "crypHashFunc": "md5",
+            "flv:identify": {
+                "1": {
+                    "width": "8109",
+                    "format": "JP2",
+                    "height": "6083",
+                    "orientation": "Undefined"
+                }
+            }
+        },
+        "urn:uuid:b51393f4-30eb-43e1-9c67-13b8c0a30111": {
+            "url": "s3:\/\/619\/image-g5833-b2s5-1632-m47-1650-edit-b51393f4-30eb-43e1-9c67-13b8c0a30111.jp2",
+            "name": "G5833-B2S5_1632_-M47_1650_edit.jp2",
+            "tags": [],
+            "type": "Image",
+            "dr:fid": 3206,
+            "dr:for": "image",
+            "dr:uuid": "b51393f4-30eb-43e1-9c67-13b8c0a30111",
+            "checksum": "61977f4a8f4a696cbf3e99d2833c87b5",
+            "flv:exif": {
+                "FileSize": "127 MB",
+                "MIMEType": "image\/jp2",
+                "ImageSize": "6354x5576",
+                "ColorSpace": "sRGB",
+                "ImageWidth": 6354,
+                "ImageHeight": 5576
+            },
+            "sequence": 1,
+            "flv:pronom": {
+                "label": "JP2 (JPEG 2000 part 1)",
+                "mimetype": "image\/jp2",
+                "pronom_id": "info:pronom\/x-fmt\/392",
+                "detection_type": "signature"
+            },
+            "dr:filesize": 127033400,
+            "dr:mimetype": "image\/jp2",
+            "crypHashFunc": "md5",
+            "flv:identify": {
+                "1": {
+                    "width": "6354",
+                    "format": "JP2",
+                    "height": "5576",
+                    "orientation": "Undefined"
+                }
+            }
+        }
+    },
+    "language": [
+        "ger"
+    ],
+    "node_uuid": "854f0098-6c6c-47d8-bafe-2883db66b89e",
+    "genre_form": "",
+    "identifier": [
+        {
+            "value": "on1405860228",
+            "authority": "OCoLC"
+        },
+        {
+            "value": "1405860228",
+            "authority": "OCoLC"
+        },
+        {
+            "value": "in00004749969",
+            "authority": "local"
+        }
+    ],
+    "ismemberof": [
+        456
+    ],
+    "provenance": "",
+    "contributor": "",
+    "coordinates": [
+        "Not drawn to scale."
+    ],
+    "date_issued": "..\/1650-XX-XX",
+    "description": [
+        "Copper engraved print.",
+        "Vertical fold line in center.",
+        "Additional engraving of panoramic view of the city (5 x 13 cm).",
+        "Inset close-up map of 'batterie'.",
+        "Includes alphabetized index.",
+        "Oriented with North to the right.",
+        "Appears in: Theatrum Europaeum.",
+        "The Cushing Library copy is part of the Ronald L. and V. Jane Woellhof Rare Map Collection."
+    ],
+    "content_type": [
+        "StillImage"
+    ],
+    "\"date_issued\"": "",
+    "canvas_labels": [
+        "Recto",
+        "Watermark"
+    ],
+    "state_edition": "",
+    "classification": [
+        {
+            "value": "G5833.B2S5 1632 .M47 1650",
+            "authority": "lcc"
+        }
+    ],
+    "digital_origin": "reformatted digital",
+    "related_record": "",
+    "rights_details": "No Copyright - United States",
+    "geojson_feature": "",
+    "place_of_origin": [
+        "Frankfurt am Main?"
+    ],
+    "ap:entitymapping": {
+        "entity:file": [
+            "image"
+        ],
+        "entity:node": [
+            "ismemberof"
+        ]
+    },
+    "date_issued_edtf": "",
+    "agent_linked_data": "",
+    "digital_publisher": [
+        "Texas A & M University. Libraries"
+    ],
+    "table_of_contents": "",
+    "title_alternative": [
+        "Belagerung der vestung Benfeldt in Nahmen I.K.M. zu Schweden etc. durch I. Exc. Feldmarschalck Gustav. Horn den 10\/20 Septemb. 1632",
+        "Belagerung der vestung Benfeldt in Nahmen Ihro Königlichen Majestät zu Schweden etc. durch I. Exc. Feldmarschalck Gustav. Horn den 10\/20 September 1632",
+        "Additional engraving title: Benfeld"
+    ],
+    "geographic_subject": [
+        "Benfeld (France)--Aerial views--Early works to 1800",
+        "Bas-Rhin (France)--Aerial views--Early works to 1800"
+    ],
+    "original_publisher": [
+        "Merian"
+    ],
+    "physical_collection": "Ronald L. and V. Jane Woellhof Rare Map Collection",
+    "subject_linked_data": "",
+    "original_publication": "",
+    "genre_form_linked_data": [
+        {
+            "uri": "http:\/\/id.loc.gov\/authorities\/genreForms\/gf2011026033",
+            "value": "Aerial views"
+        },
+        {
+            "uri": "http:\/\/id.loc.gov\/authorities\/genreForms\/gf2011026218",
+            "value": "Early maps"
+        },
+        {
+            "uri": "http:\/\/id.loc.gov\/authorities\/genreForms\/gf2011026396",
+            "value": "Military maps"
+        }
+    ],
+    "geographic_subject_linked_data": ""
+}

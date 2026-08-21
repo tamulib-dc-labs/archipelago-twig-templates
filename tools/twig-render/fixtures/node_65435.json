@@ -1,0 +1,147 @@
+{
+    "type": "Image",
+    "image": [
+        74206
+    ],
+    "label": "Berger-Cloonan #3576",
+    "extent": [
+        "1 sheet of yellow and grayish blue sprinkled paper; 11.00 x 18.75 in."
+    ],
+    "medium": [
+        "Paper"
+    ],
+    "rights": "http:\/\/rightsstatements.org\/vocab\/InC\/1.0\/",
+    "creator": "",
+    "subject": [
+        "Decorative paper",
+        "sprinkling"
+    ],
+    "ap:tasks": {
+        "ap:sortfiles": "index"
+    },
+    "as:image": {
+        "urn:uuid:2727ecb5-a1e7-4d89-b5e6-ea35b6335d32": {
+            "url": "s3:\/\/b3c\/image-03576-2727ecb5-a1e7-4d89-b5e6-ea35b6335d32.jpg",
+            "name": "03576.jpg",
+            "tags": [],
+            "type": "Image",
+            "dr:fid": 74206,
+            "dr:for": "image",
+            "dr:uuid": "2727ecb5-a1e7-4d89-b5e6-ea35b6335d32",
+            "checksum": "b3c6e836462e48a73989b454480550f6",
+            "flv:exif": {
+                "Make": "i2S, Corp.",
+                "Model": "SupraScanQuartzA00 [SN: 342202] - CamQuartzHD [SN: 342202]",
+                "Format": "image\/jpeg",
+                "History": "\t# Crop\r\n\t\t'CropRect': ((213,264), 4735, 7841), \r\n\t\t'Mode': App.Constants.CropMode.Custom, \r\n\t\t'Units': App.Constants.CropUnits.Inches, \r\n\t\t'SelectedArea': False, \r\n\t\t'PrintWidth': -1, \r\n\t\t'PrintHeight': -1, \r\n\t\t'CropAsNewImage': False, \r\n\t\t'RotationAngle': -0, \r\n\t\t'AutoFit': False\r\n\r\n\t# CropFixup\r\n\t\t\r\n\r\n3\/3\/2020 2:54:10 PM # File 'M2.D4.F3_03576.jpg' saved.\r\n\r\n",
+                "FileSize": "14 MB",
+                "MIMEType": "image\/jpeg",
+                "ColorMode": "RGB",
+                "ImageSize": "4735x7841",
+                "ColorSpace": "Uncalibrated",
+                "CreateDate": "2017:10:09 16:05:08-05:00",
+                "DocumentID": "xmp.did:B5775AB855AFE7118CD497FA6D7270F3",
+                "ImageWidth": 4735,
+                "InstanceID": "xmp.iid:B6775AB855AFE7118CD497FA6D7270F3",
+                "ModifyDate": "2020:03:03 14:54:10-05:00",
+                "XMPToolkit": "XMP Core 5.1.2",
+                "Compression": "Uncompressed",
+                "CreatorTool": "PaintShop Pro 20.00",
+                "Description": "13 - Right",
+                "HistoryWhen": [
+                    "2017:10:09 16:05:08-05:00",
+                    "2017:10:12 09:01:05-05:00"
+                ],
+                "ImageHeight": 7841,
+                "Orientation": "Horizontal (normal)",
+                "XResolution": 400,
+                "YResolution": 400,
+                "MetadataDate": "2017:10:12 09:01:05-05:00",
+                "BitsPerSample": [
+                    8
+                ],
+                "HistoryAction": [
+                    "created",
+                    "converted",
+                    "saved"
+                ],
+                "ExifImageWidth": 4735,
+                "HistoryChanged": "\/",
+                "ICCProfileName": "Adobe RGB (1998)",
+                "ResolutionUnit": "inches",
+                "ExifImageHeight": 7841,
+                "HistoryInstanceID": [
+                    "xmp.iid:B5775AB855AFE7118CD497FA6D7270F3",
+                    "xmp.iid:B6775AB855AFE7118CD497FA6D7270F3"
+                ],
+                "HistoryParameters": "from image\/tiff to image\/jpeg",
+                "OriginalDocumentID": "xmp.did:B5775AB855AFE7118CD497FA6D7270F3",
+                "PlanarConfiguration": "Chunky",
+                "HistorySoftwareAgent": [
+                    "Adobe Photoshop CS6 (Windows)"
+                ],
+                "PhotometricInterpretation": "RGB"
+            },
+            "sequence": 1,
+            "flv:pronom": {
+                "label": "JPEG File Interchange Format",
+                "mimetype": "image\/jpeg",
+                "pronom_id": "info:pronom\/fmt\/43",
+                "detection_type": "signature"
+            },
+            "dr:filesize": 13965615,
+            "dr:mimetype": "image\/jpeg",
+            "crypHashFunc": "md5",
+            "flv:identify": {
+                "1": {
+                    "width": "4735",
+                    "format": "JPEG",
+                    "height": "7841",
+                    "orientation": "TopLeft"
+                }
+            }
+        }
+    },
+    "node_uuid": "9bc2dd16-ad20-4fba-8445-05b50b793fc2",
+    "genre_form": [
+        "Multi-colored sprinkled papers",
+        "Art reproduction",
+        "Decorated papers"
+    ],
+    "identifier": [
+        {
+            "value": "3576",
+            "authority": "local"
+        }
+    ],
+    "ismemberof": [
+        64031
+    ],
+    "contributor": "",
+    "description": [
+        "Distribution of fibers; Surface application; Deckled; Sprinkled; M2.D4.F3; Blue and yellow sprinkles over gray-blue background; 3 deckles; [written in pencil on verso]: 'Sweden 1971 Spatter paper Gift from Sonia Lerston ACQ. from Phoebe Easton '04' 'SW 2'; Sidney E. Berger and Michele V. Cloonan purchased the sheet from Phoebe Easton in 2004.; Section(s) from the Decorated and Decorative Paper Terms Thesaurus: II.C; VIII.I.1; Not signed; Not stamped; Not stickered; Not embossed"
+    ],
+    "content_type": [
+        "StillImage"
+    ],
+    "date_created": "..\/1971?",
+    "classification": "",
+    "digital_origin": "reformatted digital",
+    "ap:entitymapping": {
+        "entity:file": [
+            "image"
+        ],
+        "entity:node": [
+            "ismemberof"
+        ]
+    },
+    "digital_publisher": [
+        "Texas A & M University. Libraries"
+    ],
+    "embargo_ip_bypass": 1,
+    "title_alternative": "",
+    "geographic_subject": [
+        "Sweden"
+    ],
+    "date_digital_creation": "2022-05-12T22:02:57.413000+00:00"
+}
