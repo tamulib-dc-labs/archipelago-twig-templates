@@ -102,19 +102,49 @@ exit($diagnostics === [] ? 0 : 1);
 // ---------------------------------------------------------------------------
 
 /**
+ * The IIIF templates, and only those.
+ *
+ * Scope is IIIF by decision, not by accident. The MODS, Dublin Core, OAI-PMH,
+ * GeoJSON, schema.org and DataCite templates are deliberately NOT checked here
+ * and are expected to get their own tier later.
+ *
+ * The list comes from tools/twig-render/templates.json rather than a filename
+ * pattern or a second copy kept here. That file already has to enumerate every
+ * IIIF template -- the five it renders and the four it cannot -- so reading it
+ * means there is exactly one definition of "which templates are IIIF" and the
+ * two tools cannot drift apart. Pass paths explicitly to lint anything else.
+ *
  * @return array<string, string> absolute path => repo-relative path
  */
 function discover(string $repoRoot): array
 {
-    $iterator = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($repoRoot . '/twig', FilesystemIterator::SKIP_DOTS),
-    );
+    $manifest = $repoRoot . '/tools/twig-render/templates.json';
+    if (!is_file($manifest)) {
+        fwrite(STDERR, "Missing {$manifest}, which defines the IIIF template set.\n");
+        fwrite(STDERR, "Pass template paths explicitly to lint without it.\n");
+        exit(2);
+    }
+
+    $config = json_decode((string) file_get_contents($manifest), true);
+    if (!is_array($config) || !isset($config['templates'])) {
+        fwrite(STDERR, "templates.json is malformed: no 'templates' key.\n");
+        exit(2);
+    }
 
     $found = [];
-    foreach ($iterator as $file) {
-        /** @var SplFileInfo $file */
-        if ($file->isFile() && str_ends_with($file->getFilename(), '.twig.html')) {
-            $found[$file->getPathname()] = relative($file->getPathname(), $repoRoot);
+    foreach ($config['templates'] as $entry) {
+        $name = (string) ($entry['file'] ?? '');
+        if ($name === '') {
+            continue;
+        }
+
+        // Templates marked "skip" cannot be RENDERED offline, but they are
+        // still Twig and still have to parse, so they are linted like the rest.
+        $absolute = $repoRoot . '/twig/metadatadisplays/' . $name;
+        if (is_file($absolute)) {
+            $found[$absolute] = relative($absolute, $repoRoot);
+        } else {
+            fwrite(STDERR, "Listed in templates.json but missing: {$name}\n");
         }
     }
 

@@ -1,8 +1,19 @@
-# Archipelago Twig lint
+# Archipelago Twig lint (IIIF)
 
 Answers one question, in about two seconds, without a Drupal install:
 
 > **Would Archipelago accept this template?**
+
+**Scope: the nine IIIF templates only.** MODS, Dublin Core, OAI-PMH, GeoJSON,
+schema.org and DataCite are deliberately not checked, and are expected to get
+their own tier in a later PR. Nothing here looks at them, so a green build says
+nothing about them.
+
+The list is read from [`tools/twig-render/templates.json`](../twig-render/templates.json)
+rather than kept as a second copy here. That file already has to enumerate every
+IIIF template — the five it renders and the four it cannot — so there is exactly
+one definition of "which templates are IIIF" and the two tools cannot drift.
+Pass paths explicitly to lint anything outside that set.
 
 ## Why this is worth a CI job
 
@@ -26,7 +37,7 @@ output to the public**. Whoever pasted it in sees a working site. That is the
 failure mode this job exists to prevent, and it is why a red build here is
 never cosmetic.
 
-All 26 templates currently pass. Two did not when this tool was written —
+All nine IIIF templates currently pass. Two did not when this tool was written —
 `IIIF_Presenation_API_3_Series_Manifest_Unified` (an unknown `json_endcode_raw`
 filter) and `iiif_manifest_3.0_thumbnail` (a Twig 2 `{% spaceless %}` tag and
 two inline `for … if` loops). Both have since been fixed. Every one of those
@@ -56,11 +67,11 @@ compiling would report problems Archipelago would happily accept.
 
 ## Running it
 
-In CI this runs on every PR touching `twig/**`. Locally:
+In CI this runs on every PR touching an IIIF template. Locally:
 
 ```bash
 composer install -d tools/twig-lint
-php tools/twig-lint/lint.php                    # all templates
+php tools/twig-lint/lint.php                    # the nine IIIF templates
 php tools/twig-lint/lint.php twig/metadatadisplays/MODS_3_7.twig.html
 php tools/twig-lint/selftest.php                # check the linter itself
 ```
@@ -131,19 +142,25 @@ There were two checks against that and both have been removed at the
 maintainers' request: a weekly job comparing the registry to upstream module
 source, and a live check that asked the deployed site directly.
 
-**Two names are known to be wrong.** Measured against `archipelago-dev` on
-08/20/2026 by attempting to save a one-line template using each:
+**Two registered names are known to be wrong.** Measured against
+`archipelago-dev` on 08/20/2026 by attempting to save a one-line template using
+each — both were rejected, so neither exists there:
 
-| Name | Status on archipelago-dev |
-|---|---|
-| `sbf_datacite` | **Does not exist.** Comes from Fragaria, a subscription module not installed there. Harmless today: the only call site, in `AMI_Ingest_JSON_Template`, sits inside a `{#- … #}` comment block, so Twig never resolves it. |
-| `allmaps_annotation_url` | **Does not exist.** `Object_Description.twig.html` calls it live at line 111, so that template is rejected by the site while passing this linter. The single confirmed false pass. |
+| Name | Where it is used | In IIIF scope? |
+|---|---|---|
+| `sbf_datacite` | `AMI_Ingest_JSON_Template`, inside a `{#- … #}` comment block, so Twig never resolves it | No |
+| `allmaps_annotation_url` | `Object_Description.twig.html` line 111, a live call | No |
 
-Whether production also lacks them is unresolved — the measurement was against
+Neither is used by any of the nine IIIF templates, so **narrowing this tool to
+IIIF removed its only known false pass**. That is a genuine improvement in what
+a green build here means — but it is narrowing, not fixing. Both names are still
+registered, and `Object_Description` is still rejected by the site while nothing
+in CI looks at it any more.
+
+Whether production also lacks them is unresolved: the measurement was against
 dev, and dev is not a faithful mirror. `Object_Description` hardcodes
-`digitalcollections.library.tamu.edu`, so it was written for production; if
-production has the function this is a dev-parity gap, and if it does not, that
-template renders empty to anonymous visitors today.
+`digitalcollections.library.tamu.edu`, so it was written for production. Worth
+settling when the non-IIIF tier is built.
 
 ## What this does NOT check
 

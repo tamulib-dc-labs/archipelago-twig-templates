@@ -31,7 +31,7 @@ output is well formed for the mimetype its Metadata Display declares:
 | mimetype | check |
 |---|---|
 | any `json` / `ld+json` | parses as JSON |
-| `application/xml` | XML well-formedness |
+| the same, with `fragment` | parses once wrapped in braces |
 | anything else | rendered non-empty |
 
 **2. Python validates the IIIF documents** with [`iiif-prezi3`][prezi], parsing
@@ -174,6 +174,12 @@ before the real checks in CI.
 
 ## What this still does not check
 
+- **Anything that is not IIIF.** MODS, Dublin Core, OAI-PMH, GeoJSON,
+  schema.org and DataCite are neither rendered here nor syntax-checked by
+  `twig-lint` — that is roughly 1,500 lines of XML-emitting Twig with no
+  coverage at all. A malformed MODS record breaks OAI-PMH harvesters the same
+  way a malformed manifest breaks viewers. Expected in a later PR; until then a
+  green build says nothing about them.
 - **Semantic correctness.** A manifest can parse cleanly and still describe the
   wrong thing. Valid ≠ right.
 - **The aggregate manifests**, per above.

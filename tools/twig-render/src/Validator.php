@@ -48,7 +48,6 @@ final class Validator
 
         return match (true) {
             str_contains($mimetype, 'json') => $this->validateJson($output),
-            str_contains($mimetype, 'xml') => $this->validateXml($output),
             default => $this->validateNonEmpty($output),
         };
     }
@@ -115,36 +114,6 @@ final class Validator
         return [];
     }
 
-    /**
-     * @return list<Problem>
-     */
-    private function validateXml(string $output): array
-    {
-        $trimmed = trim($output);
-        if ($trimmed === '') {
-            return [new Problem('empty', 'Rendered to an empty document.')];
-        }
-
-        $previous = libxml_use_internal_errors(true);
-        libxml_clear_errors();
-
-        $document = new \DOMDocument();
-        $document->loadXML($trimmed);
-        $errors = libxml_get_errors();
-
-        libxml_clear_errors();
-        libxml_use_internal_errors($previous);
-
-        $problems = [];
-        foreach (array_slice($errors, 0, 8) as $error) {
-            $problems[] = new Problem(
-                'invalid-xml',
-                sprintf('line %d: %s', $error->line, trim($error->message)),
-            );
-        }
-
-        return $problems;
-    }
 
     /**
      * @return list<Problem>
