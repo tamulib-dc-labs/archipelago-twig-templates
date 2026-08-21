@@ -17,7 +17,7 @@
         "than left as a silent omission."
     ],
     "defaults": {
-        "fixtures": ["rich-image", "typical-image", "map", "pathfinder-log"]
+        "fixtures": ["node_2637", "node_4276"]
     },
     "templates": [
         {

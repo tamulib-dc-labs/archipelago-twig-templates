@@ -139,23 +139,44 @@ but nothing renders them.
 
 ## Fixtures are the ground truth
 
-`fixtures/*.json` are real Strawberryfield records pulled from
-`archipelago-dev`, all open access.
+`fixtures/*.json` are real Strawberryfield records **from production**, named
+after the node they came from so their provenance is never in question.
 
-| Fixture | What it exercises |
+| Fixture | What it is |
 |---|---|
-| `rich-image` | 74 metadata keys — the widest branch coverage available |
-| `typical-image` | 22 keys — an ordinary production record |
-| `map` | Coordinates, georeferencing, `navPlace` |
+| `node_2637` | Map — 46 keys. `agent_linked_data` populated, `digital_publisher` as an **array** |
+| `node_4276` | U.S.S. Pathfinder log, Map — 23 keys. `digital_publisher` as a bare **string** |
 
-**This tier is only as good as these files.** Two known gaps: dev held no A/V or
-PDF objects, so the `as:video` and `as:document` branches are unexercised, and
-every fixture is a single object rather than a collection. Adding a fixture is
-the cheapest way to widen coverage — drop the raw `field_descriptive_metadata`
-value in as `<name>.json` and it is picked up automatically.
+Between them those two cover both shapes `digital_publisher` takes in real data,
+which is exactly why the template coerces with `is iterable` rather than
+assuming one.
 
-The self-test fails if the fixtures directory is empty, so "0 documents checked"
-can never pass as success.
+### Production only, on purpose
+
+An earlier version of this used records pulled from `archipelago-dev`. That was
+a mistake and they have been removed. Dev holds test records whose fields do not
+match the metadata model, and testing against them produces **confident, wrong
+findings**: a dev record carrying `agent_linked_data` as
+`{uri, label, role_uri, role_label}` was reported here as a data defect, when
+real production data is `{value, uri, role}` — exactly what the template reads
+and what [`mappings/main.yml`][mappings] specifies. The template was right the
+whole time; the fixture was junk.
+
+So: **fixtures come from production, or they do not go in.** A wrong fixture is
+worse than a missing one, because it manufactures bugs that do not exist and
+costs someone the time to disprove them.
+
+### Adding one
+
+Drop the raw `field_descriptive_metadata` value in as `node_<nid>.json` and add
+its name to `defaults.fixtures` in `templates.json`.
+
+**This tier is only as good as these files.** Current gaps: both fixtures are
+Maps, so no A/V or PDF object exercises the `as:video` or `as:document`
+branches, and neither is a collection. The self-test fails if the fixtures
+directory is empty, so "0 documents checked" can never pass as success.
+
+[mappings]: https://github.com/tamulib-dc-labs/archipelago-metadata-mappings/blob/main/mappings/main.yml
 
 ## The self-test exists for a reason
 
