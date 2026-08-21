@@ -127,7 +127,7 @@ Without Double quotes.
 		{% set computed_rights = "http://rightsstatements.org/vocab/NKC/1.0/" %}
 	{% endif %}
 {% endif %}
-{#- navDate: single XSD dateTime derived from date_created (preferred) or date_issued.
+{#- navDate: Create single XSD dateTime derived from date_created (preferred) or date_issued.
    Both are free-text EDTF strings (e.g. "1674?", "1890/1900"). Strip EDTF
    uncertainty/approximation qualifiers, take the start of a range, and only
    emit navDate when what remains is an unambiguous year/month/day/datetime. -#}
