@@ -1,0 +1,108 @@
+{
+    "_comment": [
+        "Registry of every Twig filter / function / test that exists in the TARGET Archipelago",
+        "install but is NOT built in to twig/twig. The linter registers these as no-op stubs so",
+        "that parsing a template here behaves the same way it does inside Drupal.",
+        "",
+        "FIDELITY RULE: a name missing from this file causes a FALSE FAILURE; a name present here",
+        "that the target install does not actually provide causes a FALSE PASS. False passes are",
+        "silent, so this registry is deliberately MINIMAL -- it lists what these templates actually",
+        "use plus the fully-verified format_strawberryfield set. Before adding a name, confirm it",
+        "exists in the deployed site (grep the module source, or check /admin/reports/status).",
+        "",
+        "See README.md -> 'Registry drift' for the maintenance story."
+    ],
+    "twig_core_note": "twig/twig built-ins (json_encode, merge, default, replace, url_encode, round, trim, escape, split, join, date, striptags, first, last, title, lower, number_format, slice, keys, length, raw, attribute, constant, ...) are NOT listed here -- Twig provides them itself.",
+    "sources": [
+        {
+            "id": "drupal-core",
+            "provider": "Drupal\\Core\\Template\\TwigExtension",
+            "verified": "Drupal 10.x core, well-known public API",
+            "filters": [
+                "t",
+                "trans",
+                "placeholder",
+                "drupal_escape",
+                "safe_join",
+                "without",
+                "clean_class",
+                "clean_id",
+                "render",
+                "format_date",
+                "add_suggestion"
+            ],
+            "functions": [
+                "render_var",
+                "url",
+                "path",
+                "link",
+                "file_url",
+                "attach_library",
+                "active_theme_path",
+                "active_theme",
+                "create_attribute"
+            ],
+            "tests": []
+        },
+        {
+            "id": "format_strawberryfield",
+            "provider": "Drupal\\format_strawberryfield\\TwigExtension",
+            "verified": "read from esmero/format_strawberryfield@main src/TwigExtension.php -- complete set (getFilters + getFunctions + getTests)",
+            "filters": [
+                "sbf_json_decode",
+                "sbf_render",
+                "markdown_2_html",
+                "html_2_markdown",
+                "bibliography",
+                "edtf_2_human_date",
+                "edtf_2_iso_date",
+                "format_strawberry_safe_escape"
+            ],
+            "functions": [
+                "sbf_entity_ids_by_label",
+                "clipboard_copy",
+                "sbf_search_api",
+                "sbf_file_content",
+                "sbf_drupal_view_paged"
+            ],
+            "tests": [
+                "instanceof"
+            ]
+        },
+        {
+            "id": "twig_tweak",
+            "provider": "drupal/twig_tweak",
+            "verified": "only the names these templates use -- twig_tweak provides many more",
+            "filters": [
+                "preg_replace"
+            ],
+            "functions": [
+                "drupal_view"
+            ],
+            "tests": []
+        },
+        {
+            "id": "bamboo_twig",
+            "provider": "drupal/bamboo_twig (bamboo_twig_loader)",
+            "verified": "only the names these templates use -- bamboo_twig provides many more",
+            "filters": [],
+            "functions": [
+                "bamboo_load_entity"
+            ],
+            "tests": []
+        },
+        {
+            "id": "site-local",
+            "provider": "Fragaria (sbf_datacite) + unidentified module (allmaps_annotation_url)",
+            "verified": "NO -- see README 'Open questions'. allmaps_annotation_url could not be traced to a published module.",
+            "scan_exempt": true,
+            "scan_exempt_reason": "Neither name is declared by the upstream modules in registry/sources.json, so bin/build-dump.php cannot confirm them and would report a permanent false failure. Settle these by running bin/dump-twig-names.php against the deployed site.",
+            "filters": [],
+            "functions": [
+                "sbf_datacite",
+                "allmaps_annotation_url"
+            ],
+            "tests": []
+        }
+    ]
+}

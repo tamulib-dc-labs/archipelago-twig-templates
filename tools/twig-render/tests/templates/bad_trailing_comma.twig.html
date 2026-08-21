@@ -1,0 +1,4 @@
+{# MUST FAIL: a trailing comma before the closing bracket. This is the exact
+   bug class this tier exists for -- it parses as Twig, saves into Archipelago
+   without complaint, and breaks every JSON consumer. #}
+{"items":[{% for x in [1,2,3] %}{"n": {{ x }}},{% endfor %}]}

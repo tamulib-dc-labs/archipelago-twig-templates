@@ -1,0 +1,7 @@
+{# Expected to FAIL: the inline "for ... if ..." condition was removed in
+   Twig 3. Copied from iiif_manifest_3.0_thumbnail.twig.html, where this was
+   still live in two places as of 08/11/2026. #}
+{% set break = false %}
+{% for document in data['as:document'] if not break %}
+  {% set break = true %}
+{% endfor %}

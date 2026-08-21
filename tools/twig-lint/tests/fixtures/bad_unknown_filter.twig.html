@@ -1,0 +1,6 @@
+{# Expected to FAIL: json_endcode_raw is not a filter.
+   Copied from IIIF_Presenation_API_3_Series_Manifest_Unified.twig.html:106,
+   where this was still live as of 08/11/2026. #}
+{
+  "value": { "en": [ {{ data.attribution|json_endcode_raw }} ] }
+}

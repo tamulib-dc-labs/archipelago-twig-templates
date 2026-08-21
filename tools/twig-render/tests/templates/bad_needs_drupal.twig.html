@@ -1,0 +1,3 @@
+{# MUST FAIL LOUDLY: drupal_view cannot work offline. The renderer must THROW,
+   not silently return null and let empty output validate as fine. #}
+{"items": {{ drupal_view('some_view', 'default')|json_encode|raw }} }

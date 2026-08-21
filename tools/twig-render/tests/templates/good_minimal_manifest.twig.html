@@ -1,0 +1,7 @@
+{# MUST PASS: a minimal but valid Presentation 3.0 manifest. If this ever
+   starts failing, the schema or the validator wiring broke -- not the template. #}
+{"@context":"http://iiif.io/api/presentation/3/context.json",
+ "id":"https://example.org/m/1","type":"Manifest",
+ "label":{"en":["{{ data.label|default('Untitled') }}"]},
+ "metadata":[{"label":{"en":["Publisher"]},"value":{"en":["wrapped correctly"]}}],
+ "items":[]}

@@ -1,0 +1,33 @@
+{
+    "name": "tamulib-dc-labs/archipelago-twig-render",
+    "description": "Renders Archipelago metadata display templates against fixtures and validates the output",
+    "type": "project",
+    "license": "MIT",
+    "extra": {
+        "note": [
+        "This tier answers a different question from tools/twig-lint. That one asks whether",
+        "Archipelago would ACCEPT a template (parse time). This one asks whether the template",
+        "PRODUCES VALID OUTPUT when fed known metadata -- the failure that breaks viewers.",
+        "",
+        "A template emitting {\"items\":[{...},]} parses perfectly and saves into Archipelago",
+        "without complaint. Only rendering it and parsing the result catches that."
+        ]
+    },
+    "require": {
+        "php": ">=8.2",
+        "ext-json": "*",
+        "twig/twig": "^3.14",
+        "league/commonmark": "^2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tamu\\ArchipelagoTwigRender\\": "src/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "8.2.0"
+        }
+    }
+}
