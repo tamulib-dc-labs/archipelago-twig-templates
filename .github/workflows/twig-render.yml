@@ -1,0 +1,105 @@
+name: Render and validate IIIF
+
+# Renders each Metadata Display template against committed Strawberryfield
+# fixtures and checks what comes out.
+#
+# Two stages, deliberately split by language:
+#
+#   1. PHP renders the templates and checks the output is well formed JSON/XML.
+#   2. Python validates the IIIF documents with iiif-prezi3, the library
+#      maintained alongside the Presentation API specification.
+#
+# iiif-prezi3 rather than a vendored copy of the JSON Schema: it is generated
+# from that schema, its pydantic errors name the offending field and the type
+# it expected, and a defect found here is reportable upstream against the
+# library consumers actually use.
+#
+# This is a DIFFERENT question from the `Twig lint` job. That one asks whether
+# Archipelago would ACCEPT the template, decided at parse time. It cannot see
+# that a template emits
+#
+#     {"items":[{"n":1},{"n":2},]}
+#
+# which parses perfectly, saves into Archipelago without complaint, and breaks
+# every consumer downstream. Only rendering and parsing the result catches it.
+#
+# Runs fully offline: no Drupal, no credentials, no self-hosted runner. The
+# GitHub-hosted image already ships PHP, Composer and Python 3, so no toolchain
+# setup actions are needed and the repo's no-marketplace-actions convention
+# holds -- actions/checkout and actions/upload-artifact are both published by
+# GitHub itself.
+
+on:
+  pull_request:
+    paths:
+      - 'twig/metadatadisplays/*IIIF*'
+      - 'twig/metadatadisplays/iiif*'
+      - 'tools/twig-render/**'
+      - '.github/workflows/twig-render.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: twig-render-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render-and-validate:
+    name: IIIF output is valid
+    runs-on: ubuntu-latest
+
+    env:
+      RENDERED: ${{ github.workspace }}/rendered
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          php -v
+          composer --version
+          python3 --version
+
+      - name: Install the render harness
+        working-directory: tools/twig-render
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install iiif-prezi3
+        run: python3 -m pip install --quiet --break-system-packages -r tools/twig-render/requirements.txt
+
+      # Both self-tests run FIRST, because every way these harnesses can rot
+      # looks exactly like success: a loosened validator, a stub returning null
+      # so templates render empty and "validate" fine, or a dependency bump that
+      # quietly stops rejecting anything.
+      - name: Self-test the renderer
+        run: php tools/twig-render/selftest.php
+
+      - name: Self-test the IIIF validator
+        run: python3 tools/twig-render/bin/validate_iiif.py --selftest
+
+      - name: Render every covered IIIF template
+        run: |
+          php tools/twig-render/bin/render-check.php \
+            --format=github \
+            --summary="$GITHUB_STEP_SUMMARY" \
+            --write="$RENDERED"
+
+      - name: Validate the IIIF documents with iiif-prezi3
+        run: python3 tools/twig-render/bin/validate_iiif.py --format=github "$RENDERED/index.json"
+
+      # Makes a failure diagnosable without reproducing anything locally: the
+      # exact document the validator rejected is attached to the run.
+      - name: Upload the rendered documents
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-output
+          path: ${{ env.RENDERED }}
+          retention-days: 14
+          if-no-files-found: warn
+

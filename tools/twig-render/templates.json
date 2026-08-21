@@ -1,0 +1,71 @@
+{
+    "_comment": [
+        "Which IIIF templates get rendered, against which fixtures, and how the output is judged.",
+        "",
+        "Scope is deliberately IIIF only. Every Metadata Display in twig/metadatadisplays is",
+        "still syntax-checked by tools/twig-lint; this tier renders the IIIF ones and checks",
+        "what they produce, because those are the documents that break viewers and",
+        "interoperability when they are malformed.",
+        "",
+        "'mimetype' mirrors what the Metadata Display entity declares on the site. 'iiif': true",
+        "additionally parses the result with iiif-prezi3. 'fragment': true means the template",
+        "emits an embeddable snippet rather than a whole document, so it is wrapped in braces",
+        "before being parsed -- see the note on the thumbnails below.",
+        "",
+        "A template with 'skip' is NOT covered. Each one queries for other objects, so no",
+        "amount of fixture data makes it renderable offline. The reason is recorded rather",
+        "than left as a silent omission."
+    ],
+    "defaults": {
+        "fixtures": ["node_2637", "node_4276"]
+    },
+    "templates": [
+        {
+            "file": "IIIF_Presentation_API_3.0_manifest.twig.html",
+            "mimetype": "application/ld+json",
+            "iiif": true,
+            "note": "The manifest viewers load most. Full Presentation 3 validation via iiif-prezi3."
+        },
+        {
+            "file": "IIIF_Presentation_API_2.1_Manifest.twig.html",
+            "mimetype": "application/ld+json",
+            "iiif": false,
+            "note": "Presentation 2.1. iiif-prezi3 models Presentation 3, so parsing a 2.1 manifest with it would fail for the wrong reason. JSON validity only."
+        },
+        {
+            "file": "IIIF_Presentation_API_3_Creative_Works_Series_Child_Canvases.twig.html",
+            "mimetype": "application/json",
+            "iiif": false,
+            "note": "Emits canvases for embedding in a series manifest. Parses as a whole document, but is not a standalone IIIF resource, so the model does not apply to it entire."
+        },
+        {
+            "file": "IIIF_Presentation_API_3_Thumbnail.twig.html",
+            "mimetype": "application/json",
+            "fragment": true,
+            "note": "Emits a bare \"thumbnail\": [...] member, not a document. Wrapped in braces before parsing: a trailing comma or unbalanced bracket here corrupts every manifest that embeds it, which is worth catching even though the snippet is not valid JSON on its own."
+        },
+        {
+            "file": "iiif_manifest_3.0_thumbnail.twig.html",
+            "mimetype": "application/json",
+            "fragment": true,
+            "note": "Same shape as the above. This is the template that carried three Twig 3 syntax errors and was rejected outright by Archipelago until they were fixed."
+        },
+
+        {
+            "file": "IIIF_Presentation_API_3_Collection_Manifest.twig.html",
+            "skip": "Calls drupal_view() to find member objects. Needs a database."
+        },
+        {
+            "file": "IIIF_Presentation_API_3_Creative_Works_Series_Manifest.twig.html",
+            "skip": "Calls drupal_view() and bamboo_load_entity(). Needs a database."
+        },
+        {
+            "file": "IIIF_Presenation_API_3_Series_Manifest_Unified.twig.html",
+            "skip": "Calls sbf_drupal_view_paged() and bamboo_load_entity(). Needs a database."
+        },
+        {
+            "file": "Multiple Thumbnails via IIIF and FontAwesome-7ca9ef30-1535-4616-b3b2-201dcc7d6a69.twig.html",
+            "skip": "Calls drupal_view(). Needs a database."
+        }
+    ]
+}

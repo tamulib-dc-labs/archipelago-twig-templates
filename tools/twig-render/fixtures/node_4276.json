@@ -1,0 +1,150 @@
+{
+    "type": "Map",
+    "agent": "",
+    "image": [
+        5853
+    ],
+    "label": "World War II log of the U.S.S. Pathfinder : first voyage Sept. 1, 1942-Oct. 21, 1944 : second voyage Dec. 18, 1944-Dec. 1945",
+    "extent": [
+        "1 map ; 39 x 50 cm, on sheet 44 x 57 cm"
+    ],
+    "rights": "http:\/\/rightsstatements.org\/vocab\/NKC\/1.0\/",
+    "subject": [
+        "Pathfinder (Ship : 1942-1971) -- History -- Maps",
+        "World War, 1939-1945 -- Campaigns -- Pacific Ocean -- Maps",
+        "World War, 1939-1945 -- Naval operations, American -- Maps",
+        "Pictorial maps",
+        "Military maps",
+        "Thematic maps"
+    ],
+    "ap:tasks": {
+        "ap:sortfiles": "index"
+    },
+    "as:image": {
+        "urn:uuid:017588c9-f068-441f-87e0-ebcec298f4c5": {
+            "url": "s3:\/\/254\/image-service-maps-0073-0001-017588c9-f068-441f-87e0-ebcec298f4c5.jp2",
+            "name": "service_maps_0073_0001.jp2",
+            "tags": [],
+            "type": "Image",
+            "dr:fid": 5853,
+            "dr:for": "image",
+            "dr:uuid": "017588c9-f068-441f-87e0-ebcec298f4c5",
+            "checksum": "254fc29fd410d7e6e345b509fc51c3c2",
+            "flv:exif": {
+                "Make": "i2S, Corp.",
+                "Model": "SupraScan Quartz 2A0 [SN: ] - Quartz HD [SN: 342202]",
+                "Format": "image\/tiff",
+                "FileSize": "8.2 MB",
+                "MIMEType": "image\/jp2",
+                "ColorMode": "RGB",
+                "ImageSize": "9097x7136",
+                "ColorSpace": "sRGB",
+                "CreateDate": "2024:04:25 11:17:44-05:00",
+                "DocumentID": "xmp.did:d962f300-42c0-46c3-b291-80e33c36c86d",
+                "ImageWidth": 9097,
+                "InstanceID": "xmp.iid:045418d2-51f2-4f8b-9940-76c71efe82e3",
+                "ModifyDate": "2024:10:31 23:01:41-05:00",
+                "XMPToolkit": "Adobe XMP Core 9.1-c002 79.a6a63968a, 2024\/03\/06-11:52:05        ",
+                "Compression": "Uncompressed",
+                "CreatorTool": "Adobe Photoshop 25.12 (Macintosh)",
+                "HistoryWhen": [
+                    "2024:04:25 11:17:44-05:00",
+                    "2024:10:31 23:01:41-05:00"
+                ],
+                "ImageHeight": 7136,
+                "Orientation": "Horizontal (normal)",
+                "XResolution": 400,
+                "YResolution": 400,
+                "MetadataDate": "2024:10:31 23:01:41-05:00",
+                "BitsPerSample": [
+                    16
+                ],
+                "HistoryAction": [
+                    "created",
+                    "saved"
+                ],
+                "ExifImageWidth": 9097,
+                "HistoryChanged": "\/",
+                "ResolutionUnit": "inches",
+                "ExifImageHeight": 7136,
+                "SamplesPerPixel": 3,
+                "HistoryInstanceID": [
+                    "xmp.iid:d962f300-42c0-46c3-b291-80e33c36c86d",
+                    "xmp.iid:045418d2-51f2-4f8b-9940-76c71efe82e3"
+                ],
+                "OriginalDocumentID": "xmp.did:d962f300-42c0-46c3-b291-80e33c36c86d",
+                "PlanarConfiguration": "Chunky",
+                "HistorySoftwareAgent": [
+                    "Adobe Photoshop 25.12 (Macintosh)"
+                ],
+                "PhotometricInterpretation": "RGB"
+            },
+            "sequence": 1,
+            "flv:pronom": {
+                "label": "JP2 (JPEG 2000 part 1)",
+                "mimetype": "image\/jp2",
+                "pronom_id": "info:pronom\/x-fmt\/392",
+                "detection_type": "signature"
+            },
+            "dr:filesize": 8164293,
+            "dr:mimetype": "image\/jp2",
+            "crypHashFunc": "md5",
+            "flv:identify": {
+                "1": {
+                    "width": "9097",
+                    "format": "JP2",
+                    "height": "7136",
+                    "orientation": "Undefined"
+                }
+            }
+        }
+    },
+    "language": [
+        "eng"
+    ],
+    "node_uuid": "2c1cada5-887e-4993-8f6f-8c520473d77b",
+    "genre_form": [
+        "Maps"
+    ],
+    "identifier": [
+        {
+            "value": "service_maps_0073_0001.jp2",
+            "authority": "local"
+        },
+        {
+            "value": "20240418_0002_USS-Pathfinder.tif",
+            "authority": "local"
+        }
+    ],
+    "ismemberof": [
+        4008
+    ],
+    "date_issued": 1945,
+    "description": [
+        "Shows routes of the U.S.S. Pathfinder in the Pacific Ocean during World War II.",
+        "Includes illustrations (\"U.S.S. Pathfinder\" and \"Nago Wan Okinawa\") and textual descriptions of voyages."
+    ],
+    "content_type": [
+        "StillImage"
+    ],
+    "classification": [
+        {
+            "value": "G9231.S7 1945 .W675",
+            "authority": "lcc"
+        }
+    ],
+    "digital_origin": "reformatted digital",
+    "related_record": [
+        "https:\/\/catalog.library.tamu.edu\/Record\/in00004644355"
+    ],
+    "ap:entitymapping": {
+        "entity:file": [
+            "image"
+        ],
+        "entity:node": [
+            "ismemberof"
+        ]
+    },
+    "digital_publisher": "Texas A & M University. Libraries",
+    "table_of_contents": ""
+}

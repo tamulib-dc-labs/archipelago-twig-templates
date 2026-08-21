@@ -1,0 +1,77 @@
+name: Twig lint (IIIF)
+
+# Answers one question on every PR: would Archipelago accept these templates?
+#
+# The check is a parity implementation of format_strawberryfield's
+# MetadataDisplayEntity::validateSource(), which is the exact gate a Metadata
+# Display entity goes through. A template that fails here renders the error
+# text to logged-in users and EMPTY OUTPUT to anonymous visitors -- so this
+# failing is never cosmetic.
+#
+# SCOPE: IIIF templates only, the same nine listed in
+# tools/twig-render/templates.json. MODS, Dublin Core, OAI-PMH, GeoJSON,
+# schema.org and DataCite are deliberately NOT checked and are expected to get
+# their own tier in a later PR. Nothing here looks at them, so do not read a
+# green build as a statement about them.
+#
+# NO MARKETPLACE ACTIONS. The only action used is actions/checkout, which is
+# published by GitHub itself and is permitted under even the strictest org
+# Actions policy. Everything else is a plain shell command: the GitHub-hosted
+# Ubuntu runner already ships PHP and Composer, so no toolchain setup action
+# is needed.
+#
+# See tools/twig-lint/README.md for what it does and does not cover.
+
+on:
+  pull_request:
+    paths:
+      # Narrowed to the IIIF templates so a change to, say, MODS_3_7 does not
+      # start a run whose result says nothing about the file that changed.
+      - 'twig/metadatadisplays/*IIIF*'
+      - 'twig/metadatadisplays/iiif*'
+      - 'tools/twig-lint/**'
+      - 'tools/twig-render/templates.json'
+      - '.github/workflows/twig-lint.yml'
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: twig-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-source-parity:
+    name: validateSource parity (IIIF)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      # Printed so that a runner-image bump changing the PHP version shows up
+      # in the log instead of becoming a mystery failure. The linter supports
+      # PHP 8.2 through 8.4.
+      - name: Show toolchain
+        run: |
+          php -v
+          composer --version
+
+      - name: Install dependencies
+        working-directory: tools/twig-lint
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      # Proves the linter still detects the bug classes it is meant to detect,
+      # and that no name has been dropped from the extension registry. Runs
+      # first so a broken linter never reports a false green.
+      - name: Self-test the linter
+        run: php tools/twig-lint/selftest.php
+
+      # --format=github emits ::error workflow commands, which GitHub renders
+      # as annotations in the Checks tab, and inline on the Files changed tab
+      # whenever the flagged line is part of the diff.
+      - name: Lint every IIIF template
+        run: php tools/twig-lint/lint.php --format=github --summary="$GITHUB_STEP_SUMMARY"
