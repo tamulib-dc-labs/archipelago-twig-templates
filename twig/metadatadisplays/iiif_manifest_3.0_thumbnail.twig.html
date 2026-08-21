@@ -36,7 +36,6 @@ Without Double quotes.
 3.- Movies
 #}
 {% apply spaceless %}    
-{% spaceless %}
 {% if attribute(data, 'as:image')|length > 0 %}  
   {% set document  = data['as:image']|first %} 
   {# if the default size is smaller than the source use the source one #}
@@ -47,9 +46,11 @@ Without Double quotes.
   {% set source = cantaloupeid ~ "/full/" ~ width  ~ ",/0/default.jpg" %}
 {% elseif attribute(data, 'as:document')|length > 0 %}  
   {% set break = false %}
-  {% for document in data['as:document'] if not break %}
+  {# Twig 3 removed the inline "for ... if ..." condition, so the break guard
+     moves into the body. Same behaviour: once break is set nothing else runs. #}
+  {% for document in data['as:document'] %}
   {# this is just an example, we  allow every PDF here but we can also filter by pronom id "info:pronom/fmt/17" or info:pronom/fmt/18 #}
-    {% if document['flv:exif'].MIMEType == "application/pdf" and document['flv:exif'].PageCount > 0 %}   
+    {% if not break and document['flv:exif'].MIMEType == "application/pdf" and document['flv:exif'].PageCount > 0 %}
       {% set cantaloupeid  = IIIFserverurl ~ document['url']|replace({'s3://':''})|replace({'private://':''})|url_encode %} 
       {% set source = cantaloupeid ~ "/full/" ~ width  ~ ",/0/default.jpg?page=1" %}
       {% set break = true %}
@@ -57,9 +58,11 @@ Without Double quotes.
   {% endfor %}
 {% elseif attribute(data, 'as:video')|length > 0 %}  
   {% set break = false %}
-  {% for document in data['as:video'] if not break %}
+  {# Twig 3 removed the inline "for ... if ..." condition, so the break guard
+     moves into the body. Same behaviour: once break is set nothing else runs. #}
+  {% for document in data['as:video'] %}
   {# this is just an example, we process here only MP4 quicktimes #}
-    {% if document['flv:pronom'].mimetype == "video/quicktime" %}
+    {% if not break and document['flv:pronom'].mimetype == "video/quicktime" %}
       {% set cantaloupeid  = IIIFserverurl ~ document['url']|replace({'s3://':''})|replace({'private://':''})|url_encode %} 
       {% set source = cantaloupeid ~ "/full/" ~ width  ~ ",/0/default.jpg?time=00:00:01" %}
       {% set break = true %}
@@ -86,5 +89,4 @@ Without Double quotes.
   "height": 180
 }]
 {% endif %}
-{% endspaceless %}
 {% endapply %}
