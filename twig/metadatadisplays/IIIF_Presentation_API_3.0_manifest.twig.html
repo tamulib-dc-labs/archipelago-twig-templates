@@ -296,7 +296,7 @@ Without Double quotes.
     {% if data.digital_publisher %}
     {
       "label": { "{{ len }}": ["Digital Publisher"] },
-      "value": { "{{ len }}": {{ data.digital_publisher|json_encode|raw }} }
+      "value": { "{{ len }}": {{ (data.digital_publisher is iterable ? data.digital_publisher : [data.publisher])|json_encode|raw }} }
     },
     {% endif %}
     {% if data.extent %}
