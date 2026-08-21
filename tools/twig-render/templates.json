@@ -11,7 +11,7 @@
         "offline. The reason is recorded rather than left as a silent omission."
     ],
     "defaults": {
-        "fixtures": ["rich-image", "typical-image", "map"]
+        "fixtures": ["rich-image", "typical-image", "map", "pathfinder-log"]
     },
     "templates": [
         {
