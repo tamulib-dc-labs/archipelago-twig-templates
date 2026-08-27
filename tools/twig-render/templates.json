@@ -14,11 +14,14 @@
         "",
         "A template with 'skip' is NOT covered. Each one queries for other objects, so no",
         "amount of fixture data makes it renderable offline. The reason is recorded rather",
-        "than left as a silent omission."
+        "than left as a silent omission.",
+        "",
+        "No 'defaults.fixtures' key on purpose: render-check.php falls back to every fixture",
+        "file present (array_keys($fixtures)) when a template entry doesn't list its own.",
+        "Dropping a new fixture into tools/twig-render/fixtures/*.json is enough to have it",
+        "picked up everywhere -- no second place to remember to update. Give a template its",
+        "own 'fixtures' list only to deliberately narrow it, not to add to this default set."
     ],
-    "defaults": {
-        "fixtures": ["node_2637", "node_4276"]
-    },
     "templates": [
         {
             "file": "IIIF_Presentation_API_3.0_manifest.twig.html",
