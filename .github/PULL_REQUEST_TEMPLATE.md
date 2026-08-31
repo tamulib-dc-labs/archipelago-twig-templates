@@ -14,9 +14,3 @@ What problem does this solve?
 ## Screenshots (if UI changes)
 
 Before / After screenshots go here.
-
-## Checklist
-
-- [ ] Templates follow naming conventions
-- [ ] File headers/comments updated
-- [ ] No unnecessary overrides

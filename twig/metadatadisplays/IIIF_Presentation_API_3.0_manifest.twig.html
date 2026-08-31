@@ -48,7 +48,7 @@ Structures passed from Archipelago are
 - data
   The Full JSON Structure converted in an Array
 - iiif_server
-  The publicly available IIIF Server (Global Setting)​
+  The publicly available IIIF Server (Global Setting)
 Since JSON was decoded into the 'data' values are valid PHP but could not
 be valid JSON when outputting. So We use data.description|json_encode|raw
 Without Double quotes.
@@ -127,6 +127,30 @@ Without Double quotes.
 		{% set computed_rights = "http://rightsstatements.org/vocab/NKC/1.0/" %}
 	{% endif %}
 {% endif %}
+{#- navDate: Create single XSD dateTime derived from date_created (preferred) or date_issued.
+   Both are free-text EDTF strings (e.g. "1674?", "1890/1900"). Strip EDTF
+   uncertainty/approximation qualifiers, take the start of a range, and only
+   emit navDate when what remains is an unambiguous year/month/day/datetime. -#}
+{%- set navdate_raw = (data.date_created ?: data.date_issued) ~ '' -%}
+{%- set navdate_clean = navdate_raw|replace({'?': '', '~': '', '%': '', ' ': ''}) -%}
+{%- set navdate_start = navdate_clean -%}
+{%- if '/' in navdate_clean -%}
+  {%- set navdate_parts = navdate_clean|split('/') -%}
+  {%- set navdate_start = navdate_parts[0] -%}
+  {%- if navdate_start == '' or navdate_start starts with '..' -%}
+    {%- set navdate_start = navdate_parts[1]|default('') -%}
+  {%- endif -%}
+{%- endif -%}
+{%- set navDate = null -%}
+{%- if navdate_start matches '/^-?\\d{4}$/' -%}
+  {%- set navDate = navdate_start ~ '-01-01T00:00:00Z' -%}
+{%- elseif navdate_start matches '/^-?\\d{4}-\\d{2}$/' -%}
+  {%- set navDate = navdate_start ~ '-01T00:00:00Z' -%}
+{%- elseif navdate_start matches '/^-?\\d{4}-\\d{2}-\\d{2}$/' -%}
+  {%- set navDate = navdate_start ~ 'T00:00:00Z' -%}
+{%- elseif navdate_start matches '/^-?\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(Z|[+-]\\d{2}:\\d{2})$/' -%}
+  {%- set navDate = navdate_start -%}
+{%- endif -%}
 {%- set max_thumb_width = 240 -%}{
   "@context": [
   "http://www.w3.org/ns/anno.jsonld",
@@ -149,6 +173,7 @@ Without Double quotes.
     }
   ],
   "rights": {{ computed_rights|json_encode|raw }},
+  {% if navDate %}"navDate": {{ navDate|json_encode|raw }},{% endif %}
   "behavior": ["individuals"],
   "requiredStatement": {
     "label": { "en": [ "Attribution" ] },
