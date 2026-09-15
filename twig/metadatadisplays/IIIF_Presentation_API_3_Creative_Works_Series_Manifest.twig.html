@@ -1,4 +1,7 @@
 {#-
+Updated 09/15/2026. digital_publisher now accepts either a string or an array of
+strings (was previously always wrapped in a single-item array), matching the
+3.0 manifest's logic.
 Updated 08/07/2026. Metadata fields now accept either a string or an array of strings:
 access_rights, audience, content_type, coordinates, description, language, local_department,
 medium, note, original_publication, original_publisher, physical_location, place_of_origin,
@@ -158,7 +161,7 @@ Without Double quotes.
 },
 "requiredStatement": {
 "label": { "en": [ "Attribution" ] },
-"value": { "en": [ "Provided by Archipelago Deployment" ] }
+"value": { "en": [ "Provided by Cushing Memorial Library and Archives, Texas A&M University" ] }
 },
 "rights": {{ computed_rights|json_encode|raw }},
 {% if navDate %}"navDate": {{ navDate|json_encode|raw }},{% endif %}
@@ -312,7 +315,7 @@ Without Double quotes.
             {% if data.digital_publisher %}
             {
             "label": { "{{ len }}": ["Digital Publisher"] },
-            "value": { "{{ len }}": [ {{ data.digital_publisher|json_encode|raw }} ] }
+            "value": { "{{ len }}": {{ (data.digital_publisher is iterable ? data.digital_publisher : [data.digital_publisher])|json_encode|raw }} }
             },
             {% endif %}
             {% if data.extent %}
