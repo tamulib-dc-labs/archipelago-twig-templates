@@ -1,0 +1,91 @@
+{
+    "type": "CreativeWorkSeries",
+    "image": [
+        3776
+    ],
+    "label": "Aston Hall",
+    "format": "reformatted digital",
+    "rights": "http:\/\/rightsstatements.org\/vocab\/InC\/1.0\/",
+    "abstract": "Aston Hall is a dormitory building constructed in 1976.",
+    "ap:tasks": {
+        "ap:sortfiles": "index"
+    },
+    "as:image": {
+        "urn:uuid:9bfbc27a-6334-4cc8-b9de-6188045ff951": {
+            "url": "s3:\/\/d94\/image-att-aston-001-edit-9bfbc27a-6334-4cc8-b9de-6188045ff951.jp2",
+            "name": "ATT_aston_001_edit.jp2",
+            "tags": [],
+            "type": "Image",
+            "dr:fid": 3776,
+            "dr:for": "image",
+            "dr:uuid": "9bfbc27a-6334-4cc8-b9de-6188045ff951",
+            "checksum": "d9404aa380df932af406465d392774b7",
+            "flv:exif": {
+                "FileSize": "1387 kB",
+                "MIMEType": "image\/jp2",
+                "ImageSize": "3797x2468",
+                "ColorSpace": "sRGB",
+                "ImageWidth": 3797,
+                "ImageHeight": 2468
+            },
+            "sequence": 1,
+            "flv:pronom": {
+                "label": "JP2 (JPEG 2000 part 1)",
+                "mimetype": "image\/jp2",
+                "pronom_id": "info:pronom\/x-fmt\/392",
+                "detection_type": "signature"
+            },
+            "dr:filesize": 1386608,
+            "dr:mimetype": "image\/jp2",
+            "crypHashFunc": "md5",
+            "flv:identify": {
+                "1": {
+                    "width": "3797",
+                    "format": "JP2",
+                    "height": "2468",
+                    "orientation": "Undefined"
+                }
+            }
+        }
+    },
+    "ispartof": "",
+    "node_uuid": "597edabf-f8e6-4058-ad9b-520943d789dc",
+    "date_built": "1976",
+    "date_razed": "Present",
+    "identifier": "",
+    "ismemberof": [
+        2834
+    ],
+    "attribution": "",
+    "description": "",
+    "sequence_id": "",
+    "content_type": [
+        "Collection"
+    ],
+    "date_created": "",
+    "rights_details": "In Copyright",
+    "geojson_feature": {
+        "type": "Feature",
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                -96.33618825010036,
+                30.614614520845375
+            ]
+        },
+        "properties": []
+    },
+    "ap:entitymapping": {
+        "entity:file": [
+            "image"
+        ],
+        "entity:node": [
+            "ispartof",
+            "ismemberof"
+        ]
+    },
+    "digital_publisher": [
+        "Texas A & M University. Libraries"
+    ],
+    "title_alternative": ""
+}
