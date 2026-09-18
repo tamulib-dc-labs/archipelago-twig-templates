@@ -1,4 +1,9 @@
 {#-
+Also 09/18/2026. Rights Statement now resolves on the vocabulary code rather than
+on string equality against a full URI, so recorded variants (https, no trailing
+slash, array-valued) stop rendering an empty field. Added the download terms
+modal in front of the object's own file downloads; the metadata exports are
+deliberately left one-click.
 Last updated 08/18/2026. Added a campus-only access notice shown when an object is IP embargoed.
 Last updated 08/07/2026. Removed the Date Available (date_available) and
 Related URL (Historic) (related_url_historic) rows from the description list.
@@ -95,6 +100,13 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
   </ul></dd>
   {%- endif -%}
 {%- endmacro html_output_search_lod -%}
+{#- Download menu entry for one of the object's own files. The href is the real
+    download URL, so with scripting off the link still works and simply skips the
+    notice; the modal intercepts the click when scripting is available. -#}
+{%- macro download_entry(node_uuid, f) -%}
+<li><a download rel="nofollow" target="_blank" class="dropdown-item tamu-dlterms-open" href="/do/{{ node_uuid }}/file/{{ f.tamu_uuid }}/download/{{ f.tamu_name }}" data-tamu-dl-uuid="{{ f.tamu_uuid }}">{{ f.tamu_name }}<span class="tamu-dlterms-flag">terms</span></a></li>
+{%- endmacro -%}
+
 {#- --- End Macros ---- -#}
 {{ attach_library('strawberryfield_clover/clover_data_attr') }}
 {{ attach_library('strawberryfield_clover_iiif/clover_data_attr') }}
@@ -104,6 +116,238 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
    {# also restrict if embargoed #}
    {% set file_download_restricted = true %}
 {% endif %}
+
+
+{# -- Rights resolution -------------------------------------------------------
+   Resolved once, here, and consumed twice: by the Rights Statement row in the
+   Description tab and by the download terms modal at the foot of this file.
+   One resolution means the badge on the page and the terms in the modal can
+   never contradict each other.
+
+   Matching is on the vocabulary CODE lifted out of the URI path, never on
+   string equality against a full URL. The recorded values vary in scheme
+   (http/https), in trailing slash, and in whether the version segment is
+   present; an equality chain renders an EMPTY field for every variant it does
+   not literally contain, which is what it had been doing.
+#}
+{# Repeatable fields arrive as a scalar or an array depending on how the record
+   was made. Take the first non-empty value either way. #}
+{% set rights_list = (data.rights is iterable ? data.rights : [data.rights|default('')]) %}
+{% set rights_raw = (rights_list|filter(v => v is not empty)|first)|default('') %}
+{% set rights_raw = rights_raw is iterable ? '' : rights_raw|trim %}
+
+{% set rights_details_list = (data.rights_details is iterable ? data.rights_details : [data.rights_details|default('')]) %}
+{% set rights_details_text = (rights_details_list|filter(v => v is not empty)|first)|default('') %}
+{% set rights_details_text = rights_details_text is iterable ? '' : rights_details_text|trim %}
+
+{# Keys are lower-cased so a value recorded as .../vocab/inc-edu/ resolves too.
+   'code' carries the canonical casing back for the badge filename. #}
+{% set rights_map = {
+  'inc':       {'code': 'InC',       'vocab': 'rs', 'label': 'In Copyright',
+                'desc': 'This item is protected by copyright. You may use it as permitted by copyright law; any other use needs permission from the rights holder.'},
+  'inc-edu':   {'code': 'InC-EDU',   'vocab': 'rs', 'label': 'In Copyright - Educational Use Permitted',
+                'desc': 'This item is protected by copyright, and the rights holder permits use for research, teaching and private study. Other uses need permission from the rights holder.'},
+  'inc-ruu':   {'code': 'InC-RUU',   'vocab': 'rs', 'label': 'In Copyright - Rights-holder(s) Unlocatable or Unidentifiable',
+                'desc': 'This item is believed to be in copyright, but the rights holder could not be identified or located after a diligent search. You are responsible for your own use.'},
+  'noc-us':    {'code': 'NoC-US',    'vocab': 'rs', 'label': 'No Copyright - United States',
+                'desc': 'There is no known copyright in this item in the United States. Copyright may still apply in other countries, and other restrictions - privacy, publicity, trademark - may apply to your use.'},
+  'noc-nc':    {'code': 'NoC-NC',    'vocab': 'rs', 'label': 'No Copyright - Non-Commercial Use Only',
+                'desc': 'There is no known copyright in this item, and it is made available for non-commercial use only. Commercial use needs permission.'},
+  'cne':       {'code': 'CNE',       'vocab': 'rs', 'label': 'Copyright Not Evaluated',
+                'desc': 'The copyright status of this item has not been evaluated. You are responsible for determining how you may use it.'},
+  'inc-ow-eu': {'code': 'InC-OW-EU', 'vocab': 'rs', 'label': 'In Copyright - EU Orphan Work',
+                'desc': 'This item is an orphan work under EU law: it is protected by copyright, but the rights holder could not be identified or located after a diligent search. You are responsible for your own use.'},
+  'inc-nc':    {'code': 'InC-NC',    'vocab': 'rs', 'label': 'In Copyright - Non-Commercial Use Permitted',
+                'desc': 'This item is protected by copyright, and the rights holder permits non-commercial use. Commercial use needs permission from the rights holder.'},
+  'noc-cr':    {'code': 'NoC-CR',    'vocab': 'rs', 'label': 'No Copyright - Contractual Restrictions',
+                'desc': 'There is no known copyright in this item, but a contract restricts how it may be used. Contact us before using it beyond those terms.'},
+  'noc-oklr':  {'code': 'NoC-OKLR',  'vocab': 'rs', 'label': 'No Copyright - Other Known Legal Restrictions',
+                'desc': 'There is no known copyright in this item, but other legal restrictions - privacy, publicity, cultural protocols - limit how it may be used.'},
+  'und':       {'code': 'UND',       'vocab': 'rs', 'label': 'Copyright Undetermined',
+                'desc': 'The copyright status of this item could not be determined. You are responsible for determining how you may use it.'},
+  'nkc':       {'code': 'NKC',       'vocab': 'rs', 'label': 'No Known Copyright',
+                'desc': 'This item is free of known copyright restrictions. Other restrictions - privacy, publicity, trademark - may still apply to your use.'},
+
+  'by':        {'code': 'BY',       'vocab': 'cc', 'badge': 'by',           'label': 'Creative Commons Attribution (CC BY)',
+                'desc': 'You may share and adapt this item for any purpose, including commercially, as long as you credit the creator.'},
+  'by-sa':     {'code': 'BY-SA',    'vocab': 'cc', 'badge': 'by-sa',        'label': 'Creative Commons Attribution-ShareAlike (CC BY-SA)',
+                'desc': 'You may share and adapt this item for any purpose, including commercially, as long as you credit the creator and license your adaptations on the same terms.'},
+  'by-nd':     {'code': 'BY-ND',    'vocab': 'cc', 'badge': 'by-nd',        'label': 'Creative Commons Attribution-NoDerivatives (CC BY-ND)',
+                'desc': 'You may share this item for any purpose, including commercially, as long as you credit the creator and do not distribute adaptations of it.'},
+  'by-nc':     {'code': 'BY-NC',    'vocab': 'cc', 'badge': 'by-nc',        'label': 'Creative Commons Attribution-NonCommercial (CC BY-NC)',
+                'desc': 'You may share and adapt this item for non-commercial purposes, as long as you credit the creator.'},
+  'by-nc-sa':  {'code': 'BY-NC-SA', 'vocab': 'cc', 'badge': 'by-nc-sa',     'label': 'Creative Commons Attribution-NonCommercial-ShareAlike (CC BY-NC-SA)',
+                'desc': 'You may share and adapt this item for non-commercial purposes, as long as you credit the creator and license your adaptations on the same terms.'},
+  'by-nc-nd':  {'code': 'BY-NC-ND', 'vocab': 'cc', 'badge': 'by-nc-nd',     'label': 'Creative Commons Attribution-NonCommercial-NoDerivatives (CC BY-NC-ND)',
+                'desc': 'You may share this item for non-commercial purposes, as long as you credit the creator and do not distribute adaptations of it.'},
+  'zero':      {'code': 'CC0',      'vocab': 'cc', 'badge': 'cc-zero',      'label': 'Creative Commons Zero (CC0)',
+                'desc': 'The creator has waived all copyright in this item worldwide. You may use it for any purpose without permission.'},
+  'mark':      {'code': 'PDM',      'vocab': 'cc', 'badge': 'publicdomain', 'label': 'Public Domain Mark',
+                'desc': 'This item has been identified as free of known copyright restrictions worldwide. Other restrictions - privacy, publicity, trademark - may still apply to your use.'}
+} %}
+
+{# Pull the code out of the path. Both vocabularies put it second-to-last when a
+   version segment is present (.../vocab/InC-EDU/1.0/, .../licenses/by-nc/4.0/)
+   and last when it is not, so try that order and accept whichever the map
+   knows. An unrecognised URI leaves the code empty and becomes its own state
+   rather than silently rendering nothing. #}
+{% set rights_is_uri = (rights_raw|lower starts with 'http://') or (rights_raw|lower starts with 'https://') %}
+{% set rights_segments = rights_is_uri ? rights_raw|trim('/')|split('/') : [] %}
+{% set rights_seg_last = rights_segments|length > 0 ? rights_segments|last|lower : '' %}
+{% set rights_seg_prev = rights_segments|length > 1 ? rights_segments[rights_segments|length - 2]|lower : '' %}
+{% set rights_key = rights_map[rights_seg_prev] is defined ? rights_seg_prev : (rights_map[rights_seg_last] is defined ? rights_seg_last : '') %}
+{% set rights_term = rights_key ? rights_map[rights_key] : null %}
+
+{# Where the value came from, for the provenance line under the terms. #}
+{% set rights_source = rights_raw is not empty ? 'item' : 'none' %}
+
+{# -- Inheritance from the parent collection (resolution order step 2) --------
+   Only consulted when the item itself records nothing. field_descriptive_metadata
+   is the Strawberryfield field machine name on both the digital_object and
+   digital_object_collection bundles - see the "bundle" keys in
+   AMI_Set_Description.twig.html. Every step is guarded, so if that field is ever
+   renamed this degrades to the site-wide fallback rather than erroring.
+   Set rights_inherit_enabled to false to switch inheritance off entirely. #}
+{% set rights_inherit_enabled = true %}
+{% set rights_inherited_from = '' %}
+
+{% if rights_raw is empty and rights_inherit_enabled and attribute(data, 'ismemberof') %}
+  {% set rights_parent_nid = attribute(data, 'ismemberof') is iterable ? attribute(data, 'ismemberof')|first : attribute(data, 'ismemberof') %}
+  {% set rights_parent_node = rights_parent_nid ? bamboo_load_entity('node', rights_parent_nid) : null %}
+  {% set rights_parent_json = (rights_parent_node and rights_parent_node.field_descriptive_metadata is defined) ? rights_parent_node.field_descriptive_metadata.value : '' %}
+  {% set rights_parent_data = rights_parent_json is not empty ? rights_parent_json|sbf_json_decode : {} %}
+  {% set rights_parent_list = (rights_parent_data.rights is defined and rights_parent_data.rights is iterable) ? rights_parent_data.rights : [rights_parent_data.rights|default('')] %}
+  {% set rights_parent_raw = (rights_parent_list|filter(v => v is not empty)|first)|default('') %}
+  {% set rights_parent_raw = rights_parent_raw is iterable ? '' : rights_parent_raw|trim %}
+
+  {% if rights_parent_raw is not empty %}
+    {% set rights_raw = rights_parent_raw %}
+    {% set rights_source = 'collection' %}
+    {% set rights_inherited_from = rights_parent_node.label()|default('') %}
+    {% set rights_is_uri = (rights_raw|lower starts with 'http://') or (rights_raw|lower starts with 'https://') %}
+    {% set rights_segments = rights_is_uri ? rights_raw|trim('/')|split('/') : [] %}
+    {% set rights_seg_last = rights_segments|length > 0 ? rights_segments|last|lower : '' %}
+    {% set rights_seg_prev = rights_segments|length > 1 ? rights_segments[rights_segments|length - 2]|lower : '' %}
+    {% set rights_key = rights_map[rights_seg_prev] is defined ? rights_seg_prev : (rights_map[rights_seg_last] is defined ? rights_seg_last : '') %}
+    {% set rights_term = rights_key ? rights_map[rights_key] : null %}
+    {# Rights details follow the statement they qualify. #}
+    {% if rights_details_text is empty and rights_parent_data.rights_details is defined %}
+      {% set rights_pd_list = rights_parent_data.rights_details is iterable ? rights_parent_data.rights_details : [rights_parent_data.rights_details] %}
+      {% set rights_details_text = (rights_pd_list|filter(v => v is not empty)|first)|default('') %}
+      {% set rights_details_text = rights_details_text is iterable ? '' : rights_details_text|trim %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{# Four mutually exclusive states. 'fallback' is the single most common branch
+   across the collections - 21 of 52 sampled objects record no rights value at
+   all - so it gets designed copy, not an empty element. #}
+{% if rights_term %}
+  {% set rights_state = 'known' %}
+{% elseif rights_is_uri %}
+  {% set rights_state = 'unknown_uri' %}
+{% elseif rights_raw is not empty %}
+  {% set rights_state = 'freetext' %}
+{% else %}
+  {% set rights_state = 'fallback' %}
+{% endif %}
+
+{% if rights_term %}
+  {% set rights_label = rights_term.label %}
+{% elseif rights_state == 'freetext' %}
+  {% set rights_label = 'Rights statement' %}
+{% else %}
+  {% set rights_label = 'Rights status undetermined' %}
+{% endif %}
+
+{% if rights_term %}
+  {% set rights_desc = rights_term.desc %}
+{% elseif rights_state == 'unknown_uri' %}
+  {% set rights_desc = 'The rights statement recorded for this item is not one this site recognises. Follow the link below for its terms. You are responsible for determining how you may use this item.' %}
+{% elseif rights_state == 'freetext' %}
+  {% set rights_desc = '' %}
+{% else %}
+  {% set rights_desc = 'No rights statement has been recorded for this item or its collection. You are responsible for determining how you may use it. Texas A&M University Libraries does not grant or deny permission on behalf of any rights holder.' %}
+{% endif %}
+
+{# Badge: the official button for the vocabulary the value belongs to. A CC value
+   must never be fed to the rightsstatements button path - it 404s. #}
+{% if rights_term and rights_term.vocab == 'rs' %}
+  {% set rights_badge = 'https://rightsstatements.org/files/buttons/' ~ rights_term.code ~ '.white.svg' %}
+{% elseif rights_term and rights_term.vocab == 'cc' %}
+  {% set rights_badge = 'https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/' ~ rights_term.badge ~ '.svg' %}
+{% else %}
+  {% set rights_badge = '' %}
+{% endif %}
+
+{# Credit line: the same string the IIIF v3 manifest publishes as its
+   requiredStatement, so the two cannot drift apart. #}
+{% set credit_line = 'Provided by Texas A&M University Libraries' %}
+
+{# Questions about rights go to Cushing, who can actually speak to reproduction,
+   not the general Ask Us desk. Deliberately a URL: the address on /about is
+   obfuscated against scraping and hard-coding it here would defeat that. #}
+{% set rights_contact_url = 'https://library.tamu.edu/askus/contact-us.php' %}
+{% set rights_contact_name = 'Cushing Memorial Library' %}
+{# -- End rights resolution -- #}
+
+{# -- Downloadable files ------------------------------------------------------
+   Built once, then used twice: for the Download menu entries below and for the
+   file picker inside the terms modal. Building it in one place is what stops the
+   modal offering a derivative the menu does not list, or the reverse.
+
+   The per-type caps are the ones this menu has always applied (documents and
+   texts fewer than 10, the rest 10 or fewer) - an object with hundreds of
+   derivatives would otherwise produce an unusable dropdown.
+
+   Each entry is decorated with what the modal has to show: a format token for
+   the button label, a human file size, and a line saying what the format is for.
+   as: members are keyed by urn:uuid, which is unique across the media types, so
+   merging the five hashes cannot collide. #}
+{% set dl_docs   = attribute(data, 'as:document')|default({}) %}
+{% set dl_texts  = attribute(data, 'as:text')|default({}) %}
+{% set dl_images = attribute(data, 'as:image')|default({}) %}
+{% set dl_videos = attribute(data, 'as:video')|default({}) %}
+{% set dl_audios = attribute(data, 'as:audio')|default({}) %}
+
+{% set dl_files = {} %}
+{% if dl_docs|length > 0 and dl_docs|length < 10 %}
+  {% set dl_files = dl_files|merge(dl_docs|map(f => f|merge({'tamu_kind': 'Document'}))) %}
+{% endif %}
+{% if dl_texts|length > 0 and dl_texts|length < 10 %}
+  {% set dl_files = dl_files|merge(dl_texts|map(f => f|merge({'tamu_kind': 'Text'}))) %}
+{% endif %}
+{% if dl_images|length > 0 and dl_images|length <= 10 %}
+  {% set dl_files = dl_files|merge(dl_images|map(f => f|merge({'tamu_kind': 'Image'}))) %}
+{% endif %}
+{% if dl_videos|length > 0 and dl_videos|length <= 10 %}
+  {% set dl_files = dl_files|merge(dl_videos|map(f => f|merge({'tamu_kind': 'Video'}))) %}
+{% endif %}
+{% if dl_audios|length > 0 and dl_audios|length <= 10 %}
+  {% set dl_files = dl_files|merge(dl_audios|map(f => f|merge({'tamu_kind': 'Audio'}))) %}
+{% endif %}
+
+{# Decorate. flv:exif.FileSize is already human readable ("190 MB") where
+   exiftool ran; dr:filesize is the byte count and is the fallback. Neither is
+   guaranteed, so the size is allowed to come out empty and every consumer below
+   treats it as optional. #}
+{% set dl_files = dl_files|map(f => f|merge({
+  'tamu_uuid':   attribute(f, 'dr:uuid')|default(''),
+  'tamu_name':   f.name|default(''),
+  'tamu_format': (f.name|default('')|split('.')|length > 1) ? (f.name|split('.')|last|upper) : (f.tamu_kind|upper),
+  'tamu_size':   attribute(attribute(f, 'flv:exif')|default({}), 'FileSize')|default(
+                   attribute(f, 'dr:filesize')|default(0) > 0
+                     ? ((attribute(f, 'dr:filesize') / 1048576)|round(1) ~ ' MB')
+                     : ''
+                 ),
+  'tamu_about':  attribute(attribute(f, 'flv:pronom')|default({}), 'label')|default(
+                   attribute(f, 'dr:mimetype')|default('')
+                 )
+})) %}
+
+{% set dl_file_count = dl_files|length %}
+{% set dl_terms_enabled = dl_file_count > 0 or file_download_restricted %}
+{# -- End downloadable files -- #}
 
 {# AllMaps #}
 {# was: nodeinfo.uuid -- that's empty in this template context #}
@@ -146,41 +390,45 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     {% else %}
     <li><a rel="nofollow" download class="dropdown-item" href="/do/{{ node.uuid.value }}/metadata/iiifmanifest3collection/default.jsonld">IIIF Presentation Manifest 3.0</a></li>
     {% endif %}
-    {% if attribute(data, 'as:document')|length < 10 and attribute(data, 'as:document')|length > 0 %}
-	   <li><hr class="dropdown-divider"></li>
-       <li><h2 class="dropdown-header">{{ download_file_doc }}</h2></li>
-      {% for singledocument in attribute(data, 'as:document') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singledocument['dr:uuid'] }}/download/{{ singledocument.name }}" target="_blank">{{ singledocument.name }}</a></li>
-	  {% endfor %}
+    {# The object's own files. Each entry is flagged "terms" so the reader knows
+       the click opens the notice first; the metadata exports above stay one-click
+       because harvesters and viewers fetch them directly. #}
+    {% set dl_docs_list = dl_files|filter(f => f.tamu_kind == 'Document') %}
+    {% if dl_docs_list|length > 0 %}
+    <li><hr class="dropdown-divider"></li>
+    <li><h2 class="dropdown-header">{{ download_file_doc }}</h2></li>
+    {% for f in dl_docs_list %}{{ _self.download_entry(node.uuid.value, f) }}{% endfor %}
     {% endif %}
-    {% if attribute(data, 'as:text')|length < 10 and attribute(data, 'as:text')|length > 0 %}
-	   <li><hr class="dropdown-divider"></li>
-       <li><h2 class="dropdown-header">{{ download_file_text }}</h2></li>
-      {% for singletext in attribute(data, 'as:text') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singletext['dr:uuid'] }}/download/{{ singletext.name }}" target="_blank">{{ singletext.name }}</a></li>
-	  {% endfor %}
+    {% set dl_texts_list = dl_files|filter(f => f.tamu_kind == 'Text') %}
+    {% if dl_texts_list|length > 0 %}
+    <li><hr class="dropdown-divider"></li>
+    <li><h2 class="dropdown-header">{{ download_file_text }}</h2></li>
+    {% for f in dl_texts_list %}{{ _self.download_entry(node.uuid.value, f) }}{% endfor %}
     {% endif %}
-    {% if attribute(data, 'as:image')|length <= 10 and attribute(data, 'as:image')|length > 0 %}
-	   <li><hr class="dropdown-divider"></li>
-       <li><h2 class="dropdown-header">{{ download_file_img }}</h2></li>
-      {% for singleimage in attribute(data, 'as:image') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singleimage['dr:uuid'] }}/download/{{  singleimage.name }}" target="_blank">{{ singleimage.name }}</a></li>
-	  {% endfor %}
+    {% set dl_images_list = dl_files|filter(f => f.tamu_kind == 'Image') %}
+    {% if dl_images_list|length > 0 %}
+    <li><hr class="dropdown-divider"></li>
+    <li><h2 class="dropdown-header">{{ download_file_img }}</h2></li>
+    {% for f in dl_images_list %}{{ _self.download_entry(node.uuid.value, f) }}{% endfor %}
     {% endif %}
-    {% if attribute(data, 'as:video')|length <= 10 and attribute(data, 'as:video')|length > 0 %}
-	   <li><hr class="dropdown-divider"></li>
-       <li><h2 class="dropdown-header">{{ download_file_video }}</h2></li>
-      {% for singlevideo in attribute(data, 'as:video') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singlevideo['dr:uuid'] }}/download/{{ singlevideo.name }}" target="_blank">{{ singlevideo.name }}</a></li>
-	  {% endfor %}
+    {% set dl_videos_list = dl_files|filter(f => f.tamu_kind == 'Video') %}
+    {% if dl_videos_list|length > 0 %}
+    <li><hr class="dropdown-divider"></li>
+    <li><h2 class="dropdown-header">{{ download_file_video }}</h2></li>
+    {% for f in dl_videos_list %}{{ _self.download_entry(node.uuid.value, f) }}{% endfor %}
     {% endif %}
-    {% if attribute(data, 'as:audio')|length <= 10 and attribute(data, 'as:audio')|length > 0 %}
-	   <li><hr class="dropdown-divider"></li>
-       <li><h2 class="dropdown-header">{{ download_file_audio }}</h2></li>
-      {% for singleaudio in attribute(data, 'as:audio') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singleaudio['dr:uuid'] }}/download/{{ singleaudio.name }}" target="_blank">{{ singleaudio.name }}</a></li>
-	  {% endfor %}
+    {% set dl_audios_list = dl_files|filter(f => f.tamu_kind == 'Audio') %}
+    {% if dl_audios_list|length > 0 %}
+    <li><hr class="dropdown-divider"></li>
+    <li><h2 class="dropdown-header">{{ download_file_audio }}</h2></li>
+    {% for f in dl_audios_list %}{{ _self.download_entry(node.uuid.value, f) }}{% endfor %}
     {% endif %}
+  {% else %}
+    {# Restricted. Say why the files are absent rather than silently dropping the
+       entries and leaving the reader to wonder what happened to them. #}
+    <li><hr class="dropdown-divider"></li>
+    <li><h2 class="dropdown-header">{{ download_file_label }}</h2></li>
+    <li><button type="button" class="dropdown-item tamu-dlterms-open" data-tamu-dl-uuid="">Files not available<span class="tamu-dlterms-flag">why?</span></button></li>
   {% endif %}
   {% endset %}
 {# -- Main Object Description Display Template : Primary Nav-tab -- #}
@@ -658,48 +906,41 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {{ _self.html_output('Content Type', data.content_type) }}
 {{ _self.html_output('ADO Type', data.type) }}
 
-{# Rights Statement (URI → badge display) #}
-{% if data.rights|length > 0 %}
+{# Rights Statement.
+   Rendered from the resolution at the top of this template, so this row and the
+   download terms modal always state the same thing. The row is rendered in every
+   state, the fallback included: a blank box is what sent readers to the exports
+   to find out what they may do with an item. #}
 <dt>Rights Statement</dt>
 <dd>
-  {% if data.rights == 'http://rightsstatements.org/vocab/InC/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/InC/1.0/"><img src="https://rightsstatements.org/files/buttons/InC.white.svg" title="In Copyright" alt="In Copyright" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/InC-OW-EU/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/InC-OW-EU/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-OW-EU.white.svg" title="In Copyright - EU Orphan Work" alt="In Copyright - EU Orphan Work" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/InC-EDU/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/InC-EDU/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-EDU.white.svg" title="In Copyright - Educational Use Permitted" alt="In Copyright - Educational Use Permitted" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/InC-NC/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/InC-NC/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-NC.white.svg" title="In Copyright - Non-Commercial Use Permitted" alt="In Copyright - Non-Commercial Use Permitted" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/InC-RUU/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/InC-RUU/1.0/"><img src="https://rightsstatements.org/files/buttons/InC-RUU.white.svg" title="In Copyright - Rights-holder(s) Unlocatable or Unidentifiable" alt="In Copyright - Rights-holder(s) Unlocatable or Unidentifiable" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/NoC-CR/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/NoC-CR/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-CR.white.svg" title="No Copyright - Contractual Restrictions" alt="No Copyright - Contractual Restrictions" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/NoC-NC/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/NoC-NC/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-NC.white.svg" title="No Copyright - Non-Commercial Use Only" alt="No Copyright - Non-Commercial Use Only" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/NoC-OKLR/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/NoC-OKLR/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-OKLR.white.svg" title="No Copyright - Other Known Legal Restrictions" alt="No Copyright - Other Known Legal Restrictions" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/NoC-US/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/NoC-US/1.0/"><img src="https://rightsstatements.org/files/buttons/NoC-US.white.svg" title="No Copyright - United States" alt="No Copyright - United States" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/CNE/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/CNE/1.0/"><img src="https://rightsstatements.org/files/buttons/CNE.white.svg" title="Copyright Not Evaluated" alt="Copyright Not Evaluated" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/UND/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/UND/1.0/"><img src="https://rightsstatements.org/files/buttons/UND.white.svg" title="Copyright Undetermined" alt="Copyright Undetermined" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
-  {% if data.rights == 'http://rightsstatements.org/vocab/NKC/1.0/' %}
-    <a href="http://rightsstatements.org/vocab/NKC/1.0/"><img src="https://rightsstatements.org/files/buttons/NKC.white.svg" title="No Known Copyright" alt="No Known Copyright" style="max-width:120px;height:auto;background-color:#800000;padding:1em"></a>
-  {% endif %}
+  <div class="tamu-rights tamu-rights--{{ rights_state }}">
+    {% if rights_badge %}
+    <a class="tamu-rights__badge" href="{{ rights_raw }}" target="_blank" rel="noopener">
+      <img src="{{ rights_badge }}" alt="{{ rights_label }}" title="{{ rights_label }}">
+    </a>
+    {% endif %}
+    <div class="tamu-rights__body">
+      <p class="tamu-rights__label">{{ rights_label }}</p>
+      {% if rights_state == 'freetext' %}
+      <p class="tamu-rights__desc">{{ rights_raw }}</p>
+      {% elseif rights_desc %}
+      <p class="tamu-rights__desc">{{ rights_desc }}</p>
+      {% endif %}
+      {% if rights_is_uri %}
+      <p class="tamu-rights__source">
+        {% if rights_source == 'collection' %}
+        Inherited from the collection {{ rights_inherited_from }} &middot;
+        {% else %}
+        From this item&rsquo;s rights statement &middot;
+        {% endif %}
+        <a href="{{ rights_raw }}" target="_blank" rel="noopener">{{ rights_raw }}</a>
+      </p>
+      {% elseif rights_source == 'collection' %}
+      <p class="tamu-rights__source">Inherited from the collection {{ rights_inherited_from }}</p>
+      {% endif %}
+    </div>
+  </div>
 </dd>
-{% endif %}
 
 {# Rights Details (free text) #}
 {{ _self.html_output('Rights Details', data.rights_details, true) }}
@@ -868,3 +1109,538 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endif %}
 
 </div>{# Closes tab-content #}
+
+
+{# -- Download terms modal ----------------------------------------------------
+   Shown in front of downloads of the object's OWN files. The metadata exports
+   (MODS, Dublin Core, GeoJSON, the IIIF manifests) are deliberately NOT routed
+   through it: they are machine-facing, and a dialog in front of them breaks
+   harvesters and viewers that fetch them directly.
+
+   The modal informs, it does not gate. There is no checkbox and no "I agree" -
+   read the terms, press Download. File URLs remain reachable directly, so this
+   is a notice mechanism rather than an access control.
+
+   Rendered once per page and reused by every download entry in the menu; the
+   entry that was clicked preselects its own file in the picker.
+#}
+{% if dl_terms_enabled %}
+{% set dl_title = (((data.label is iterable ? data.label : [data.label|default('')])|filter(v => v is not empty)|first)|default(node.label()))|trim %}
+{% set dl_first = dl_file_count > 0 ? (dl_files|first) : null %}
+
+<div class="tamu-dlterms" id="tamu-dlterms" data-open="false">
+  {# The overlay is a sibling of the dialog and only exists while the modal is
+     open - a position:fixed backdrop left in the page swallows clicks on
+     anything below it, sticky site header included. #}
+  <div class="tamu-dlterms__backdrop" data-tamu-dlterms-dismiss></div>
+
+  <div class="tamu-dlterms__dialog" role="dialog" aria-modal="true" aria-labelledby="tamu-dlterms-title">
+    <div class="tamu-dlterms__head">
+      <div>
+        <p class="tamu-dlterms__eyebrow">Download</p>
+        <h2 class="tamu-dlterms__title" id="tamu-dlterms-title">{{ dl_title }}</h2>
+      </div>
+      <button type="button" class="tamu-dlterms__close" data-tamu-dlterms-dismiss aria-label="Close">
+        <span aria-hidden="true">&#10005;</span>
+      </button>
+    </div>
+
+    <div class="tamu-dlterms__body">
+      {% if file_download_restricted %}
+      <p class="tamu-dlterms__intro">This item can be viewed online, but its files are not available for download.</p>
+      {% else %}
+      <p class="tamu-dlterms__intro">Please review the terms of use for this item before downloading.</p>
+      {% endif %}
+
+      {# Terms. Restricted outranks the rights state: when the files cannot be
+         had at all, the reason for that is the thing to say first. #}
+      {% if file_download_restricted %}
+      <section class="tamu-dlterms__terms tamu-dlterms__terms--restricted" aria-label="Access restriction">
+        <div class="tamu-dlterms__icon" aria-hidden="true">&#9888;</div>
+        <div class="tamu-dlterms__termsbody">
+          <p class="tamu-dlterms__rightslabel">Files restricted</p>
+          <p class="tamu-dlterms__rightsdesc">
+            {% if data_embargo.embargoed %}
+            Access to this item&rsquo;s files is limited to the Texas A&amp;M campus network. The full description of the item is available to everyone.
+            {% else %}
+            The files for this item are not available for download.
+            {% endif %}
+          </p>
+          {% if data.access_rights %}
+          <p class="tamu-dlterms__details">
+            <span class="tamu-dlterms__detailslabel">Access rights</span>
+            {{ data.access_rights is iterable ? data.access_rights|join(' ') : data.access_rights }}
+          </p>
+          {% endif %}
+        </div>
+      </section>
+      {% else %}
+      <section class="tamu-dlterms__terms tamu-dlterms__terms--{{ rights_state }}" aria-label="Terms of use">
+        <div class="tamu-dlterms__icon" aria-hidden="true">&#169;</div>
+        <div class="tamu-dlterms__termsbody">
+          <p class="tamu-dlterms__rightslabel">
+            {{ rights_label }}
+            {% if rights_badge %}
+            <img class="tamu-dlterms__badge" src="{{ rights_badge }}" alt="" title="{{ rights_label }}">
+            {% endif %}
+          </p>
+          {% if rights_state == 'freetext' %}
+          <p class="tamu-dlterms__rightsdesc">{{ rights_raw }}</p>
+          {% elseif rights_desc %}
+          <p class="tamu-dlterms__rightsdesc">{{ rights_desc }}</p>
+          {% endif %}
+
+          {# The URI says which category the work falls in; the details say what
+             that means for this particular work. They belong together. #}
+          {% if rights_details_text %}
+          <p class="tamu-dlterms__details">
+            <span class="tamu-dlterms__detailslabel">Rights details</span>
+            {{ rights_details_text }}
+          </p>
+          {% endif %}
+
+          {% if rights_is_uri %}
+          <p class="tamu-dlterms__source">
+            {% if rights_source == 'collection' %}
+            Inherited from the collection {{ rights_inherited_from }} &middot;
+            {% else %}
+            From this item&rsquo;s rights statement &middot;
+            {% endif %}
+            <a href="{{ rights_raw }}" target="_blank" rel="noopener">{{ rights_raw }}</a>
+          </p>
+          {% elseif rights_source == 'collection' %}
+          <p class="tamu-dlterms__source">Inherited from the collection {{ rights_inherited_from }}</p>
+          {% elseif rights_state == 'fallback' %}
+          <p class="tamu-dlterms__source">This is general guidance, not a statement recorded for this item.</p>
+          {% endif %}
+        </div>
+      </section>
+      {% endif %}
+
+      {% if not file_download_restricted %}
+      {# Give people the credit line rather than asking them to reassemble one
+         from a bullet list - that is how credit lines get mangled. This is the
+         same string the IIIF manifest publishes as its requiredStatement. #}
+      <section class="tamu-dlterms__credit">
+        <div>
+          <p class="tamu-dlterms__creditlabel">Please include this credit line</p>
+          <p class="tamu-dlterms__creditvalue" id="tamu-dlterms-credit">{{ credit_line }}</p>
+        </div>
+        <button type="button" class="tamu-dlterms__copy" id="tamu-dlterms-copy" data-copied="false">
+          <span class="tamu-dlterms__copytext">Copy</span>
+        </button>
+      </section>
+      {% endif %}
+
+      {# A peer of the other terms, in the body - not tucked into the footer. #}
+      <p class="tamu-dlterms__contact">
+        <span class="tamu-dlterms__contacticon" aria-hidden="true">&#9993;</span>
+        Questions about usage or reproduction?
+        <a href="{{ rights_contact_url }}" target="_blank" rel="noopener">Contact {{ rights_contact_name }}</a>.
+      </p>
+
+      {% if not file_download_restricted and dl_file_count > 1 %}
+      {# Only when the object actually exposes more than one derivative. The
+         terms above are read once, not once per format. #}
+      <fieldset class="tamu-dlterms__picker">
+        <legend class="tamu-dlterms__pickerlabel">Choose a file</legend>
+        {% for f in dl_files %}
+        <label class="tamu-dlterms__option">
+          <input type="radio" name="tamu-dlterms-file" value="{{ f.tamu_uuid }}"
+                 data-dl-href="/do/{{ node.uuid.value }}/file/{{ f.tamu_uuid }}/download/{{ f.tamu_name }}"
+                 data-dl-format="{{ f.tamu_format }}"
+                 data-dl-size="{{ f.tamu_size }}"
+                 {{ loop.first ? 'checked' : '' }}>
+          <span class="tamu-dlterms__optionbody">
+            <span class="tamu-dlterms__optionhead">
+              {{ f.tamu_format }}{% if f.tamu_size %} &middot; {{ f.tamu_size }}{% endif %}
+            </span>
+            <span class="tamu-dlterms__optionnote">
+              {{ f.tamu_kind }}{% if f.tamu_about %} &mdash; {{ f.tamu_about }}{% endif %}
+            </span>
+          </span>
+        </label>
+        {% endfor %}
+      </fieldset>
+      {% endif %}
+
+      {% if not file_download_restricted %}
+      <p class="tamu-dlterms__sizenote">Large files may take a few moments to start downloading.</p>
+      {% endif %}
+    </div>
+
+    <div class="tamu-dlterms__foot">
+      <button type="button" class="tamu-dlterms__btn tamu-dlterms__btn--quiet" data-tamu-dlterms-dismiss>
+        {{ file_download_restricted ? 'Close' : 'Cancel' }}
+      </button>
+      {% if file_download_restricted %}
+      <a class="tamu-dlterms__btn tamu-dlterms__btn--primary" href="{{ rights_contact_url }}" target="_blank" rel="noopener">
+        Request research access
+      </a>
+      {% elseif dl_first %}
+      <a class="tamu-dlterms__btn tamu-dlterms__btn--primary" id="tamu-dlterms-go" download rel="nofollow"
+         href="/do/{{ node.uuid.value }}/file/{{ dl_first.tamu_uuid }}/download/{{ dl_first.tamu_name }}">
+        Download <span id="tamu-dlterms-golabel">{{ dl_first.tamu_format }}{% if dl_first.tamu_size %} &middot; {{ dl_first.tamu_size }}{% endif %}</span>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+/* Scoped to .tamu-dlterms / .tamu-rights so nothing here can reach the rest of
+   the page.
+
+   The values below are the ones measured off the live site. They are declared
+   as custom properties in one place so the theme's own variables can be
+   substituted here once their names are confirmed, rather than having colours
+   and faces scattered through the rules. */
+.tamu-dlterms,
+.tamu-rights {
+  --tamu-maroon: #500000;
+  --tamu-btn: #732f2f;
+  --tamu-btn-border: #3c0000;
+  --tamu-body: #3b4952;
+  --tamu-rule: #d8dde0;
+  --tamu-panel: #f4f5f6;
+  --tamu-amber: #b26a00;
+  --tamu-amber-bg: #fdf6ea;
+  --tamu-muted: #6b7880;
+  --tamu-sans: "Work Sans", Arial, sans-serif;
+  --tamu-serif: "Droid Serif", Georgia, serif;
+}
+
+/* Rights row on the Description tab */
+.tamu-rights { display: flex; gap: 1rem; align-items: flex-start; }
+.tamu-rights__badge { flex: 0 0 auto; }
+.tamu-rights__badge img {
+  max-width: 120px; height: auto;
+  background-color: var(--tamu-maroon); padding: 1em;
+}
+.tamu-rights__body { min-width: 0; }
+.tamu-rights__label {
+  font-family: var(--tamu-sans); font-weight: 600; color: var(--tamu-maroon);
+  margin: 0 0 .25rem;
+}
+.tamu-rights__desc {
+  font-family: var(--tamu-serif); font-weight: 300; font-size: 1rem; line-height: 1.5;
+  color: var(--tamu-body); margin: 0 0 .35rem;
+}
+.tamu-rights__source { font-family: var(--tamu-sans); font-size: .8125rem; color: var(--tamu-muted); margin: 0; }
+.tamu-rights__source a { word-break: break-all; }
+.tamu-rights--fallback .tamu-rights__label,
+.tamu-rights--unknown_uri .tamu-rights__label { color: var(--tamu-muted); }
+
+/* Modal shell. Visibility is driven by a data attribute rather than the hidden
+   attribute: display:flex on this element would override [hidden] and leave the
+   dialog on screen permanently. */
+.tamu-dlterms[data-open="false"] { display: none; }
+.tamu-dlterms[data-open="true"] {
+  display: block; position: fixed; inset: 0; z-index: 2000;
+}
+.tamu-dlterms__backdrop { position: absolute; inset: 0; background: rgba(20, 24, 27, .55); }
+.tamu-dlterms__dialog {
+  position: relative; z-index: 1;
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  margin: 1rem auto; overflow-y: auto;
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, .3);
+  display: flex; flex-direction: column;
+}
+
+.tamu-dlterms__head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+  padding: 1.25rem 1.5rem .75rem;
+}
+.tamu-dlterms__eyebrow {
+  font-family: var(--tamu-sans); font-size: .75rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--tamu-muted); margin: 0 0 .25rem;
+}
+.tamu-dlterms__title {
+  font-family: var(--tamu-sans); font-size: 1.6rem; line-height: 1.2; font-weight: 400;
+  color: var(--tamu-maroon); margin: 0;
+}
+.tamu-dlterms__close {
+  flex: 0 0 auto; background: none; border: 0; font-size: 1.1rem; line-height: 1;
+  padding: .4rem; border-radius: 6px; color: var(--tamu-body); cursor: pointer;
+}
+.tamu-dlterms__body { padding: 0 1.5rem; }
+.tamu-dlterms__intro {
+  font-family: var(--tamu-serif); font-weight: 300; color: var(--tamu-body);
+  font-size: 1rem; line-height: 1.5; margin: 0 0 1rem;
+}
+
+.tamu-dlterms__terms {
+  display: flex; gap: .75rem; padding: .9rem 1rem;
+  border-left: 4px solid var(--tamu-maroon); background: var(--tamu-panel);
+  border-radius: 0 6px 6px 0; margin-bottom: 1rem;
+}
+.tamu-dlterms__terms--fallback,
+.tamu-dlterms__terms--unknown_uri { border-left-color: var(--tamu-rule); }
+.tamu-dlterms__terms--restricted { border-left-color: var(--tamu-amber); background: var(--tamu-amber-bg); }
+.tamu-dlterms__icon { flex: 0 0 auto; font-size: 1.1rem; color: var(--tamu-maroon); line-height: 1.4; }
+.tamu-dlterms__terms--restricted .tamu-dlterms__icon { color: var(--tamu-amber); }
+.tamu-dlterms__terms--fallback .tamu-dlterms__icon,
+.tamu-dlterms__terms--unknown_uri .tamu-dlterms__icon { color: var(--tamu-muted); }
+.tamu-dlterms__termsbody { min-width: 0; }
+.tamu-dlterms__rightslabel {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  font-family: var(--tamu-sans); font-weight: 600; color: var(--tamu-maroon); margin: 0 0 .3rem;
+}
+.tamu-dlterms__terms--fallback .tamu-dlterms__rightslabel,
+.tamu-dlterms__terms--unknown_uri .tamu-dlterms__rightslabel { color: var(--tamu-muted); }
+.tamu-dlterms__terms--restricted .tamu-dlterms__rightslabel { color: var(--tamu-amber); }
+.tamu-dlterms__badge { height: 26px; width: auto; background: var(--tamu-maroon); padding: .25rem .4rem; border-radius: 3px; }
+.tamu-dlterms__rightsdesc,
+.tamu-dlterms__details {
+  font-family: var(--tamu-serif); font-weight: 300; font-size: .95rem; line-height: 1.5;
+  color: var(--tamu-body); margin: 0 0 .35rem;
+}
+.tamu-dlterms__detailslabel,
+.tamu-dlterms__creditlabel,
+.tamu-dlterms__pickerlabel {
+  display: block; font-family: var(--tamu-sans); font-size: .7rem; font-weight: 600;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--tamu-muted); margin-bottom: .15rem;
+}
+.tamu-dlterms__source { font-family: var(--tamu-sans); font-size: .78rem; color: var(--tamu-muted); margin: .3rem 0 0; }
+.tamu-dlterms__source a { word-break: break-all; }
+
+.tamu-dlterms__credit {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  background: var(--tamu-panel); border-radius: 6px; padding: .85rem 1rem; margin-bottom: 1rem;
+}
+.tamu-dlterms__creditvalue {
+  font-family: var(--tamu-serif); font-weight: 300; color: var(--tamu-body);
+  font-size: .95rem; line-height: 1.4; margin: 0;
+}
+.tamu-dlterms__copy {
+  flex: 0 0 auto; font-family: var(--tamu-sans); font-size: .8rem; font-weight: 600;
+  background: #fff; color: var(--tamu-body);
+  border: 1px solid var(--tamu-rule); border-radius: 6px; padding: .4rem .8rem; cursor: pointer;
+}
+.tamu-dlterms__copy[data-copied="true"] { color: var(--tamu-maroon); border-color: var(--tamu-maroon); }
+
+.tamu-dlterms__contact {
+  font-family: var(--tamu-serif); font-weight: 300; font-size: .95rem; line-height: 1.5;
+  color: var(--tamu-body); margin: 0 0 1rem;
+}
+.tamu-dlterms__contacticon { margin-right: .4rem; }
+
+.tamu-dlterms__picker { border: 0; padding: 0; margin: 0 0 1rem; }
+.tamu-dlterms__option {
+  display: flex; gap: .6rem; align-items: flex-start;
+  border: 1px solid var(--tamu-rule); border-radius: 6px;
+  padding: .6rem .8rem; margin-bottom: .4rem; cursor: pointer;
+}
+.tamu-dlterms__option:has(input:checked) { border-color: var(--tamu-maroon); background: var(--tamu-panel); }
+.tamu-dlterms__option input { margin-top: .25rem; flex: 0 0 auto; }
+.tamu-dlterms__optionbody { min-width: 0; }
+.tamu-dlterms__optionhead {
+  display: block; font-family: var(--tamu-sans); font-weight: 600;
+  font-size: .9rem; color: var(--tamu-body);
+}
+.tamu-dlterms__optionnote {
+  display: block; font-family: var(--tamu-serif); font-weight: 300;
+  font-size: .85rem; color: var(--tamu-muted);
+}
+
+.tamu-dlterms__sizenote {
+  font-family: var(--tamu-sans); font-size: .78rem; color: var(--tamu-muted); margin: 0 0 1rem;
+}
+
+.tamu-dlterms__foot {
+  display: flex; justify-content: flex-end; gap: .6rem;
+  padding: 1rem 1.5rem 1.25rem; border-top: 1px solid var(--tamu-rule); margin-top: auto;
+}
+.tamu-dlterms__btn {
+  font-family: var(--tamu-sans); font-size: .95rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .02em;
+  border-radius: 8px; padding: .6rem 1.1rem; cursor: pointer;
+  text-decoration: none; display: inline-block; text-align: center;
+}
+.tamu-dlterms__btn--quiet { background: #fff; color: var(--tamu-body); border: 1px solid var(--tamu-rule); }
+.tamu-dlterms__btn--primary {
+  background: var(--tamu-btn); color: #fff; border: 1px solid var(--tamu-btn-border);
+}
+.tamu-dlterms__btn--primary:hover,
+.tamu-dlterms__btn--primary:focus { color: #fff; }
+
+/* Never remove the focus ring: this dialog is operable by keyboard alone. */
+.tamu-dlterms :focus-visible,
+.tamu-dlterms__open:focus-visible {
+  outline: 3px solid var(--tamu-maroon); outline-offset: 2px;
+}
+
+/* The "terms" flag on the menu entries that open this dialog, so the
+   interruption is not a surprise. */
+.tamu-dlterms-flag {
+  font-family: var(--tamu-sans); font-size: .65rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em;
+  border: 1px solid var(--tamu-rule); border-radius: 3px;
+  padding: .05rem .3rem; margin-left: .4rem; color: var(--tamu-muted); vertical-align: middle;
+}
+
+@media (max-width: 480px) {
+  .tamu-dlterms__dialog { width: calc(100vw - 1rem); margin: .5rem auto; }
+  .tamu-dlterms__head { padding: 1rem 1rem .5rem; }
+  .tamu-dlterms__body { padding: 0 1rem; }
+  .tamu-dlterms__foot { padding: .75rem 1rem 1rem; flex-direction: column-reverse; }
+  .tamu-dlterms__btn { width: 100%; }
+  .tamu-dlterms__credit { flex-direction: column; align-items: flex-start; }
+  .tamu-dlterms__title { font-size: 1.3rem; }
+}
+</style>
+
+<script>
+(function () {
+  var root = document.getElementById('tamu-dlterms');
+  if (!root) { return; }
+
+  var dialog  = root.querySelector('.tamu-dlterms__dialog');
+  var goLink  = document.getElementById('tamu-dlterms-go');
+  var goLabel = document.getElementById('tamu-dlterms-golabel');
+  var copyBtn = document.getElementById('tamu-dlterms-copy');
+  var creditEl = document.getElementById('tamu-dlterms-credit');
+  var lastTrigger = null;
+
+  var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+  function focusable() {
+    return Array.prototype.filter.call(
+      dialog.querySelectorAll(FOCUSABLE),
+      function (el) { return el.offsetWidth > 0 || el.offsetHeight > 0 || el === document.activeElement; }
+    );
+  }
+
+  // Keeps the footer button describing exactly what pressing it will fetch.
+  function syncSelection(uuid) {
+    var radios = root.querySelectorAll('input[name="tamu-dlterms-file"]');
+    var chosen = null;
+    if (radios.length) {
+      for (var i = 0; i < radios.length; i++) {
+        if (uuid && radios[i].value === uuid) { radios[i].checked = true; }
+        if (radios[i].checked) { chosen = radios[i]; }
+      }
+      if (!chosen) { radios[0].checked = true; chosen = radios[0]; }
+    }
+    if (chosen && goLink) {
+      goLink.setAttribute('href', chosen.getAttribute('data-dl-href'));
+      if (goLabel) {
+        var fmt = chosen.getAttribute('data-dl-format') || '';
+        var size = chosen.getAttribute('data-dl-size') || '';
+        goLabel.textContent = size ? (fmt + ' · ' + size) : fmt;
+      }
+    }
+  }
+
+  function open(trigger, uuid) {
+    lastTrigger = trigger || null;
+    syncSelection(uuid);
+    root.setAttribute('data-open', 'true');
+    // Body scroll is locked so the dialog stays usable with the page scrolled.
+    document.body.style.overflow = 'hidden';
+    var first = focusable()[0];
+    if (first) { first.focus(); } else { dialog.focus(); }
+  }
+
+  function close() {
+    root.setAttribute('data-open', 'false');
+    document.body.style.overflow = '';
+    // Focus goes back to where it came from, not to the top of the page. The
+    // trigger lives in a Bootstrap dropdown that has since closed, though, and
+    // focusing a display:none element silently drops focus onto the body -- so
+    // when the trigger is no longer visible, fall back to the dropdown toggle
+    // that opens it, which is the nearest thing still on screen.
+    var target = lastTrigger;
+    if (target && target.offsetParent === null) {
+      var holder = target.closest ? target.closest('.dropdown, .nav-item') : null;
+      target = holder ? holder.querySelector('.dropdown-toggle') : null;
+    }
+    if (target && typeof target.focus === 'function') { target.focus(); }
+    lastTrigger = null;
+  }
+
+  function isOpen() { return root.getAttribute('data-open') === 'true'; }
+
+  document.addEventListener('click', function (e) {
+    var trigger = e.target.closest ? e.target.closest('.tamu-dlterms-open') : null;
+    if (trigger) {
+      e.preventDefault();
+      open(trigger, trigger.getAttribute('data-tamu-dl-uuid'));
+      return;
+    }
+    if (isOpen() && e.target.closest && e.target.closest('[data-tamu-dlterms-dismiss]')) {
+      e.preventDefault();
+      close();
+    }
+  });
+
+  root.addEventListener('change', function (e) {
+    if (e.target && e.target.name === 'tamu-dlterms-file') { syncSelection(e.target.value); }
+  });
+
+  // Downloading is the end of the interaction; leaving the dialog open over a
+  // finished download just makes the reader dismiss it for no reason.
+  if (goLink) {
+    goLink.addEventListener('click', function () { window.setTimeout(close, 150); });
+  }
+
+  if (copyBtn && creditEl) {
+    copyBtn.addEventListener('click', function () {
+      var text = creditEl.textContent.trim();
+      var label = copyBtn.querySelector('.tamu-dlterms__copytext');
+      var done = function () {
+        copyBtn.setAttribute('data-copied', 'true');
+        if (label) { label.textContent = 'Copied'; }
+        window.setTimeout(function () {
+          copyBtn.setAttribute('data-copied', 'false');
+          if (label) { label.textContent = 'Copy'; }
+        }, 2000);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () {});
+      } else {
+        // execCommand is deprecated but is the only route on http:// origins.
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'absolute';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (err) { /* nothing useful to do */ }
+        document.body.removeChild(ta);
+      }
+    });
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (!isOpen()) { return; }
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      e.preventDefault();
+      close();
+      return;
+    }
+    if (e.key !== 'Tab') { return; }
+    // Trap: Tab and Shift+Tab wrap inside the dialog rather than walking out
+    // into the page behind it.
+    var items = focusable();
+    if (!items.length) { return; }
+    var first = items[0];
+    var last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    } else if (!dialog.contains(document.activeElement)) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+})();
+</script>
+{% endif %}
+{# -- End download terms modal -- #}
