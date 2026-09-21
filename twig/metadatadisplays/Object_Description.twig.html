@@ -111,14 +111,19 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% set annotation_url = allmaps_annotation_url(manifest_url) %}
 {# End AllMaps #}
 
-{# -- Remix or Share / IIIF Manifest URL (type-aware, matches Downloads section logic) -- #}
-{% if data.type not in ['Collection','CreativeWorkSeries'] %}
-  {% set iiif_manifest_href = '/do/' ~ node.uuid.value ~ '/metadata/iiifmanifest/default.jsonld' %}
-{% elseif data.type == 'CreativeWorkSeries' %}
-  {% set iiif_manifest_href = '/do/' ~ node.uuid.value ~ '/metadata/iiifmanifest3cws/default.jsonld' %}
+{# -- Remix or Share / IIIF Manifest URL (bundle- and type-aware) -- #}
+{# A Book (or any type) can live in either bundle: digital_object is a single manifest,
+   digital_object_collection is a series of children. Bundle decides for Book; the
+   Collection and CreativeWorkSeries types always map to their own manifest routes. #}
+{% set is_collection_bundle = node.type.target_id == 'digital_object_collection' %}
+{% if data.type == 'CreativeWorkSeries' or (data.type == 'Book' and is_collection_bundle) %}
+  {% set iiif_manifest_route = 'iiifmanifest3cws' %}
+{% elseif data.type == 'Collection' %}
+  {% set iiif_manifest_route = 'iiifmanifest3collection' %}
 {% else %}
-  {% set iiif_manifest_href = '/do/' ~ node.uuid.value ~ '/metadata/iiifmanifest3collection/default.jsonld' %}
+  {% set iiif_manifest_route = 'iiifmanifest' %}
 {% endif %}
+{% set iiif_manifest_href = '/do/' ~ node.uuid.value ~ '/metadata/' ~ iiif_manifest_route ~ '/default.jsonld' %}
 {% set iiif_manifest_absolute = 'https://digitalcollections.library.tamu.edu' ~ iiif_manifest_href %}
 {# End Remix or Share / IIIF Manifest URL #}
 
@@ -138,13 +143,9 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     <li><a download class="dropdown-item" href="/do/{{ node.uuid.value }}/metadata/dc/dc.xml">Dublin Core</a></li>
     <li><a download class="dropdown-item" href="/do/{{ node.uuid.value }}/metadata/geojson/geojson.json">GeoJSON</a></li>
   {% if not file_download_restricted %}
-    {% if data.type not in ['Collection','CreativeWorkSeries'] %}
-    <li><a rel="nofollow" download class="dropdown-item" href="/do/{{ node.uuid.value }}/metadata/iiifmanifest/default.jsonld">IIIF Presentation Manifest 3.0</a></li>
+    <li><a rel="nofollow" download class="dropdown-item" href="{{ iiif_manifest_href }}">IIIF Presentation Manifest 3.0</a></li>
+    {% if iiif_manifest_route == 'iiifmanifest' %}
     <li><a rel="nofollow" download class="dropdown-item" href="/do/{{ node.uuid.value }}/metadata/iiifmanifestv2/default.jsonld">IIIF Presentation Manifest 2.1</a></li>
-    {% elseif data.type == 'CreativeWorkSeries' %}
-    <li><a rel="nofollow" download class="dropdown-item" href="/do/{{ node.uuid.value }}/metadata/iiifmanifest3cws/default.jsonld">IIIF Presentation Manifest 3.0</a></li>
-    {% else %}
-    <li><a rel="nofollow" download class="dropdown-item" href="/do/{{ node.uuid.value }}/metadata/iiifmanifest3collection/default.jsonld">IIIF Presentation Manifest 3.0</a></li>
     {% endif %}
     {% if attribute(data, 'as:document')|length < 10 and attribute(data, 'as:document')|length > 0 %}
 	   <li><hr class="dropdown-divider"></li>
