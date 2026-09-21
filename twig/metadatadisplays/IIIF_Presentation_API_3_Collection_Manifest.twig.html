@@ -509,12 +509,17 @@ Without Double quotes.
 {% set collection_items = collection_view|sbf_json_decode %}
 {% for items in collection_items %}
 {# canvas|json_encode #}
+{#- A Book can live in digital_object (single manifest) or digital_object_collection
+    (series of children). The View row must expose the child's bundle as `bundle`;
+    if it does not, this is empty and Books fall through to the single manifest. -#}
+{% set ado_types = items['ado_type']|split(',') %}
+{% set is_series = 'CreativeWorkSeries' in ado_types or ('Book' in ado_types and items['bundle']|default('') == 'digital_object_collection') %}
     {
-    {% if 'CreativeWorkSeries' in items['ado_type']|split(',') %}
+    {% if is_series %}
         "id": "{{ url('format_strawberryfield.metadatadisplay_caster', {'node': items['uuid'],'metadataexposeconfig_entity':'iiifmanifest3cws', 
         'format':'default.jsonld'}, {'absolute': true, 'alias': true}) }}",
         "type": "Manifest",
-     {% elseif 'Collection' in items['ado_type']|split(',') %}
+     {% elseif 'Collection' in ado_types %}
         "id": "{{ url('format_strawberryfield.metadatadisplay_caster', {'node': items['uuid'], 'metadataexposeconfig_entity':'iiifmanifest3collection', 
         'format':'default.jsonld'}, {'absolute': true, 'alias': true}) }}",
         "type": "Collection",
