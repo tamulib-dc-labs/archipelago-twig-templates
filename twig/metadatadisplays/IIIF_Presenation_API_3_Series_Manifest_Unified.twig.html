@@ -87,10 +87,35 @@ Without Double quotes.
 		{% set computed_rights = "http://rightsstatements.org/vocab/NKC/1.0/" %}
 	{% endif %}
 {% endif %}
+{#- navDate: single XSD dateTime derived from date_created (preferred) or date_issued.
+   Both are free-text EDTF strings (e.g. "1674?", "1890/1900"). Strip EDTF
+   uncertainty/approximation qualifiers, take the start of a range, and only
+   emit navDate when what remains is an unambiguous year/month/day/datetime. -#}
+{%- set navdate_raw = (data.date_created ?: data.date_issued) ~ '' -%}
+{%- set navdate_clean = navdate_raw|replace({'?': '', '~': '', '%': '', ' ': ''}) -%}
+{%- set navdate_start = navdate_clean -%}
+{%- if '/' in navdate_clean -%}
+  {%- set navdate_parts = navdate_clean|split('/') -%}
+  {%- set navdate_start = navdate_parts[0] -%}
+  {%- if navdate_start == '' or navdate_start starts with '..' -%}
+    {%- set navdate_start = navdate_parts[1]|default('') -%}
+  {%- endif -%}
+{%- endif -%}
+{%- set navDate = null -%}
+{%- if navdate_start matches '/^-?\\d{4}$/' -%}
+  {%- set navDate = navdate_start ~ '-01-01T00:00:00Z' -%}
+{%- elseif navdate_start matches '/^-?\\d{4}-\\d{2}$/' -%}
+  {%- set navDate = navdate_start ~ '-01T00:00:00Z' -%}
+{%- elseif navdate_start matches '/^-?\\d{4}-\\d{2}-\\d{2}$/' -%}
+  {%- set navDate = navdate_start ~ 'T00:00:00Z' -%}
+{%- elseif navdate_start matches '/^-?\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(Z|[+-]\\d{2}:\\d{2})$/' -%}
+  {%- set navDate = navdate_start -%}
+{%- endif -%}
 {
 {# Top Object Metadata #}
 "@context": [
   "http://www.w3.org/ns/anno.jsonld",
+  "http://iiif.io/api/extension/navplace/context.json",
   "http://iiif.io/api/presentation/3/context.json"
 ],
 "type": "Manifest",
@@ -100,52 +125,350 @@ Without Double quotes.
 {{ node.label|json_encode|raw }}
 ]
 },
-{% if data.attribution %}
 "requiredStatement": {
-    "label": { "en": [ "Attribution" ] },
-    "value": { "en": [ {{ data.attribution|json_encode|raw }} ] }
+"label": { "en": [ "Attribution" ] },
+"value": { "en": [ "Provided by Cushing Memorial Library and Archives, Texas A&M University" ] }
 },
-{% endif %}
 "rights": {{ computed_rights|json_encode|raw }},
+{% if navDate %}"navDate": {{ navDate|json_encode|raw }},{% endif %}
+"homepage": [
+            {
+            "id": "{{nodeurl}}",
+            "type": "Text",
+            "label": { "en": [ "Explore {{node.label}} from Texas A&M Libraries" ] },
+            "format": "text/html"
+            }
+],
 "metadata": [
-{% for agent in attribute(data, 'edm_agent') %}
-    {
-    "label": {
-    "{{ len }}": [
-    {{ agent.role_label|json_encode|raw }}
-    ]
-    },
-    "value": {
-    "{{ len }}": [
-    {{ agent.name_label|json_encode|raw }}
-    ]
-    }
-    },
-{% endfor %}
-{
-"label": {
-"{{ len }}": [
-"description"
-]
-},
-"value": {
-"{{ len }}": [
-{{ data.description|json_encode|raw }}
-]
-}
-},
-{
-"label": {
-   "{{ len }}": [
-       "license"
-  ]
-},
-"value": {
-  "{{ len }}": [
-     {{ computed_rights|json_encode|raw }}
-     ]
-    }
-  }
+            {% if data.abstract %}
+            {
+            "label": { "{{ len }}": ["Abstract"] },
+            "value": { "{{ len }}": [{{ data.abstract|markdown_2_html|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.access_rights %}
+            {
+            "label": { "{{ len }}": ["Access Rights"] },
+            "value": { "{{ len }}": {{ (data.access_rights is iterable ? data.access_rights : [data.access_rights])|json_encode|raw }} }
+            },
+            {% endif %}
+            {#- agent and agent_linked_data share one label, so they share one entry -#}
+            {% set agent_values = [] %}
+            {% set agent_items = data.agent.value is defined ? [data.agent] : (data.agent is iterable ? data.agent : []) %}
+            {% for item in agent_items %}
+              {% set agent_values = agent_values|merge([item.value|default(item)]) %}
+            {% endfor %}
+            {% set agent_ld_items = data.agent_linked_data.value is defined ? [data.agent_linked_data] : (data.agent_linked_data is iterable ? data.agent_linked_data : []) %}
+            {% for item in agent_ld_items %}
+              {% set agent_values = agent_values|merge([item.value|default(item)]) %}
+            {% endfor %}
+            {% if agent_values %}
+            {
+            "label": { "{{ len }}": ["Creator/Contributor"] },
+            "value": { "{{ len }}": {{ agent_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.audience %}
+            {
+            "label": { "{{ len }}": ["Audience"] },
+            "value": { "{{ len }}": {{ (data.audience is iterable ? data.audience : [data.audience])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.classification %}
+              {% set classification_items = data.classification.value is defined ? [data.classification] : (data.classification is iterable ? data.classification : [data.classification]) %}
+              {% set classification_values = [] %}
+              {% for item in classification_items %}
+                {% set classification_values = classification_values|merge([item.value|default(item)]) %}
+              {% endfor %}
+            {
+            "label": { "{{ len }}": ["Classification"] },
+            "value": { "{{ len }}": {{ classification_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.collecting_area %}
+            {
+            "label": { "{{ len }}": ["Collecting Area"] },
+            "value": { "{{ len }}": {% if data.collecting_area is iterable %}{{ data.collecting_area|json_encode|raw }}{% else %}[{{ data.collecting_area|json_encode|raw }}]{% endif %} }
+            },
+            {% endif %}
+            {% if data.content_type %}
+            {
+            "label": { "{{ len }}": ["Content Type"] },
+            "value": { "{{ len }}": {{ (data.content_type is iterable ? data.content_type : [data.content_type])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% set creator_values = data.creator is iterable ? data.creator : (data.creator ? [data.creator] : []) %}
+            {% set creator_ld_items = data.creator_linked_data.value is defined ? [data.creator_linked_data] : (data.creator_linked_data is iterable ? data.creator_linked_data : []) %}
+            {% for item in creator_ld_items %}
+              {% set creator_values = creator_values|merge([item.value|default(item)]) %}
+            {% endfor %}
+            {% if creator_values %}
+            {
+            "label": { "{{ len }}": ["Creator"] },
+            "value": { "{{ len }}": {{ creator_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% set contributor_values = data.contributor is iterable ? data.contributor : (data.contributor ? [data.contributor] : []) %}
+            {% set contributor_ld_items = data.contributor_linked_data.value is defined ? [data.contributor_linked_data] : (data.contributor_linked_data is iterable ? data.contributor_linked_data : []) %}
+            {% for item in contributor_ld_items %}
+              {% set contributor_values = contributor_values|merge([item.value|default(item)]) %}
+            {% endfor %}
+            {% if contributor_values %}
+            {
+            "label": { "{{ len }}": ["Contributor"] },
+            "value": { "{{ len }}": {{ contributor_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.coordinates %}
+            {
+            "label": { "{{ len }}": ["Coordinates"] },
+            "value": { "{{ len }}": {{ (data.coordinates is iterable ? data.coordinates : [data.coordinates])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.date_built %}
+            {
+            "label": { "{{ len }}": ["Date Built"] },
+            "value": { "{{ len }}": [{{ (data.date_built ~ '')|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.date_created %}
+            {
+            "label": { "{{ len }}": ["Date Created"] },
+            "value": { "{{ len }}": [{{ (data.date_created ~ '')|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.date_digital_creation %}
+            {
+            "label": { "{{ len }}": ["Date Available Online"] },
+            "value": { "{{ len }}": [{{ data.date_digital_creation|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.date_issued %}
+            {
+            "label": { "{{ len }}": ["Date Issued"] },
+            "value": { "{{ len }}": [{{ (data.date_issued ~ '')|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.date_razed %}
+            {
+            "label": { "{{ len }}": ["Date Razed"] },
+            "value": { "{{ len }}": [{{ (data.date_razed ~ '')|json_encode|raw }}] }
+            },
+            {% endif %}
+            {% if data.description %}
+            {
+            "label": { "{{ len }}": ["Description"] },
+            "value": { "{{ len }}": {{ (data.description is iterable ? data.description : [data.description])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.digital_exhibit %}
+              {% set digital_exhibit_items = data.digital_exhibit.value is defined ? [data.digital_exhibit] : (data.digital_exhibit is iterable ? data.digital_exhibit : [data.digital_exhibit]) %}
+              {% set digital_exhibit_values = [] %}
+              {% for item in digital_exhibit_items %}
+                {% set digital_exhibit_values = digital_exhibit_values|merge([item.value|default(item)]) %}
+              {% endfor %}
+            {
+            "label": { "{{ len }}": ["Part of Digital Exhibit"] },
+            "value": { "{{ len }}": {{ digital_exhibit_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.digital_origin %}
+            {
+            "label": { "{{ len }}": ["Digital Origin"] },
+            "value": { "{{ len }}": {{ (data.digital_origin is iterable ? data.digital_origin : [data.digital_origin])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.digital_publisher %}
+            {
+            "label": { "{{ len }}": ["Digital Publisher"] },
+            "value": { "{{ len }}": {{ (data.digital_publisher is iterable ? data.digital_publisher : [data.digital_publisher])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.extent %}
+            {
+            "label": { "{{ len }}": ["Extent"] },
+            "value": { "{{ len }}": {% if data.extent is iterable %}{{ data.extent|json_encode|raw }}{% else %}[{{ data.extent|json_encode|raw }}]{% endif %} }
+            },
+            {% endif %}
+            {% if data.format %}
+            {
+            "label": { "{{ len }}": ["Format"] },
+            "value": { "{{ len }}": [ {{ data.format|json_encode|raw }} ] }
+            },
+            {% endif %}
+            {#- genre_form and genre_form_linked_data share one label, so they share one entry -#}
+            {% set genre_values = data.genre_form is iterable ? data.genre_form : (data.genre_form ? [data.genre_form] : []) %}
+            {% set genre_ld_items = data.genre_form_linked_data.value is defined ? [data.genre_form_linked_data] : (data.genre_form_linked_data is iterable ? data.genre_form_linked_data : []) %}
+            {% for item in genre_ld_items %}
+              {% set genre_values = genre_values|merge([item.value|default(item)]) %}
+            {% endfor %}
+            {% if genre_values %}
+            {
+            "label": { "{{ len }}": ["Genre"] },
+            "value": { "{{ len }}": {{ genre_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {#- geographic_subject and geographic_subject_linked_data share one label, so they share one entry -#}
+            {% set geo_subject_values = data.geographic_subject is iterable ? data.geographic_subject : (data.geographic_subject ? [data.geographic_subject] : []) %}
+            {% set geo_subject_ld_items = data.geographic_subject_linked_data.value is defined ? [data.geographic_subject_linked_data] : (data.geographic_subject_linked_data is iterable ? data.geographic_subject_linked_data : []) %}
+            {% for item in geo_subject_ld_items %}
+              {% set geo_subject_values = geo_subject_values|merge([item.value|default(item)]) %}
+            {% endfor %}
+            {% if geo_subject_values %}
+            {
+            "label": { "{{ len }}": ["Geographic Subject"] },
+            "value": { "{{ len }}": {{ geo_subject_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% set identifier_items = data.identifier is defined and data.identifier.value is defined ? [data.identifier] : (attribute(data, 'identifier')|default([])) %}
+            {% for item in identifier_items %}
+            {
+            "label": { "{{ len }}": ["Identifier"] },
+            "value": { "{{ len }}": [{{ item.value|default(item)|json_encode|raw }}] }
+            },
+            {% endfor %}
+            {% if data.language %}
+            {
+            "label": { "{{ len }}": ["Language"] },
+            "value": { "{{ len }}": {{ (data.language is iterable ? data.language : [data.language])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.local_department %}
+            {
+            "label": { "{{ len }}": ["Local Department"] },
+            "value": { "{{ len }}": {{ (data.local_department is iterable ? data.local_department : [data.local_department])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.medium %}
+            {
+            "label": { "{{ len }}": ["Medium"] },
+            "value": { "{{ len }}": {{ (data.medium is iterable ? data.medium : [data.medium])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.note %}
+            {
+            "label": { "{{ len }}": ["Note"] },
+            "value": { "{{ len }}": {{ (data.note is iterable ? data.note : [data.note])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.original_publication %}
+            {
+            "label": { "{{ len }}": ["Original Publication"] },
+            "value": { "{{ len }}": {{ (data.original_publication is iterable ? data.original_publication : [data.original_publication])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.original_publisher %}
+            {
+            "label": { "{{ len }}": ["Original Publisher"] },
+            "value": { "{{ len }}": {{ (data.original_publisher is iterable ? data.original_publisher : [data.original_publisher])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.physical_collection %}
+            {
+            "label": { "{{ len }}": ["Physical Collection"] },
+            "value": { "{{ len }}": {% if data.physical_collection is iterable %}{{ data.physical_collection|json_encode|raw }}{% else %}[{{ data.physical_collection|json_encode|raw }}]{% endif %} }
+            },
+            {% endif %}
+            {% if data.physical_location %}
+            {
+            "label": { "{{ len }}": ["Physical Location"] },
+            "value": { "{{ len }}": {{ (data.physical_location is iterable ? data.physical_location : [data.physical_location])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.place_of_origin %}
+            {
+            "label": { "{{ len }}": ["Place of Origin"] },
+            "value": { "{{ len }}": {{ (data.place_of_origin is iterable ? data.place_of_origin : [data.place_of_origin])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.projection %}
+            {
+            "label": { "{{ len }}": ["Projection"] },
+            "value": { "{{ len }}": {{ (data.projection is iterable ? data.projection : [data.projection])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.provenance %}
+            {
+            "label": { "{{ len }}": ["Provenance"] },
+            "value": { "{{ len }}": {{ (data.provenance is iterable ? data.provenance : [data.provenance])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.related_item %}
+            {
+            "label": { "{{ len }}": ["Related Item"] },
+            "value": { "{{ len }}": {{ (data.related_item is iterable ? data.related_item : [data.related_item])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.related_url %}
+            {
+            "label": { "{{ len }}": ["Related URL"] },
+            "value": { "{{ len }}": {{ (data.related_url is iterable ? data.related_url : [data.related_url])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.rights_details %}
+            {
+            "label": { "{{ len }}": ["Rights Details"] },
+            "value": { "{{ len }}": {{ (data.rights_details is iterable ? data.rights_details : [data.rights_details])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.rights_holder %}
+            {
+            "label": { "{{ len }}": ["Rights Holder"] },
+            "value": { "{{ len }}": {{ (data.rights_holder is iterable ? data.rights_holder : [data.rights_holder])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.sponsorship %}
+            {
+            "label": { "{{ len }}": ["Sponsorship"] },
+            "value": { "{{ len }}": {{ (data.sponsorship is iterable ? data.sponsorship : [data.sponsorship])|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.state_edition %}
+            {
+            "label": { "{{ len }}": ["State Edition"] },
+            "value": { "{{ len }}": {{ (data.state_edition is iterable ? data.state_edition : [data.state_edition])|json_encode|raw }} }
+            },
+            {% endif %}
+            {#- subject and subject_linked_data share one label, so they share one entry -#}
+            {% set subject_values = data.subject is iterable ? data.subject : (data.subject ? [data.subject] : []) %}
+            {% set subject_ld_items = data.subject_linked_data.value is defined ? [data.subject_linked_data] : (data.subject_linked_data is iterable ? data.subject_linked_data : []) %}
+            {% for item in subject_ld_items %}
+              {% set subject_values = subject_values|merge([item.value|default(item)]) %}
+            {% endfor %}
+            {% if subject_values %}
+            {
+            "label": { "{{ len }}": ["Subject"] },
+            "value": { "{{ len }}": {{ subject_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.table_of_contents %}
+            {
+            "label": { "{{ len }}": ["Table of Contents"] },
+            "value": { "{{ len }}": {{ (data.table_of_contents is iterable ? data.table_of_contents : [data.table_of_contents])|json_encode|raw }} }
+            },
+            {% endif %}
+            {#- temporal_subject and temporal_subject_linked_data share one label, so they share one entry -#}
+            {% set temporal_values = data.temporal_subject is iterable ? data.temporal_subject : (data.temporal_subject ? [data.temporal_subject] : []) %}
+            {% set temporal_ld_items = data.temporal_subject_linked_data.value is defined ? [data.temporal_subject_linked_data] : (data.temporal_subject_linked_data is iterable ? data.temporal_subject_linked_data : []) %}
+            {% for item in temporal_ld_items %}
+              {% set temporal_values = temporal_values|merge([item.value|default(item)]) %}
+            {% endfor %}
+            {% if temporal_values %}
+            {
+            "label": { "{{ len }}": ["Temporal Subject"] },
+            "value": { "{{ len }}": {{ temporal_values|json_encode|raw }} }
+            },
+            {% endif %}
+            {% if data.title_alternative %}
+            {
+            "label": { "{{ len }}": ["Alternative Title"] },
+            "value": { "{{ len }}": {{ (data.title_alternative is iterable ? data.title_alternative : [data.title_alternative])|json_encode|raw }} }
+            },
+            {% endif %}
+            {
+            "label": { "{{ len }}": ["Rights"] },
+            "value": { "{{ len }}": [{{ computed_rights|json_encode|raw }}] }
+            }
 ],
 {# New Jan 2023:added to bring IIIF CWS and IIIF Normal V3 in sync #}
 {%- if attribute(data, 'ismemberof') %}
@@ -188,6 +511,15 @@ Without Double quotes.
         }
     ],
 {%- endif -%}
+{% if data.geojson_feature is defined and data.geojson_feature.geometry is defined %}
+"navPlace": {
+  "id": "{{ nodeurl }}/iiif/navplace",
+  "type": "FeatureCollection",
+  "features": [
+    {% set navplace_feature = data.geojson_feature|merge({'properties': {'label': {(len): [node.label]}}}) %}{{ navplace_feature|json_encode|raw }}
+  ]
+},
+{% endif %}
 "items": [
 {%- set itemCount = 0 %}
 {%- set document_count = attribute(data, 'as:document')|length -%}
