@@ -522,15 +522,10 @@ Without Double quotes.
 {% endif %}
 "items": [
 {%- set itemCount = 0 %}
-{%- set document_count = attribute(data, 'as:document')|length -%}
-{%- set TotalpageCount = 0 -%}
-{%- for document in attribute(data, 'as:document')%}
-  {%  if document['flv:exif'].PageCount -%} 
-    {%- set TotalpageCount = (TotalpageCount + document['flv:exif'].PageCount) -%}
-  {% endif %}
-{%- endfor -%}
-{% for document in attribute(data, 'as:document')%} 
-{%  if document['flv:exif'].PageCount %} 
+{#--- TOP LEVEL MEDIA DISABLED: canvases come only from child ADOs via the view below ---#}
+{% if false %}{# top-level media start #}
+{% for document in attribute(data, 'as:document')%}
+{%  if document['flv:exif'].PageCount %}
    {%- set pageCount =  document['flv:exif'].PageCount -%} 
    {%- set cantaloupeid  = IIIFserverurl ~ document['url']|replace({'s3://':''})|replace({'private://':''})|url_encode -%}
    {%  for pagenumber in 1..pageCount %}{ 
@@ -879,9 +874,10 @@ Without Double quotes.
           ] 
         } 
       ] 
-    }{{ not loop.last ? ',' : '' }} 
-  {% endfor %} 
-{% endif %} 
+    }{{ not loop.last ? ',' : '' }}
+  {% endfor %}
+{% endif %}
+{% endif %}{# top-level media end #}
 {#-- END TOP LEVEL --#}
 {# start fetch all children using a View and attach them as Items #}
 {# since Scrapbooks might have Empty Pages and InsetGroups are always empty we will Fix here 3 levels and used "nid"#}
