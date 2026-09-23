@@ -518,7 +518,7 @@ Without Double quotes.
 {% set is_series = 'CreativeWorkSeries' in ado_types or ('Book' in ado_types and items['bundle']|default('') == 'digital_object_collection') %}
     {
     {% if is_series %}
-        "id": "{{ url('format_strawberryfield.metadatadisplay_caster', {'node': items['uuid'],'metadataexposeconfig_entity':'iiifmanifest3cws', 
+        "id": "{{ url('format_strawberryfield.metadatadisplay_caster', {'node': items['uuid'],'metadataexposeconfig_entity':'iiifmanifest3cws_multiple',
         'format':'default.jsonld'}, {'absolute': true, 'alias': true}) }}",
         "type": "Manifest",
      {% elseif 'Collection' in ado_types %}
