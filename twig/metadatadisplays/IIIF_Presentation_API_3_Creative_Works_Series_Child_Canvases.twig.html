@@ -31,47 +31,49 @@ Without Double quotes.
 {# with 150 being Cantaloupe's setup PDF rastering resolution and 72 what PDFINFO produces by default #} 
 {%- set pdf_resolution = (150/72) -%}
 {% set computed_rights = "http://rightsstatements.org/vocab/InC-EDU/1.0/" %} 
-{% if data.rights|length > 0 or data.rights_statements|length > 0 %} 
-	{% if data.rights|length > 0 %} 
-		{% set computed_rights = data.rights %} 
-	{% endif %} 
-{% elseif data.rights_statements|length > 0 %} 
-	{% if data.rights_statements in ['In Copyright'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/InC/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['In Copyright - EU Orphan Work'] %} 
-    	{% set computed_rights = "http://rightsstatements.org/vocab/InC-OW-EU/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['In Copyright - Educational Use Permitted'] %} 
-	   	{% set computed_rights = "http://rightsstatements.org/vocab/InC-EDU/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['In Copyright - Non-Commercial Use Permitted'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/InC-NC/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['In Copyright - Rights-holder(s) Unlocatable or Unidentifiable'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/InC-RUU/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['No Copyright - Contractual Restrictions'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-CR/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['No Copyright - Non-Commercial Use Only'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-NC/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['No Copyright - Other Known Legal Restrictions'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-OKLR/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['No Copyright - United States'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-US/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['Copyright Not Evaluated'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/CNE/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['Copyright Undetermined'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/UND/1.0/" %} 
-	{% endif %} 
-	{% if data.rights_statements in ['No Known Copyright'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/NKC/1.0/" %} 
-	{% endif %} 
+{% if data.rights|length > 0 %}
+	{% set computed_rights = data.rights %}
+{% elseif data.rights_statements|length > 0 %}
+	{% if data.rights_statements starts with 'http://rightsstatements.org/' or data.rights_statements starts with 'https://rightsstatements.org/' or data.rights_statements starts with 'http://creativecommons.org/' or data.rights_statements starts with 'https://creativecommons.org/' %}
+		{% set computed_rights = data.rights_statements %}
+	{% else %}
+		{% if data.rights_statements in ['In Copyright'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/InC/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['In Copyright - EU Orphan Work'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/InC-OW-EU/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['In Copyright - Educational Use Permitted'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/InC-EDU/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['In Copyright - Non-Commercial Use Permitted'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/InC-NC/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['In Copyright - Rights-holder(s) Unlocatable or Unidentifiable'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/InC-RUU/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['No Copyright - Contractual Restrictions'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/NoC-CR/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['No Copyright - Non-Commercial Use Only'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/NoC-NC/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['No Copyright - Other Known Legal Restrictions'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/NoC-OKLR/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['No Copyright - United States'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/NoC-US/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['Copyright Not Evaluated'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/CNE/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['Copyright Undetermined'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/UND/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['No Known Copyright'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/NKC/1.0/" %}
+		{% endif %}
+	{% endif %}
 {% endif %} 
 {# Mirador 3 has this weird CSS thing that puts the max of thumb to that size #} 
 {% set max_thumb_width = 240 %} 

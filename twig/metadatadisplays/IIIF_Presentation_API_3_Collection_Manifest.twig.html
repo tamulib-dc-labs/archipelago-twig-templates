@@ -69,47 +69,49 @@ Without Double quotes.
   {% set nodeurl = currenturl %}
 {% endif%}
 {% set len = language.getId() ? language.getId() : "en" %}
-{% set computed_rights = "http://rightsstatements.org/vocab/InC-EDU/1.0/" %}
-{% if data.rights|length > 0 or data.rights_statements|length > 0 %}
-	{% if data.rights|length > 0 %} 
-		{% set computed_rights = data.rights %}
-	{% endif %}
+{% set computed_rights = "http://rightsstatements.org/vocab/CNE/1.0/" %}
+{% if data.rights|length > 0 %}
+	{% set computed_rights = data.rights %}
 {% elseif data.rights_statements|length > 0 %}
-	{% if data.rights_statements in ['In Copyright'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/InC/1.0/" %}
-	{% endif %}
-	{% if data.rights_statements in ['In Copyright - EU Orphan Work'] %} 
-    	{% set computed_rights = "http://rightsstatements.org/vocab/InC-OW-EU/1.0/" %}
-	{% endif %}
-	{% if data.rights_statements in ['In Copyright - Educational Use Permitted'] %} 
-	   	{% set computed_rights = "http://rightsstatements.org/vocab/InC-EDU/1.0/" %}
-	{% endif %}
-	{% if data.rights_statements in ['In Copyright - Non-Commercial Use Permitted'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/InC-NC/1.0/" %}
-	{% endif %}
-	{% if data.rights_statements in ['In Copyright - Rights-holder(s) Unlocatable or Unidentifiable'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/InC-RUU/1.0/" %}
-	{% endif %}
-	{% if data.rights_statements in ['No Copyright - Contractual Restrictions'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-CR/1.0/" %}
-	{% endif %} 
-	{% if data.rights_statements in ['No Copyright - Non-Commercial Use Only'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-NC/1.0/" %}
-	{% endif %}
-	{% if data.rights_statements in ['No Copyright - Other Known Legal Restrictions'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-OKLR/1.0/" %}
-	{% endif %}
-	{% if data.rights_statements in ['No Copyright - United States'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/NoC-US/1.0/" %}
-	{% endif %} 
-	{% if data.rights_statements in ['Copyright Not Evaluated'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/CNE/1.0/" %}
-	{% endif %}
-	{% if data.rights_statements in ['Copyright Undetermined'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/UND/1.0/" %}
-	{% endif %}
-	{% if data.rights_statements in ['No Known Copyright'] %} 
-		{% set computed_rights = "http://rightsstatements.org/vocab/NKC/1.0/" %}
+	{% if data.rights_statements starts with 'http://rightsstatements.org/' or data.rights_statements starts with 'https://rightsstatements.org/' or data.rights_statements starts with 'http://creativecommons.org/' or data.rights_statements starts with 'https://creativecommons.org/' %}
+		{% set computed_rights = data.rights_statements %}
+	{% else %}
+		{% if data.rights_statements in ['In Copyright'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/InC/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['In Copyright - EU Orphan Work'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/InC-OW-EU/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['In Copyright - Educational Use Permitted'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/InC-EDU/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['In Copyright - Non-Commercial Use Permitted'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/InC-NC/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['In Copyright - Rights-holder(s) Unlocatable or Unidentifiable'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/InC-RUU/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['No Copyright - Contractual Restrictions'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/NoC-CR/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['No Copyright - Non-Commercial Use Only'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/NoC-NC/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['No Copyright - Other Known Legal Restrictions'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/NoC-OKLR/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['No Copyright - United States'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/NoC-US/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['Copyright Not Evaluated'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/CNE/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['Copyright Undetermined'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/UND/1.0/" %}
+		{% endif %}
+		{% if data.rights_statements in ['No Known Copyright'] %}
+			{% set computed_rights = "http://rightsstatements.org/vocab/NKC/1.0/" %}
+		{% endif %}
 	{% endif %}
 {% endif %}
 {#- navDate: single XSD dateTime derived from date_created (preferred) or date_issued.
@@ -516,7 +518,7 @@ Without Double quotes.
 {% set is_series = 'CreativeWorkSeries' in ado_types or ('Book' in ado_types and items['bundle']|default('') == 'digital_object_collection') %}
     {
     {% if is_series %}
-        "id": "{{ url('format_strawberryfield.metadatadisplay_caster', {'node': items['uuid'],'metadataexposeconfig_entity':'iiifmanifest3cws', 
+        "id": "{{ url('format_strawberryfield.metadatadisplay_caster', {'node': items['uuid'],'metadataexposeconfig_entity':'iiifmanifest3cws_multiple',
         'format':'default.jsonld'}, {'absolute': true, 'alias': true}) }}",
         "type": "Manifest",
      {% elseif 'Collection' in ado_types %}

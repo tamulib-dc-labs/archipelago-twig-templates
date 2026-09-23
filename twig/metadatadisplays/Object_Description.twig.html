@@ -117,7 +117,7 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
    Collection and CreativeWorkSeries types always map to their own manifest routes. #}
 {% set is_collection_bundle = node.type.target_id == 'digital_object_collection' %}
 {% if data.type == 'CreativeWorkSeries' or (data.type == 'Book' and is_collection_bundle) %}
-  {% set iiif_manifest_route = 'iiifmanifest3cws' %}
+  {% set iiif_manifest_route = 'iiifmanifest3cws_multiple' %}
 {% elseif data.type == 'Collection' %}
   {% set iiif_manifest_route = 'iiifmanifest3collection' %}
 {% else %}
