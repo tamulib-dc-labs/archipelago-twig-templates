@@ -44,7 +44,7 @@ Without Double quotes.
     {% set nodeurl = currenturl %}
 {% endif%}
 {% set len = language.getId() ? language.getId() : "en" %}
-{% set computed_rights = "http://rightsstatements.org/vocab/InC-EDU/1.0/" %}
+{% set computed_rights = "http://rightsstatements.org/vocab/CNE/1.0/" %}
 {% if data.rights|length > 0 or data.rights_statements|length > 0 %}
 	{% if data.rights|length > 0 %}
 		{% set computed_rights = data.rights %}
