@@ -1043,8 +1043,8 @@ Without Double quotes.
        }{{ not loop.last ? ',' : '' }}       
        {% endfor -%} 
        ]}]
-      {% endif %} 
-    }{{ not loop.last ? ',' : '' }} 
+      {% endif %}
+    }
 {% endfor %}
    {# end this should be a macro #}
    {# not loop.last and children_data_had_image ? ', ---' : '---' #} 
