@@ -1047,14 +1047,11 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
           {% else %}
             <li>{{ rights_org }} has not yet assigned a rights statement to this item. Please contact us before reusing it.</li>
           {% endif %}
-          {% if data.rights_details %}
-            {# Array-valued in production metadata (see the Rights Details row below,
-               which already reads it as iterable). striptags on an array is a PHP
-               TypeError, which would render this template empty for anonymous users. #}
-            {% for rights_detail in (data.rights_details is iterable ? data.rights_details : [data.rights_details]) %}
-              {% if rights_detail|trim %}<li>{{ rights_detail|striptags }}</li>{% endif %}
-            {% endfor %}
-          {% endif %}
+          {# rights_details is deliberately NOT shown here: the modal states the terms of
+             use from the `rights` statement alone. In practice rights_details often just
+             repeats the statement label (e.g. "No Copyright - United States"), which would
+             show the same point twice. It is still rendered in the Rights Details row of
+             the description list, which is unchanged. #}
           {% if data.rights_holder %}
             <li>Rights holder: {{ data.rights_holder is iterable ? data.rights_holder|join('; ') : data.rights_holder }}</li>
           {% endif %}
