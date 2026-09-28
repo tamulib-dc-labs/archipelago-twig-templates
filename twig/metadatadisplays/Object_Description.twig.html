@@ -238,7 +238,11 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
    fallback bullet rather than asserting a copyright status. Confirm before changing. #}
   {% set rs_source = data.rights ?: collection_data.rights|default('') %}
   {% set rs_uri = (rs_source is iterable ? rs_source|first : rs_source)|default('')|trim %}
-  {% set rs_id = rs_uri matches '{rightsstatements\.org/vocab/}' ? (rs_uri|split('/vocab/')|last|split('/')|first) : '' %}
+{# The pattern is anchored on purpose. Unanchored, it would accept any value that
+   merely contains the vocab path -- e.g. a javascript: or data: URI with
+   rightsstatements.org/vocab/NKC/1.0/ appended -- and that value is emitted as the
+   href on both links in the modal, where escaping does not neutralise the scheme. #}
+  {% set rs_id = rs_uri matches '{^https?://rightsstatements\.org/vocab/[A-Za-z-]+/1\.0/?$}' ? (rs_uri|split('/vocab/')|last|split('/')|first) : '' %}
   {% set rs = rs_vocab[rs_id] ?? null %}
 
 {# Speak in Texas A&M's voice. rs_vocab above stays verbatim; this map rewrites the
@@ -1044,7 +1048,12 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
             <li>{{ rights_org }} has not yet assigned a rights statement to this item. Please contact us before reusing it.</li>
           {% endif %}
           {% if data.rights_details %}
-            <li>{{ data.rights_details|striptags }}</li>
+            {# Array-valued in production metadata (see the Rights Details row below,
+               which already reads it as iterable). striptags on an array is a PHP
+               TypeError, which would render this template empty for anonymous users. #}
+            {% for rights_detail in (data.rights_details is iterable ? data.rights_details : [data.rights_details]) %}
+              {% if rights_detail|trim %}<li>{{ rights_detail|striptags }}</li>{% endif %}
+            {% endfor %}
           {% endif %}
           {% if data.rights_holder %}
             <li>Rights holder: {{ data.rights_holder is iterable ? data.rights_holder|join('; ') : data.rights_holder }}</li>
