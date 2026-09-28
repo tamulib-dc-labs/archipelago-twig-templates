@@ -1,4 +1,5 @@
 {#-
+Last updated 09/28/2026. Added the download rights & attribution modal for file downloads.
 Last updated 08/18/2026. Added a campus-only access notice shown when an object is IP embargoed.
 Last updated 08/07/2026. Removed the Date Available (date_available) and
 Related URL (Historic) (related_url_historic) rows from the description list.
@@ -95,6 +96,16 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
   </ul></dd>
   {%- endif -%}
 {%- endmacro html_output_search_lod -%}
+{# Download link that opens the rights & attribution modal instead of downloading
+   straight away. The href stays the real file URL, so with JS disabled (or if
+   Bootstrap fails to load) the link still downloads. Macros cannot see outer
+   variables, hence node_uuid is passed in. #}
+{% macro rights_download_link(file, node_uuid) %}
+  <li><a download rel="nofollow" target="_blank" class="dropdown-item"
+         href="/do/{{ node_uuid }}/file/{{ file['dr:uuid'] }}/download/{{ file.name }}"
+         data-bs-toggle="modal" data-bs-target="#tamuDownloadRightsModal"
+         data-download-name="{{ file.name }}">{{ file.name }}</a></li>
+{% endmacro %}
 {#- --- End Macros ---- -#}
 {{ attach_library('strawberryfield_clover/clover_data_attr') }}
 {{ attach_library('strawberryfield_clover_iiif/clover_data_attr') }}
@@ -136,6 +147,137 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
   {% set download_file_img = "Images" %}
   {% set download_file_doc = "Documents" %}
   {% set download_file_text = "Texts and transcripts" %}
+
+{# -- Download rights & attribution modal: vocabulary, collection, credit line -- #}
+{# rightsstatements.org v1.0 skos:prefLabel / skos:definition (@en), inlined verbatim.
+   They cannot be fetched at runtime: rightsstatements.org sends no
+   Access-Control-Allow-Origin header, so browser JS is blocked. The v1.0 URIs are
+   versioned and immutable, so this text does not drift. Keep it verbatim for
+   traceability -- the Texas A&M rewording lives in rs_localize below, not here. #}
+  {% set rs_vocab = {
+    'InC': { label: 'In Copyright', definition: [
+      'This Item is protected by copyright and/or related rights.',
+      'You are free to use this Item in any way that is permitted by the copyright and related rights legislation that applies to your use.',
+      'For other uses you need to obtain permission from the rights-holder(s).'
+    ]},
+    'InC-OW-EU': { label: 'In Copyright - EU Orphan Work', definition: [
+      'This Item has been identified as an orphan work in the country of first publication and in line with Directive 2012/28/EU of the European Parliament and of the Council of 25 October 2012 on certain permitted uses of orphan works.',
+      'For this Item, either (a) no rights-holder(s) have been identified or (b) one or more rights-holder(s) have been identified but none have been located even though a diligent search for the rights-holder(s) has been conducted. The results of the diligent search are available in the EU Orphan Works Database.',
+      'You are free to use this Item in any way that is permitted by the copyright and related rights legislation that applies to your use.'
+    ]},
+    'InC-EDU': { label: 'In Copyright - Educational Use Permitted', definition: [
+      'This Item is protected by copyright and/or related rights.',
+      'You are free to use this Item in any way that is permitted by the copyright and related rights legislation that applies to your use. In addition, no permission is required from the rights-holder(s) for educational uses.',
+      'For other uses, you need to obtain permission from the rights-holder(s).'
+    ]},
+    'InC-NC': { label: 'In Copyright - Non-Commercial Use Permitted', definition: [
+      'This Item is protected by copyright and/or related rights.',
+      'You are free to use this Item in any way that is permitted by the copyright and related rights legislation that applies to your use. In addition, no permission is required from the rights-holder(s) for non-commercial uses.',
+      'For other uses you need to obtain permission from the rights-holder(s).'
+    ]},
+    'InC-RUU': { label: 'In Copyright - Rights-holder(s) Unlocatable or Unidentifiable', definition: [
+      'This Item is protected by copyright and/or related rights. However, for this Item, either (a) no rights-holder(s) have been identified or (b) one or more rights-holder(s) have been identified but none have been located.',
+      'You are free to use this Item in any way that is permitted by the copyright and related rights legislation that applies to your use.'
+    ]},
+    'NoC-CR': { label: 'No Copyright - Contractual Restrictions', definition: [
+      'Use of this Item is not restricted by copyright and/or related rights.',
+      'As part of the acquisition or digitization of this Work, the organization that has made the Item available is contractually required to limit the use of this Item. Limitations may include, but are not limited to, privacy issues, cultural protections, digitization agreements or donor agreements.',
+      'Please refer to the organization that has made the Item available for more information.'
+    ]},
+    'NoC-NC': { label: 'No Copyright - Non-Commercial Use Only', definition: [
+      'This Work has been digitized in a public-private partnership. As part of this partnership, the partners have agreed to limit commercial uses of this digital representation of the Work by third parties.',
+      'You can, without permission, copy, modify, distribute, display, or perform the Item, for non-commercial uses. For any other permissible uses, please review the terms and conditions of the organization that has made the Item available.'
+    ]},
+    'NoC-OKLR': { label: 'No Copyright - Other Known Legal Restrictions', definition: [
+      'Use of this Item is not restricted by copyright and/or related rights.',
+      'In one or more jurisdictions, laws other than copyright are known to impose restrictions on the use of this Item.',
+      'Please refer to the organization that has made the Item available for more information.'
+    ]},
+    'NoC-US': { label: 'No Copyright - United States', definition: [
+      'The organization that has made the Item available believes that the Item is in the Public Domain under the laws of the United States, but a determination was not made as to its copyright status under the copyright laws of other countries. The Item may not be in the Public Domain under the laws of other countries.',
+      'Please refer to the organization that has made the Item available for more information.'
+    ]},
+    'CNE': { label: 'Copyright Not Evaluated', definition: [
+      'The copyright and related rights status of this Item has not been evaluated.',
+      'Please refer to the organization that has made the Item available for more information.',
+      'You are free to use this Item in any way that is permitted by the copyright and related rights legislation that applies to your use.'
+    ]},
+    'UND': { label: 'Copyright Undetermined', definition: [
+      'The copyright and related rights status of this Item has been reviewed by the organization that has made the Item available, but the organization was unable to make a conclusive determination as to the copyright status of the Item.',
+      'Please refer to the organization that has made the Item available for more information.',
+      'You are free to use this Item in any way that is permitted by the copyright and related rights legislation that applies to your use.'
+    ]},
+    'NKC': { label: 'No Known Copyright', definition: [
+      'The organization that has made the Item available reasonably believes that the Item is not restricted by copyright or related rights, but a conclusive determination could not be made.',
+      'Please refer to the organization that has made the Item available for more information.',
+      'You are free to use this Item in any way that is permitted by the copyright and related rights legislation that applies to your use.'
+    ]}
+  } %}
+
+{# Parent collection (first ismemberof). Supplies the collection title for the
+   credit line and acts as the fallback for rights / attribution / physical_location
+   when the item itself does not carry them. #}
+  {% set collection_title = '' %}
+  {% set collection_data = {} %}
+  {% if attribute(data, 'ismemberof') %}
+    {% set collection_id = attribute(data, 'ismemberof') is iterable ? attribute(data, 'ismemberof')|first : attribute(data, 'ismemberof') %}
+    {% set collection_node = bamboo_load_entity('node', collection_id) %}
+    {% if collection_node %}
+      {% set collection_title = collection_node.title.value %}
+      {% set collection_data = collection_node.field_descriptive_metadata.value|sbf_json_decode|default({}) %}
+    {% endif %}
+  {% endif %}
+
+{# Rights for the modal: the item's own Rights Statement -- deliberately the same
+   source as the "Rights Statement" badge rendered in the description list below --
+   falling back to the collection's. Value is a URI, e.g.
+   http://rightsstatements.org/vocab/NKC/1.0/
+   NOTE for reviewers: the IIIF manifests resolve rights differently (data.rights,
+   then data.rights_statements, then defaulting to CNE). This modal intentionally
+   does NOT default to CNE, so a missing statement produces the "contact us"
+   fallback bullet rather than asserting a copyright status. Confirm before changing. #}
+  {% set rs_source = data.rights ?: collection_data.rights|default('') %}
+  {% set rs_uri = (rs_source is iterable ? rs_source|first : rs_source)|default('')|trim %}
+{# The pattern is anchored on purpose. Unanchored, it would accept any value that
+   merely contains the vocab path -- e.g. a javascript: or data: URI with
+   rightsstatements.org/vocab/NKC/1.0/ appended -- and that value is emitted as the
+   href on both links in the modal, where escaping does not neutralise the scheme. #}
+  {% set rs_id = rs_uri matches '{^https?://rightsstatements\.org/vocab/[A-Za-z-]+/1\.0/?$}' ? (rs_uri|split('/vocab/')|last|split('/')|first) : '' %}
+  {% set rs = rs_vocab[rs_id] ?? null %}
+
+{# Speak in Texas A&M's voice. rs_vocab above stays verbatim; this map rewrites the
+   generic third-party wording at render time. Twig's replace() is strtr(), which
+   matches the longest key at each position, so the full sentences below win over
+   the shorter phrases. "Please refer to the organization ... for more information."
+   is dropped because the modal already ends with its own "Contact Us" bullet. #}
+  {% set rights_org = 'Texas A&M University Libraries' %}
+  {% set rs_localize = {
+    'Please refer to the organization that has made the Item available for more information.': '',
+    'please review the terms and conditions of the organization that has made the Item available': 'please contact us',
+    'The organization that has made the Item available': rights_org,
+    'the organization that has made the Item available': rights_org,
+    'but the organization was unable': 'but the Libraries were unable',
+    'The Item': 'The item', 'This Item': 'This item', 'this Item': 'this item', 'the Item': 'the item',
+    'This Work': 'This work', 'this Work': 'this work', 'the Work': 'the work'
+  } %}
+
+{# Credit line -- always built from metadata, never hard-coded per item.
+   1. attribution on the item, else on the collection (cataloger override, used as-is)
+   2. otherwise: [item title], [collection title], [repository]
+      repository = item physical_location -> collection physical_location
+                   -> credit_repository_default (Cushing PubAck form, 5/22/2026) #}
+  {% set credit_repository_default = 'Cushing Memorial Library and Archives, Texas A&M University' %}
+  {% set credit_contact_email = 'CushingReference@library.tamu.edu' %}
+  {% set credit_attribution = data.attribution ?: collection_data.attribution|default('') %}
+  {% set credit_attribution = credit_attribution is iterable ? credit_attribution|join('; ') : credit_attribution %}
+  {% set credit_repository = data.physical_location ?: (collection_data.physical_location|default('') ?: credit_repository_default) %}
+  {% set credit_repository = credit_repository is iterable ? credit_repository|join('; ') : credit_repository %}
+  {% set credit_title = data.label is iterable ? data.label|first : data.label %}
+  {% set credit_parts = [] %}
+  {% for credit_part in [credit_title|default(''), collection_title, credit_repository] %}
+    {% if credit_part|trim %}{% set credit_parts = credit_parts|merge([credit_part|trim]) %}{% endif %}
+  {% endfor %}
+  {% set credit_line = credit_attribution|trim ?: credit_parts|join(', ') %}
 {# Downloads as a set variable #}
   {% set downloadlist %}
 {# May 2023, new downloads #}
@@ -151,35 +293,35 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 	   <li><hr class="dropdown-divider"></li>
        <li><h2 class="dropdown-header">{{ download_file_doc }}</h2></li>
       {% for singledocument in attribute(data, 'as:document') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singledocument['dr:uuid'] }}/download/{{ singledocument.name }}" target="_blank">{{ singledocument.name }}</a></li>
+		{{ _self.rights_download_link(singledocument, node.uuid.value) }}
 	  {% endfor %}
     {% endif %}
     {% if attribute(data, 'as:text')|length < 10 and attribute(data, 'as:text')|length > 0 %}
 	   <li><hr class="dropdown-divider"></li>
        <li><h2 class="dropdown-header">{{ download_file_text }}</h2></li>
       {% for singletext in attribute(data, 'as:text') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singletext['dr:uuid'] }}/download/{{ singletext.name }}" target="_blank">{{ singletext.name }}</a></li>
+		{{ _self.rights_download_link(singletext, node.uuid.value) }}
 	  {% endfor %}
     {% endif %}
     {% if attribute(data, 'as:image')|length <= 10 and attribute(data, 'as:image')|length > 0 %}
 	   <li><hr class="dropdown-divider"></li>
        <li><h2 class="dropdown-header">{{ download_file_img }}</h2></li>
       {% for singleimage in attribute(data, 'as:image') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singleimage['dr:uuid'] }}/download/{{  singleimage.name }}" target="_blank">{{ singleimage.name }}</a></li>
+		{{ _self.rights_download_link(singleimage, node.uuid.value) }}
 	  {% endfor %}
     {% endif %}
     {% if attribute(data, 'as:video')|length <= 10 and attribute(data, 'as:video')|length > 0 %}
 	   <li><hr class="dropdown-divider"></li>
        <li><h2 class="dropdown-header">{{ download_file_video }}</h2></li>
       {% for singlevideo in attribute(data, 'as:video') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singlevideo['dr:uuid'] }}/download/{{ singlevideo.name }}" target="_blank">{{ singlevideo.name }}</a></li>
+		{{ _self.rights_download_link(singlevideo, node.uuid.value) }}
 	  {% endfor %}
     {% endif %}
     {% if attribute(data, 'as:audio')|length <= 10 and attribute(data, 'as:audio')|length > 0 %}
 	   <li><hr class="dropdown-divider"></li>
        <li><h2 class="dropdown-header">{{ download_file_audio }}</h2></li>
       {% for singleaudio in attribute(data, 'as:audio') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singleaudio['dr:uuid'] }}/download/{{ singleaudio.name }}" target="_blank">{{ singleaudio.name }}</a></li>
+		{{ _self.rights_download_link(singleaudio, node.uuid.value) }}
 	  {% endfor %}
     {% endif %}
   {% endif %}
@@ -869,3 +1011,129 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endif %}
 
 </div>{# Closes tab-content #}
+
+{# -- Download rights & attribution modal --------------------------------------
+   Deliberately placed here, outside .tab-content: a modal that lives inside a
+   hidden tab-pane cannot be opened. Rendered only when downloads are allowed, so
+   an embargoed/restricted object has neither file links nor a modal.
+   Filled in from the clicked link via Bootstrap's relatedTarget -- one modal
+   serves every file. ------------------------------------------------------- #}
+{% if not file_download_restricted %}
+<div class="modal fade tamu-rights-modal" id="tamuDownloadRightsModal" tabindex="-1"
+     aria-labelledby="tamuDownloadRightsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="tamuDownloadRightsModalLabel">Download: {{ data.label }}</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <h3 class="tamu-rights-modal__label">Please review the terms of use for this item:</h3>
+        <ul class="tamu-rights-modal__list">
+          {% if rs %}
+            {# The statement's skos:definition paragraphs, localized and joined into one. #}
+            {% set rs_summary = '' %}
+            {% for rs_paragraph in rs.definition %}
+              {% set rs_clean = rs_paragraph|replace(rs_localize)|trim %}
+              {% if rs_clean %}{% set rs_summary = rs_summary ~ (rs_summary ? ' ' : '') ~ rs_clean %}{% endif %}
+            {% endfor %}
+            <li>{{ rs.label }}.</li>
+            <li>{{ rs_summary }}<br>
+              <a href="{{ rs_uri }}" target="_blank" rel="noopener">Learn more about this rights statement</a>
+              <a href="{{ rs_uri }}" target="_blank" rel="noopener" class="tamu-rights-modal__badge"><img
+                 src="https://rightsstatements.org/files/buttons/{{ rs_id }}.white.svg" alt="{{ rs.label }}" title="{{ rs.label }}"></a>
+            </li>
+          {% else %}
+            <li>{{ rights_org }} has not yet assigned a rights statement to this item. Please contact us before reusing it.</li>
+          {% endif %}
+          {# rights_details is deliberately NOT shown here: the modal states the terms of
+             use from the `rights` statement alone. In practice rights_details often just
+             repeats the statement label (e.g. "No Copyright - United States"), which would
+             show the same point twice. It is still rendered in the Rights Details row of
+             the description list, which is unchanged. #}
+          {% if data.rights_holder %}
+            <li>Rights holder: {{ data.rights_holder is iterable ? data.rights_holder|join('; ') : data.rights_holder }}</li>
+          {% endif %}
+          <li>Please include the credit line: &ldquo;{{ credit_line }}&rdquo;</li>
+          <li><a href="mailto:{{ credit_contact_email }}">Contact Us</a> if you have questions about usage or reproduction.</li>
+        </ul>
+
+        <div class="tamu-rights-modal__start">
+          <strong>Click the button below to start your download</strong>
+          <p>It may take a few moments for your download to begin, especially for large file sizes.</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <a id="tamuDownloadRightsConfirm" class="btn btn-primary" href="#" download rel="nofollow">
+          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 11.5 3.5 7l1.06-1.06 2.69 2.69V1h1.5v7.63l2.69-2.69L12.5 7 8 11.5ZM2 13.5h12V15H2v-1.5Z"/></svg>
+          Download <span data-role="file-type"></span>
+        </a>
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* tamu_theme tokens: maroon #500000, text #3b4952, label grey #606463,
+     panel #f4f8f8, dividers #dee2e6. Work Sans (title), Oswald (labels),
+     Droid Serif (body). Buttons reuse the theme's .btn-primary/.btn-outline-primary. */
+  /* Must clear #tamu-top-bar (z-index 1400) and .back-to-top (1234). */
+  .tamu-rights-modal { z-index:1460; }
+  body:has(#tamuDownloadRightsModal.show) > .modal-backdrop { z-index:1450; }
+  .tamu-rights-modal .modal-content { background:#fff; border:0; border-radius:8px; box-shadow:0 .5rem 1.5rem rgba(0,0,0,.25); }
+  .tamu-rights-modal .modal-header { padding:1.25rem 1.5rem; border-bottom:1px solid #dee2e6; align-items:flex-start; }
+  .tamu-rights-modal .modal-title { font-family:"Work Sans", Arial, sans-serif; font-size:1.3rem; font-weight:400; line-height:1.3; color:#500000; text-transform:none; margin:0; }
+  .tamu-rights-modal .modal-body { padding:1.25rem 1.5rem .75rem; font-family:"Droid Serif", serif; font-size:.9rem; color:#3b4952; }
+  .tamu-rights-modal__label { font-family:Oswald, Arial, sans-serif; font-size:.8rem; font-weight:500; letter-spacing:.04em; text-transform:uppercase; font-style:normal; color:#606463; margin:0 0 .5rem; }
+  .tamu-rights-modal__list { margin:0 0 1rem; padding-left:1.25rem; }
+  .tamu-rights-modal__list li { color:#3b4952; line-height:1.55; margin-bottom:.3rem; }
+  .tamu-rights-modal__list a { color:#500000; font-weight:700; }
+  .tamu-rights-modal__badge { display:inline-block; vertical-align:middle; margin-left:.35rem; }
+  .tamu-rights-modal__badge img { height:20px; width:auto; background:#500000; padding:4px 8px; border-radius:4px; }
+  .tamu-rights-modal__start { background:#f4f8f8; border-left:4px solid #500000; padding:.6rem 1rem; margin:0; }
+  .tamu-rights-modal__start p { margin:.2rem 0 0; padding:0; color:#3b4952; }
+  .tamu-rights-modal .modal-footer { padding:.75rem 1.5rem; border-top:1px solid #dee2e6; gap:.5rem; }
+  /* the theme puts a 16px bottom margin on every .btn */
+  .tamu-rights-modal .modal-footer .btn { display:inline-flex; align-items:center; gap:.4rem; font-size:.875rem; padding:.45rem 1.1rem; margin:0; }
+  /* the theme drops the bottom border on .btn-outline-primary; restore it so Cancel is not cut off */
+  .tamu-rights-modal .modal-footer .btn-outline-primary { border:1px solid #500000; }
+  .tamu-rights-modal .modal-footer .btn-outline-primary:hover, .tamu-rights-modal .modal-footer .btn-outline-primary:focus { background:#500000; color:#fff; }
+  /* the theme renders spans inside buttons italic/grey */
+  .tamu-rights-modal .modal-footer .btn [data-role="file-type"] { font-style:normal; font-weight:inherit; color:inherit; }
+  @media (max-width:575.98px) {
+    .tamu-rights-modal .modal-footer { flex-direction:column-reverse; align-items:stretch; }
+    .tamu-rights-modal .modal-footer .btn { justify-content:center; }
+  }
+</style>
+
+<script>
+(function () {
+  var modal = document.getElementById('tamuDownloadRightsModal');
+  if (!modal || modal.dataset.tamuBound) { return; }
+  modal.dataset.tamuBound = '1';
+  // Reparent to <body> so the formatter's own stacking/overflow cannot clip the modal.
+  document.body.appendChild(modal);
+
+  var confirmBtn = modal.querySelector('#tamuDownloadRightsConfirm');
+  var fileType = confirmBtn.querySelector('[data-role="file-type"]');
+
+  modal.addEventListener('show.bs.modal', function (event) {
+    var link = event.relatedTarget;
+    if (!link) { return; }
+    var name = link.dataset.downloadName || '';
+    var ext = name.indexOf('.') > -1 ? name.split('.').pop().toUpperCase() : '';
+    confirmBtn.setAttribute('href', link.getAttribute('href'));
+    confirmBtn.setAttribute('download', name);
+    fileType.textContent = ext ? '(' + ext + ')' : '';
+  });
+
+  confirmBtn.addEventListener('click', function () {
+    var instance = window.bootstrap && bootstrap.Modal.getInstance(modal);
+    if (instance) { setTimeout(function () { instance.hide(); }, 150); }
+  });
+})();
+</script>
+{% endif %}
