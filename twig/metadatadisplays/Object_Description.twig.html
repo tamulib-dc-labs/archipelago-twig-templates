@@ -1,4 +1,5 @@
 {#-
+Last updated 10/13/2026. Images are listed once under Download (name without extension); the modal's split button downloads the original, its toggle opens a menu below with the High/Medium/Low TIFs.
 Last updated 09/28/2026. Added the download rights & attribution modal for file downloads.
 Last updated 08/18/2026. Added a campus-only access notice shown when an object is IP embargoed.
 Last updated 08/07/2026. Removed the Date Available (date_available) and
@@ -306,8 +307,19 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     {% if attribute(data, 'as:image')|length <= 10 and attribute(data, 'as:image')|length > 0 %}
 	   <li><hr class="dropdown-divider"></li>
        <li><h2 class="dropdown-header">{{ download_file_img }}</h2></li>
+      {% set Webserverurl = url('<front>')|render|replace({':8001/':''}) ~ ':8183/iiif/2/' %}
+      {% set IIIFserverurl = iiif_server ? iiif_server ~ '/' : Webserverurl %}
       {% for singleimage in attribute(data, 'as:image') %}
-		{{ _self.rights_download_link(singleimage, node.uuid.value) }}
+        {% set cantaloupeid = IIIFserverurl ~ singleimage['url']|replace({'s3://':''})|replace({'private://':''})|url_encode %}
+        {% set image_basename = '.' in singleimage.name ? singleimage.name|split('.')|slice(0, -1)|join('.') : singleimage.name %}
+		{# One entry per image: the modal's Download button fetches the original, and its
+		   split toggle offers the IIIF TIF renditions passed in the data-variant-* attributes. #}
+		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singleimage['dr:uuid'] }}/download/{{  singleimage.name }}" target="_blank"
+		       data-bs-toggle="modal" data-bs-target="#tamuDownloadRightsModal" data-download-name="{{ singleimage.name }}"
+		       data-variant-basename="{{ image_basename }}"
+		       data-variant-high="{{ cantaloupeid }}/full/full/0/default.tif?response-content-disposition={{ ('attachment; filename="' ~ image_basename ~ '_high.tif"')|url_encode }}"
+		       data-variant-medium="{{ cantaloupeid }}/full/pct:50/0/default.tif?response-content-disposition={{ ('attachment; filename="' ~ image_basename ~ '_medium.tif"')|url_encode }}"
+		       data-variant-low="{{ cantaloupeid }}/full/pct:25/0/default.tif?response-content-disposition={{ ('attachment; filename="' ~ image_basename ~ '_low.tif"')|url_encode }}">{{ image_basename }}</a></li>
 	  {% endfor %}
     {% endif %}
     {% if attribute(data, 'as:video')|length <= 10 and attribute(data, 'as:video')|length > 0 %}
@@ -1066,10 +1078,26 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
       </div>
 
       <div class="modal-footer">
-        <a id="tamuDownloadRightsConfirm" class="btn btn-primary" href="#" download rel="nofollow">
-          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 11.5 3.5 7l1.06-1.06 2.69 2.69V1h1.5v7.63l2.69-2.69L12.5 7 8 11.5ZM2 13.5h12V15H2v-1.5Z"/></svg>
-          Download <span data-role="file-type"></span>
-        </a>
+        {# Split button: the main part downloads the file that was clicked (the original,
+           for images); the toggle on its right appears only for images and lists the
+           IIIF TIF renditions. The menu opens downward with a fixed-position popper
+           (set up in the script below), so the scrollable modal does not clip it. #}
+        <div class="btn-group tamu-rights-modal__download">
+          <a id="tamuDownloadRightsConfirm" class="btn btn-primary" href="#" download rel="nofollow">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 11.5 3.5 7l1.06-1.06 2.69 2.69V1h1.5v7.63l2.69-2.69L12.5 7 8 11.5ZM2 13.5h12V15H2v-1.5Z"/></svg>
+            Download <span data-role="variant-label"></span><span data-role="file-type"></span>
+          </a>
+          <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split d-none" data-role="variant-toggle"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="visually-hidden">Other resolutions</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" data-role="variant-menu">
+            <li><h3 class="dropdown-header">Other resolutions</h3></li>
+            <li><a class="dropdown-item" href="#" download rel="nofollow" target="_blank" data-variant="high">High <span>(TIF, full size)</span></a></li>
+            <li><a class="dropdown-item" href="#" download rel="nofollow" target="_blank" data-variant="medium">Medium <span>(TIF, 50%)</span></a></li>
+            <li><a class="dropdown-item" href="#" download rel="nofollow" target="_blank" data-variant="low">Low <span>(TIF, 25%)</span></a></li>
+          </ul>
+        </div>
         <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
       </div>
     </div>
@@ -1103,9 +1131,28 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
   .tamu-rights-modal .modal-footer .btn-outline-primary:hover, .tamu-rights-modal .modal-footer .btn-outline-primary:focus { background:#500000; color:#fff; }
   /* the theme renders spans inside buttons italic/grey */
   .tamu-rights-modal .modal-footer .btn [data-role="file-type"] { font-style:normal; font-weight:inherit; color:inherit; }
+  /* split download button: no gap between its halves, a hairline between them */
+  .tamu-rights-modal .modal-footer .btn-group > .btn + .btn { margin-left:0; border-left:1px solid rgba(255,255,255,.45); }
+  .tamu-rights-modal .modal-footer .dropdown-toggle-split { padding-left:.6rem; padding-right:.6rem; }
+  /* toggle hidden (non-image file): give the main button back its right corners */
+  .tamu-rights-modal__download.is-single > #tamuDownloadRightsConfirm { border-top-right-radius:var(--bs-btn-border-radius); border-bottom-right-radius:var(--bs-btn-border-radius); }
+  .tamu-rights-modal__download .dropdown-menu { font-family:"Droid Serif", serif; font-size:.875rem; min-width:14rem; }
+  .tamu-rights-modal__download .dropdown-header { font-family:Oswald, Arial, sans-serif; font-size:.75rem; font-weight:500; letter-spacing:.04em; text-transform:uppercase; color:#606463; margin:0; }
+  .tamu-rights-modal__download .dropdown-item { color:#3b4952; }
+  .tamu-rights-modal__download .dropdown-item span { font-style:normal; color:#606463; }
+  .tamu-rights-modal__download .dropdown-item:hover, .tamu-rights-modal__download .dropdown-item:focus { background:#500000; color:#fff; }
+  .tamu-rights-modal__download .dropdown-item:hover span, .tamu-rights-modal__download .dropdown-item:focus span { color:#fff; }
+  .tamu-rights-modal .modal-footer .btn [data-role="variant-label"] { font-style:normal; font-weight:inherit; color:inherit; }
+  .tamu-rights-modal .modal-footer .btn [data-role="variant-label"]:empty { display:none; }
+  /* the theme lays dropdown items out as a nowrap flex row (drops the space before the size note) and italicises headers */
+  .tamu-rights-modal__download .dropdown-item { gap:.35rem; }
+  .tamu-rights-modal__download .dropdown-header { font-style:normal; }
+  /* the theme hides Bootstrap's dropdown caret (only .dropup brought it back); draw a down arrow */
+  .tamu-rights-modal__download .dropdown-toggle-split::after { content:""; display:inline-block; margin:0; vertical-align:.2em; border-top:.35em solid currentColor; border-right:.35em solid transparent; border-bottom:0; border-left:.35em solid transparent; }
   @media (max-width:575.98px) {
     .tamu-rights-modal .modal-footer { flex-direction:column-reverse; align-items:stretch; }
     .tamu-rights-modal .modal-footer .btn { justify-content:center; }
+    .tamu-rights-modal__download > #tamuDownloadRightsConfirm { flex:1 1 auto; }
   }
 </style>
 
@@ -1119,6 +1166,10 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 
   var confirmBtn = modal.querySelector('#tamuDownloadRightsConfirm');
   var fileType = confirmBtn.querySelector('[data-role="file-type"]');
+  var variantLabel = confirmBtn.querySelector('[data-role="variant-label"]');
+  var group = modal.querySelector('.tamu-rights-modal__download');
+  var variantToggle = group.querySelector('[data-role="variant-toggle"]');
+  var variantItems = group.querySelectorAll('[data-variant]');
 
   modal.addEventListener('show.bs.modal', function (event) {
     var link = event.relatedTarget;
@@ -1128,9 +1179,32 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     confirmBtn.setAttribute('href', link.getAttribute('href'));
     confirmBtn.setAttribute('download', name);
     fileType.textContent = ext ? '(' + ext + ')' : '';
+
+    // Images carry their TIF renditions; anything else gets a plain button.
+    var hasVariants = false;
+    variantItems.forEach(function (item) {
+      var key = item.dataset.variant;
+      var url = link.dataset['variant' + key.charAt(0).toUpperCase() + key.slice(1)];
+      item.parentNode.hidden = !url;
+      if (url) {
+        hasVariants = true;
+        item.setAttribute('href', url);
+        item.setAttribute('download', (link.dataset.variantBasename || 'image') + '_' + key + '.tif');
+      }
+    });
+    variantLabel.textContent = hasVariants ? 'original ' : '';
+    variantToggle.classList.toggle('d-none', !hasVariants);
+    group.classList.toggle('is-single', !hasVariants);
+    // Created before the first click, so Bootstrap's data API reuses this instance.
+    // A fixed-position popper is not clipped by .modal-content's overflow:hidden.
+    if (hasVariants && window.bootstrap) {
+      bootstrap.Dropdown.getOrCreateInstance(variantToggle, { popperConfig: { strategy: 'fixed' } });
+    }
   });
 
-  confirmBtn.addEventListener('click', function () {
+  // Close the modal shortly after any download starts (main button or a rendition).
+  group.addEventListener('click', function (event) {
+    if (!event.target.closest('a[download]')) { return; }
     var instance = window.bootstrap && bootstrap.Modal.getInstance(modal);
     if (instance) { setTimeout(function () { instance.hide(); }, 150); }
   });
