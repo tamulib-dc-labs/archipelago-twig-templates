@@ -170,8 +170,9 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
         {% set cantaloupeid = IIIFserverurl ~ singleimage['url']|replace({'s3://':''})|replace({'private://':''})|url_encode %}
         {% set image_basename = '.' in singleimage.name ? singleimage.name|split('.')|slice(0, -1)|join('.') : singleimage.name %}
 		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singleimage['dr:uuid'] }}/download/{{  singleimage.name }}" target="_blank">Original: {{ singleimage.name }}</a></li>
-		<li><a download rel="nofollow" class="dropdown-item" href="{{ cantaloupeid }}/full/pct:50/0/default.tif?response-content-disposition={{ ('attachment; filename="' ~ image_basename ~ '_medium.tif"')|url_encode }}" target="_blank">Medium: {{ singleimage.name }}</a></li>
-		<li><a download rel="nofollow" class="dropdown-item" href="{{ cantaloupeid }}/full/pct:25/0/default.tif?response-content-disposition={{ ('attachment; filename="' ~ image_basename ~ '_low.tif"')|url_encode }}" target="_blank">Low: {{ singleimage.name }}</a></li>
+		<li><a download rel="nofollow" class="dropdown-item" href="{{ cantaloupeid }}/full/full/0/default.tif?response-content-disposition={{ ('attachment; filename="' ~ image_basename ~ '_high.tif"')|url_encode }}" target="_blank">High: {{ image_basename }}.tif</a></li>
+		<li><a download rel="nofollow" class="dropdown-item" href="{{ cantaloupeid }}/full/pct:50/0/default.tif?response-content-disposition={{ ('attachment; filename="' ~ image_basename ~ '_medium.tif"')|url_encode }}" target="_blank">Medium: {{ image_basename }}.tif</a></li>
+		<li><a download rel="nofollow" class="dropdown-item" href="{{ cantaloupeid }}/full/pct:25/0/default.tif?response-content-disposition={{ ('attachment; filename="' ~ image_basename ~ '_low.tif"')|url_encode }}" target="_blank">Low: {{ image_basename }}.tif</a></li>
 	  {% endfor %}
     {% endif %}
     {% if attribute(data, 'as:video')|length <= 10 and attribute(data, 'as:video')|length > 0 %}
