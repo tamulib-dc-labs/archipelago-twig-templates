@@ -164,8 +164,14 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     {% if attribute(data, 'as:image')|length <= 10 and attribute(data, 'as:image')|length > 0 %}
 	   <li><hr class="dropdown-divider"></li>
        <li><h2 class="dropdown-header">{{ download_file_img }}</h2></li>
+      {% set Webserverurl = url('<front>')|render|replace({':8001/':''}) ~ ':8183/iiif/2/' %}
+      {% set IIIFserverurl = iiif_server ? iiif_server ~ '/' : Webserverurl %}
       {% for singleimage in attribute(data, 'as:image') %}
-		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singleimage['dr:uuid'] }}/download/{{  singleimage.name }}" target="_blank">{{ singleimage.name }}</a></li>
+        {% set cantaloupeid = IIIFserverurl ~ singleimage['url']|replace({'s3://':''})|replace({'private://':''})|url_encode %}
+        {% set image_basename = '.' in singleimage.name ? singleimage.name|split('.')|slice(0, -1)|join('.') : singleimage.name %}
+		<li><a download rel="nofollow" class="dropdown-item" href="/do/{{ node.uuid.value }}/file/{{ singleimage['dr:uuid'] }}/download/{{  singleimage.name }}" target="_blank">Original: {{ singleimage.name }}</a></li>
+		<li><a download rel="nofollow" class="dropdown-item" href="{{ cantaloupeid }}/full/pct:50/0/default.tif?response-content-disposition={{ ('attachment; filename="' ~ image_basename ~ '_medium.tif"')|url_encode }}" target="_blank">Medium: {{ singleimage.name }}</a></li>
+		<li><a download rel="nofollow" class="dropdown-item" href="{{ cantaloupeid }}/full/pct:25/0/default.tif?response-content-disposition={{ ('attachment; filename="' ~ image_basename ~ '_low.tif"')|url_encode }}" target="_blank">Low: {{ singleimage.name }}</a></li>
 	  {% endfor %}
     {% endif %}
     {% if attribute(data, 'as:video')|length <= 10 and attribute(data, 'as:video')|length > 0 %}
