@@ -1,100 +1,150 @@
 {#
+Updated 07/10/2026: hidden list of the searchable fields for the search page's Match block; no full stop after a creator's dates in the byline.
+Updated 06/10/2026: search result cards. ADO type, creators/contributors and date move to a byline above the abstract (first name, then ", N more"); abstract cut to 250 characters with an ellipsis.
 Updated 09/02/2026 for Corina based on this ticket: https://www.notion.so/277cf324d44a80578525e4aea2c57e78?v=277cf324d44a80cb893f000c4304be04&p=2f7cf324d44a80e79a3bfc491b8decc7&pm=s
 Updated 31/10/2023 for 1.3.0
 -  Previously updated November 2021: trim output of data.description, add Rights Statement mapping, and show trimmed output for data.rights (local rights statement) #}
 
-{% if data.abstract or data.description | length > 0 %}
+{%- set abstract_limit = 250 -%}
+
+{# ADO type (`type`, schema.org-style worktype) as a reader-facing label.
+   Values not listed here are shown as stored. #}
+{%- set type_labels = {
+  'VideoObject': 'Video',
+  'StreamingVideo': 'Video',
+  'Movie': 'Film',
+  'AudioObject': 'Audio',
+  'MusicRecording': 'Music recording',
+  'CreativeWorkSeries': 'Series',
+  'DigitalDocument': 'Document',
+  'ArchivalDescription': 'Archival description',
+  'VisualArtwork': 'Artwork',
+  '3DModel': '3D model',
+  'WebPage': 'Web archive',
+  'ShortStory': 'Short story',
+  'PodcastEpisode': 'Podcast episode',
+  'PanoramaTour': 'Panorama tour'
+} -%}
+{%- set ado_type = data.type is iterable ? data.type|first : data.type -%}
+{%- set type_label = ado_type ? type_labels[ado_type]|default(ado_type) : '' -%}
+
+{# Creators and contributors, in the order the fields were listed before,
+   without duplicates. Plain fields are strings or arrays of strings; agent
+   and the *_linked_data fields are a {value, ...} object or an array of them. #}
+{%- set names = [] -%}
+{%- for field in [data.creator, data.contributor] -%}
+  {%- for name in (field is iterable ? field : [field]) -%}
+    {%- if name is not iterable and name|trim is not empty and name|trim not in names -%}
+      {%- set names = names|merge([name|trim]) -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endfor -%}
+{%- for field in [data.agent, data.agent_linked_data, data.creator_linked_data, data.contributor_linked_data] -%}
+  {%- set items = field.value is defined ? [field] : field -%}
+  {%- for item in (items is iterable ? items : []) -%}
+    {%- if item.value is defined and item.value|trim is not empty and item.value|trim not in names -%}
+      {%- set names = names|merge([item.value|trim]) -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endfor -%}
+
+{# "Sherzer, W. H. (William Hittell), 1860-1932." would read
+   "…1860-1932. · 1917" in the byline: drop a full stop after a date or a
+   bracket, but not after an initial ("Smith, John H."). #}
+{%- set first_name = names|first|default('') -%}
+{%- if first_name ends with '.' and first_name|slice(-2, 1) matches '/[0-9)]/' -%}
+  {%- set first_name = first_name|slice(0, -1) -%}
+{%- endif -%}
+
+{%- set date = '' -%}
+{%- if data.date_created -%}
+  {%- set date = data.date_created|edtf_2_human_date -%}
+{%- elseif data.date_issued -%}
+  {%- set date = data.date_issued|edtf_2_human_date -%}
+{%- endif -%}
+
+{%- set abstract = data.abstract is iterable ? data.abstract|first : data.abstract -%}
+{%- if not abstract and data.description|length > 0 -%}
+  {%- set abstract = data.description is iterable ? data.description|first : data.description -%}
+{%- endif -%}
+{%- set abstract = abstract|default('')|trim -%}
+{%- set abstract_cut = abstract|length > abstract_limit -%}
+{%- if abstract_cut -%}
+  {%- set cut = abstract|slice(0, abstract_limit) -%}
+  {# Back off to the last whole word unless the limit already lands on one. #}
+  {%- if abstract|slice(abstract_limit, 1) != ' ' and ' ' in cut -%}
+    {%- set cut = cut|split(' ')|slice(0, -1)|join(' ') -%}
+  {%- endif -%}
+  {%- set abstract = cut|trim(' ,;:.', 'right') -%}
+{%- endif -%}
+
+{% if type_label or names|length > 0 or date %}
+{# One space between the parts, so copied text and screen readers do not
+   run "Video", the name and the date together. The type modifier class
+   (search-result__type--audioobject, …) lets the theme pick the default
+   thumbnail icon for objects without an image. #}
+<p class="search-result__byline">
+  {%- if type_label %}<span class="search-result__type search-result__type--{{ ado_type|lower|replace({' ': '-'}) }}">{{ type_label }}</span>{% endif %}
+  {%- if names|length > 0 %} <span class="search-result__creators">{{ first_name }}{% if names|length > 1 %}, {{ names|length - 1 }} more{% endif %}</span>{% endif %}
+  {%- if date %} <span class="search-result__date">{{ date }}</span>{% endif -%}
+</p>
+{% endif %}
+
+{% if abstract %}
 <h4>Abstract</h4>
-
-    {% if data.abstract %}
-        <p>{{ data.abstract }}</p>
-    {% elseif data.description | length> 0 %}
-        {% set desc = data.description is iterable ? data.description[0] : data.description %}
-        <p>{{ desc }}</p>
-    {% endif %}
-
+<p>{{ abstract }}{% if abstract_cut %}&hellip;{% endif %}</p>
 {% endif %}
 
-  {% if data.creator or data.creator_lod or data.contributor or data.agent or data.agent_linked_data or data.creator_linked_data or data.contributor_linked_data %}
-  <h4>Creators and contributors</h4>
-  <div class="field-content">
-    <ul>
-      {# creator #}
-      {% if data.creator %}
-        {% if data.creator is iterable %}
-          {% for creator in data.creator %}
-            <li>{{ creator }}</li>
-          {% endfor %}
-        {% else %}
-          <li>{{ data.creator }}</li>
-        {% endif %}
-      {% endif %}
-      
-      {# contributor #}
-      {% if data.contributor %}
-        {% if data.contributor is iterable %}
-          {% for contributor in data.contributor %}
-            <li>{{ contributor }}</li>
-          {% endfor %}
-        {% else %}
-          <li>{{ data.contributor }}</li>
-        {% endif %}
-      {% endif %}
-
-      {# agent #}
-      {% if data.agent %}
-          {% if data.agent.value is defined %}
-            <li>{{ data.agent.value }}</li>
-            {% else %}
-              {% for agent in data.agent %}
-              <li>{{ agent.value }}</li>
-              {% endfor %}
-          {% endif %}
-        {% endif %}
-
-      {# agent_linked_data #}
-      {% if data.agent_linked_data %}
-      {% if data.agent_linked_data.value is defined %}
-            <li>{{ data.agent_linked_data.value }}</li>
-            {% else %}
-              {% for agent in data.agent_linked_data %}
-              <li>{{ agent.value }}</li>
-              {% endfor %}
-          {% endif %}
-        {% endif %}
-      
-       {# creator_linked_data #}
-      {% if data.creator_linked_data %}
-      {% if data.creator_linked_data.value is defined %}
-            <li>{{ data.creator_linked_data.value }}</li>
-            {% else %}
-              {% for creator in data.creator_linked_data %}
-              <li>{{ creator.value }}</li>
-              {% endfor %}
-          {% endif %}
-        {% endif %}
-      
-      {# contributor_linked_data #}
-      {% if data.contributor_linked_data %}
-      {% if data.contributor_linked_data.value is defined %}
-            <li>{{ data.contributor_linked_data.value }}</li>
-            {% else %}
-              {% for contributor in data.contributor_linked_data %}
-              <li>{{ contributor.value }}</li>
-              {% endfor %}
-          {% endif %}
-        {% endif %}
-    </ul>
-  </div>
-  {% endif %}
-
-{% if data.date_created or data.date_issued %}
-<h4>Date</h4>
-
-    {% if data.date_created %}
-        <p>{{ data.date_created|edtf_2_human_date }}</p>
-    {% elseif data.date_issued %}
-        <p>{{ data.date_issued|edtf_2_human_date }}</p>
-    {% endif %}
-
-{% endif %}
+{# The searchable fields, hidden. The theme's search-matches.js looks a
+   search match up here to name the field it came from ("Subject",
+   "Note", …), and shows an abstract or description match when Search API
+   returns no excerpt for the result. Title goes last so that text found
+   in both the title and another field is named after the other field. #}
+{%- set field_labels = [
+  ['abstract', 'Abstract'],
+  ['description', 'Description'],
+  ['note', 'Note'],
+  ['notes', 'Note'],
+  ['subject', 'Subject'],
+  ['subject_linked_data', 'Subject'],
+  ['temporal_subject', 'Subject'],
+  ['geographic_subject', 'Place'],
+  ['geographic_subject_linked_data', 'Place'],
+  ['place_of_origin', 'Place'],
+  ['genre_form', 'Genre'],
+  ['genre_form_linked_data', 'Genre'],
+  ['creator', 'Creator'],
+  ['creator_linked_data', 'Creator'],
+  ['contributor', 'Contributor'],
+  ['contributor_linked_data', 'Contributor'],
+  ['agent', 'Contributor'],
+  ['agent_linked_data', 'Contributor'],
+  ['original_publisher', 'Publisher'],
+  ['digital_publisher', 'Publisher'],
+  ['physical_collection', 'Collection'],
+  ['collecting_area', 'Collection'],
+  ['physical_location', 'Location'],
+  ['original_publication', 'Related'],
+  ['related_record', 'Related'],
+  ['provenance', 'Provenance'],
+  ['title_alternative', 'Alternative title'],
+  ['title_info_alternative_title', 'Alternative title'],
+  ['identifier', 'Identifier'],
+  ['local_identifier', 'Identifier'],
+  ['classification', 'Identifier'],
+  ['label', 'Title']
+] -%}
+<div class="search-result__fields" hidden aria-hidden="true">
+{%- for pair in field_labels -%}
+  {%- set values = attribute(data, pair[0]) -%}
+  {%- if values is not empty -%}
+    {#- A string, a {value, …} object, or an array of either. -#}
+    {%- set values = values is iterable and values.value is not defined ? values : [values] -%}
+    <p data-field="{{ pair[0] == 'label' ? 'title' : pair[0] }}" data-label="{{ pair[1] }}">
+      {%- for value in values -%}
+        {{ value is iterable ? (value.value ?? value.label ?? '') : value }}{{ not loop.last ? ' ; ' }}
+      {%- endfor -%}
+    </p>
+  {%- endif -%}
+{%- endfor -%}
+</div>

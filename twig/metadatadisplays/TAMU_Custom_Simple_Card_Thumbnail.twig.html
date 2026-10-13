@@ -1,7 +1,10 @@
-{#- Simple card thumbnail — plain img, no IIIF viewer scripts -#}
-{% set iiif_size = "pct:25" %}
+{#- Simple card thumbnail — plain img, no IIIF viewer scripts
+Updated 07/10/2026: the ADO type and date follow the image as a .tamu-card__meta line, which the theme (js/card-meta.js) moves under the card title.
+Updated 06/10/2026: objects without an image get an icon for their ADO type (headphones for audio, film for video, …) instead of fa-archive for everything, matching the default thumbnails in the search result list. -#}
+{% set iiif_size = "400," %}
 {% set IIIFserverurl = iiif_server ? iiif_server ~ "/" : "" %}
 {% set source = "" %}
+{%- set ado_type = data.type is iterable ? data.type|first : data.type -%}
 {% if attribute(data, "as:image")|length > 0 %}
 {% set document = data["as:image"]|first %}
 {% set cantaloupeid = IIIFserverurl ~ document["url"]|replace({"s3://":""})|replace({"private://":""})|url_encode %}
@@ -17,5 +20,64 @@
 {% if source %}
 <img src="{{ source }}" alt="{{ data.label ?? node.label.value }}" class="img-fluid">
 {% else %}
-<i class="fas fa-archive fa-4x" style="display:block;text-align:center;padding-top:40%;color:rgba(255,255,255,0.5);"></i>
+{#- Same type-to-icon mapping as the search list's default thumbnails
+    (tamu_theme css/search-results.css). -#}
+{%- if ado_type in ['AudioObject', 'MusicRecording', 'Podcast', 'PodcastEpisode'] -%}
+  {%- set icon = 'fa-headphones-alt' -%}
+{%- elseif ado_type in ['VideoObject', 'StreamingVideo', 'Movie'] -%}
+  {%- set icon = 'fa-film' -%}
+{%- elseif ado_type == 'CreativeWorkSeries' -%}
+  {%- set icon = 'fa-layer-group' -%}
+{%- elseif ado_type == 'Book' -%}
+  {%- set icon = 'fa-book' -%}
+{%- elseif ado_type in ['Manuscript', 'Letter'] -%}
+  {%- set icon = 'fa-envelope-open-text' -%}
+{%- elseif ado_type == 'Map' -%}
+  {%- set icon = 'fa-map' -%}
+{%- elseif ado_type in ['Photograph', 'Image', 'VisualArtwork', 'Painting'] -%}
+  {%- set icon = 'fa-image' -%}
+{%- elseif ado_type in ['DigitalDocument', 'Article', 'Thesis', 'Text'] -%}
+  {%- set icon = 'fa-file-alt' -%}
+{%- elseif ado_type == '3DModel' -%}
+  {%- set icon = 'fa-cube' -%}
+{%- elseif ado_type == 'WebPage' -%}
+  {%- set icon = 'fa-globe' -%}
+{%- else -%}
+  {#- Collection, and any type not listed: archive box. -#}
+  {%- set icon = 'fa-archive' -%}
+{%- endif %}
+<i class="fas {{ icon }} fa-4x" style="display:block;text-align:center;padding-top:40%;color:rgba(255,255,255,0.5);"></i>
+{% endif %}
+{#- Type tag and date, as in the search result list (Object Metadata
+    Abstract for Search Results). Hidden here: it would sit inside the
+    image box; the theme's card-meta.js moves it under the title and shows
+    it, so without that script nothing changes on the card. -#}
+{%- set type_labels = {
+  'VideoObject': 'Video',
+  'StreamingVideo': 'Video',
+  'Movie': 'Film',
+  'AudioObject': 'Audio',
+  'MusicRecording': 'Music recording',
+  'CreativeWorkSeries': 'Series',
+  'DigitalDocument': 'Document',
+  'ArchivalDescription': 'Archival description',
+  'VisualArtwork': 'Artwork',
+  '3DModel': '3D model',
+  'WebPage': 'Web archive',
+  'ShortStory': 'Short story',
+  'PodcastEpisode': 'Podcast episode',
+  'PanoramaTour': 'Panorama tour'
+} -%}
+{%- set type_label = ado_type ? type_labels[ado_type]|default(ado_type) : '' -%}
+{%- set date = '' -%}
+{%- if data.date_created -%}
+  {%- set date = data.date_created|edtf_2_human_date -%}
+{%- elseif data.date_issued -%}
+  {%- set date = data.date_issued|edtf_2_human_date -%}
+{%- endif -%}
+{% if type_label or date %}
+<p class="tamu-card__meta" hidden>
+  {%- if type_label %}<span class="tamu-card__type">{{ type_label }}</span>{% endif %}
+  {%- if date %} <span class="tamu-card__date">{{ date }}</span>{% endif -%}
+</p>
 {% endif %}
