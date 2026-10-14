@@ -16,8 +16,10 @@ be valid JSON when outputting. So We use data.description|json_encode|raw
 Without Double quotes.
 -#}
 {# <---- SETUP ---> #}
-{# -- The Desired width -- #}
-{% set width = 240 %}
+{# -- The Desired width. 480 so the list's wide-screen thumbnail (a
+   quarter of the card, tamu_theme css/search-results.css) is not
+   enlarged from a smaller image. -- #}
+{% set width = 480 %}
 {# -- Which ADO Types to check for childen --#}
 {% set ado_types_with_children = ['CreativeWorkSeries','Book','Card','NewspaperIssue'] %}
 {# -- The IIIF Server URLS -- #}
@@ -107,7 +109,7 @@ Without Double quotes.
 {% endif%}
 {% if source|length > 0 %}
 {# NOTE: remote iiif-lazy class if you do not want lazy loading #}
-<img class="field-iiif image-iiif iiif-lazy img-fluid rounded" id="thumb_iiif-field_descriptive_metadata-{{ node.uuid.value }}-0-image1" src="{{ source }}" width="240" alt="Thumbnail for {{ data.label }}" typeof="foaf:Image">
+<img class="field-iiif image-iiif iiif-lazy img-fluid rounded" id="thumb_iiif-field_descriptive_metadata-{{ node.uuid.value }}-0-image1" src="{{ source }}" width="480" alt="Thumbnail for {{ data.label }}" typeof="foaf:Image">
 {% else %}
 {# -- IF we have no source we can font awesome icons --
 Options: we took from /admin/structure/webform/config/options/manage/schema_org_creative_works/source
@@ -135,36 +137,32 @@ VideoObject: 'Video Object'
 Conversation: 'Conversation (Oral History)'
 ShortStory: 'Short Story'
 #}
-{% if data.type in ['DigitalDocument', 'Article','Thesis'] %}
-<i class="fas fa-file-alt fa-9x"></i>
-{% elseif data.type in ['Photograph','Painting','VisualArtwork', 'Card'] %}
-<i class="fas fa-photo-video fa-9x"></i>
-{% elseif data.type in ['Movie','VideoObject'] %}
-<i class="fas fa-film fa-9x"></i>
-{% elseif data.type in ['MusicRecording', 'AudioObject'] %}
+{# -- Same icon per ADO type as the grid and card thumbnails
+("TAMU Custom Simple Card Thumbnail"), so an object looks the same in
+the list and the grid. data.type can be a list; its first value counts. -- #}
+{%- set ado_type = data.type is iterable ? data.type|first : data.type -%}
+{% if ado_type in ['AudioObject', 'MusicRecording', 'Podcast', 'PodcastEpisode'] %}
 <i class="fas fa-headphones-alt fa-9x"></i>
-{% elseif data.type in ['Podcast','PodcastEpisode'] %}
-<i class="fas fa-podcast"></i>
-{% elseif data.type in ['ShortStory','Conversation',] %}
-<i class="fas fa-comments fa-9x"></i>
-{% elseif data.type in ['Sculpture','3DModel'] %}
-<i class="fas fa-cubes fa-9x"></i>
-{% elseif data.type in ['Book'] %}
+{% elseif ado_type in ['VideoObject', 'StreamingVideo', 'Movie'] %}
+<i class="fas fa-film fa-9x"></i>
+{% elseif ado_type == 'CreativeWorkSeries' %}
+<i class="fas fa-layer-group fa-9x"></i>
+{% elseif ado_type == 'Book' %}
 <i class="fas fa-book fa-9x"></i>
-{% elseif data.type in ['WebPage'] %}
-<i class="fas fa-sitemap fa-9x"></i>
-{% elseif data.type in ['Panorama','PanoramaTour'] %}
-<i class="fas fa-vr-cardboard fa-9x"></i>
-{% elseif data.type in ['Dataset'] %}
-<i class="fas fa-table fa-9x"></i>
-{% elseif data.type in ['CreativeWorkSeries'] %}
-<i class="fab fa-buffer fa-9x"></i>
-{% elseif data.type in ['Collection'] %}
-<i class="fas fa-archive fa-9x"></i>
-{% elseif data.type in ['Map'] %}
-<i class="fas fa-map-marked-alt fa-9x"></i>
+{% elseif ado_type in ['Manuscript', 'Letter'] %}
+<i class="fas fa-envelope-open-text fa-9x"></i>
+{% elseif ado_type == 'Map' %}
+<i class="fas fa-map fa-9x"></i>
+{% elseif ado_type in ['Photograph', 'Image', 'VisualArtwork', 'Painting'] %}
+<i class="fas fa-image fa-9x"></i>
+{% elseif ado_type in ['DigitalDocument', 'Article', 'Thesis', 'Text'] %}
+<i class="fas fa-file-alt fa-9x"></i>
+{% elseif ado_type == '3DModel' %}
+<i class="fas fa-cube fa-9x"></i>
+{% elseif ado_type == 'WebPage' %}
+<i class="fas fa-globe fa-9x"></i>
 {% else %}
-<i class="fas fa-file-contract fa-9x"></i>
+<i class="fas fa-archive fa-9x"></i>
 {% endif %}
 {# -- ENDIF fontawesome -- #}
 {% endif %}
