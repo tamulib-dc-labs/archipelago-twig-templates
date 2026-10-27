@@ -1,4 +1,5 @@
 {#- Simple card thumbnail — plain img, no IIIF viewer scripts
+Updated 27/10/2026: the type tag shows browse_search_type when the object has one, else the ADO type.
 Updated 07/10/2026: the ADO type and date follow the image as a .tamu-card__meta line, which the theme (js/card-meta.js) moves under the card title.
 Updated 06/10/2026: objects without an image get an icon for their ADO type (headphones for audio, film for video, …) instead of fa-archive for everything, matching the default thumbnails in the search result list. -#}
 {% set iiif_size = "400," %}
@@ -69,6 +70,17 @@ Updated 06/10/2026: objects without an image get an icon for their ADO type (hea
   'PanoramaTour': 'Panorama tour'
 } -%}
 {%- set type_label = ado_type ? type_labels[ado_type]|default(ado_type) : '' -%}
+{#- A curated browse_search_type (string or array of strings) wins over the
+    ADO type label; the icon above stays on the ADO type. -#}
+{%- set browse_label = '' -%}
+{%- for value in (data.browse_search_type is iterable ? data.browse_search_type : [data.browse_search_type]) -%}
+  {%- if browse_label is empty and value is not empty and value is not iterable and value|trim is not empty -%}
+    {%- set browse_label = value|trim -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- if browse_label is not empty -%}
+  {%- set type_label = browse_label -%}
+{%- endif -%}
 {%- set date = '' -%}
 {%- if data.date_created -%}
   {%- set date = data.date_created|edtf_2_human_date -%}
