@@ -1,4 +1,5 @@
 {#
+Updated 27/10/2026: the type tag shows browse_search_type when the object has one, else the ADO type.
 Updated 07/10/2026: hidden list of the searchable fields for the search page's Match block; no full stop after a creator's dates in the byline.
 Updated 06/10/2026: search result cards. ADO type, creators/contributors and date move to a byline above the abstract (first name, then ", N more"); abstract cut to 250 characters with an ellipsis.
 Updated 09/02/2026 for Corina based on this ticket: https://www.notion.so/277cf324d44a80578525e4aea2c57e78?v=277cf324d44a80cb893f000c4304be04&p=2f7cf324d44a80e79a3bfc491b8decc7&pm=s
@@ -27,6 +28,18 @@ Updated 31/10/2023 for 1.3.0
 } -%}
 {%- set ado_type = data.type is iterable ? data.type|first : data.type -%}
 {%- set type_label = ado_type ? type_labels[ado_type]|default(ado_type) : '' -%}
+{# A curated browse_search_type (string or array of strings) wins over the
+   ADO type label. The modifier class below stays on the ADO type: the
+   theme's thumbnail icons and search-matches.js read it. #}
+{%- set browse_label = '' -%}
+{%- for value in (data.browse_search_type is iterable ? data.browse_search_type : [data.browse_search_type]) -%}
+  {%- if browse_label is empty and value is not empty and value is not iterable and value|trim is not empty -%}
+    {%- set browse_label = value|trim -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- if browse_label is not empty -%}
+  {%- set type_label = browse_label -%}
+{%- endif -%}
 
 {# Creators and contributors, in the order the fields were listed before,
    without duplicates. Plain fields are strings or arrays of strings; agent
