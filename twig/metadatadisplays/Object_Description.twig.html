@@ -903,9 +903,8 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 </ul></dd>
 {% endif %}
 
-{# Content Type and ADO Type #}
+{# Content Type #}
 {{ _self.html_output('Content Type', data.content_type) }}
-{{ _self.html_output('ADO Type', data.type) }}
 
 {# Rights Statement.
    Rendered from the resolution at the top of this template, so this row and the
@@ -1046,6 +1045,9 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {{ _self.html_output('Drupal Node ID:', node.id) }}
 {{ _self.html_output('Archipelago UUID:', node.uuid.value) }}
 {{ _self.html_output('Local Identifier:', data.local_identifier) }}
+{# ADO Type and Browse Search Type #}
+{{ _self.html_output('ADO Type', data.type) }}
+{{ _self.html_output('Browse Search Type', data.browse_search_type) }}
 </dl>
 {% endif %}
 </div>
