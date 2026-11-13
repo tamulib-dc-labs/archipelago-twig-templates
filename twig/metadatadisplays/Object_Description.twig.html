@@ -349,9 +349,10 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% set dl_terms_enabled = dl_file_count > 0 or file_download_restricted %}
 {# -- End downloadable files -- #}
 
-{# AllMaps #}
-{# was: nodeinfo.uuid -- that's empty in this template context #}
-{% set manifest_url = 'https://digitalcollections.library.tamu.edu/do/' ~ node.uuid.value ~ '/metadata/iiifmanifest/default.jsonld' %}
+{# AllMaps -- reuses the bundle/type-aware manifest URL above instead of
+   always checking the plain "iiifmanifest" route, which doesn't exist for
+   Collections/Series and left the tab hidden even when georeferenced. #}
+{% set manifest_url = iiif_manifest_absolute %}
 {% set annotation_url = allmaps_annotation_url(manifest_url) %}
 {# End AllMaps #}
 
