@@ -349,13 +349,6 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% set dl_terms_enabled = dl_file_count > 0 or file_download_restricted %}
 {# -- End downloadable files -- #}
 
-{# AllMaps -- reuses the bundle/type-aware manifest URL above instead of
-   always checking the plain "iiifmanifest" route, which doesn't exist for
-   Collections/Series and left the tab hidden even when georeferenced. #}
-{% set manifest_url = iiif_manifest_absolute %}
-{% set annotation_url = allmaps_annotation_url(manifest_url) %}
-{# End AllMaps #}
-
 {# -- Remix or Share / IIIF Manifest URL (bundle- and type-aware) -- #}
 {# A Book (or any type) can live in either bundle: digital_object is a single manifest,
    digital_object_collection is a series of children. Bundle decides for Book; the
@@ -371,6 +364,13 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% set iiif_manifest_href = '/do/' ~ node.uuid.value ~ '/metadata/' ~ iiif_manifest_route ~ '/default.jsonld' %}
 {% set iiif_manifest_absolute = 'https://digitalcollections.library.tamu.edu' ~ iiif_manifest_href %}
 {# End Remix or Share / IIIF Manifest URL #}
+
+{# AllMaps -- reuses the bundle/type-aware manifest URL above instead of
+   always checking the plain "iiifmanifest" route, which doesn't exist for
+   Collections/Series and left the tab hidden even when georeferenced. #}
+{% set manifest_url = iiif_manifest_absolute %}
+{% set annotation_url = allmaps_annotation_url(manifest_url) %}
+{# End AllMaps #}
 
 {# -- File Downloads Section -- #}
   {% set download_label = "Download" %}
