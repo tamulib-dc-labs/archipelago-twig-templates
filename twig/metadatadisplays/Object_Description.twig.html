@@ -1020,11 +1020,12 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endmacro %}
 
 {# Related resources #}
-{% if data.related_url|length > 0 %}
+{% set urls = data.related_url is iterable ? data.related_url : [data.related_url] %}
+{% if urls|length > 0 %}
 <dt>Related URL</dt>
-<dd>
-   <a href="{{ data.related_url }}" target="_blank">{{ data.related_url }}</a>
-</dd>
+  {% for url in urls %}
+<dd><a href="{{ url }}" target="_blank">{{ url }}</a></dd>
+  {% endfor %}
 {% endif %}
 {{ _self.html_output('Related Item', data.related_record) }}
 {{ _self.html_output('Original Publication', data.original_publication) }}
