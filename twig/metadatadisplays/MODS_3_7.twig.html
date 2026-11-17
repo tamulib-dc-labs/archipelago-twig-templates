@@ -105,14 +105,18 @@
 {% if data.creator_linked_data %}
   {% set creators = data.creator_linked_data.value is defined ? [data.creator_linked_data] : data.creator_linked_data %}
   {% for creator in creators %}
-{{ m.name_with_role(creator, 'http://id.loc.gov/vocabulary/relators/cre', 'creator') }}
+    {% set role = creator.role is defined and creator.role ? creator.role : 'creator' %}
+     {% set role_uri = creator.role_uri is defined and creator.role_uri ? creator.role_uri : 'http://id.loc.gov/vocabulary/relators/cre' %}
+    {{ m.name_with_role(creator, role_uri, role) }}
   {% endfor %}
 {% endif %}
 
 {% if data.contributor_linked_data %}
   {% set contributors = data.contributor_linked_data.value is defined ? [data.contributor_linked_data] : data.contributor_linked_data %}
   {% for contributor in contributors %}
-{{ m.name_with_role(contributor, 'http://id.loc.gov/vocabulary/relators/ctb', 'contributor') }}
+  {% set role = contributor.role is defined and contributor.role ? contributor.role : 'contributor' %}
+  {% set role_uri = contributor.role_uri is defined and contributor.role_uri ? contributor.role_uri : 'http://id.loc.gov/vocabulary/relators/ctb' %}
+{{ m.name_with_role(contributor, role_uri, role) }}
   {% endfor %}
 {% endif %}
 
