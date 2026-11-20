@@ -699,38 +699,52 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
     {% set creator_grouped = {} %}
     {% for creator in data.creator_linked_data %}
       {% if creator_grouped[creator.value] is not defined %}
-        {% set creator_grouped = creator_grouped|merge({(creator.value): []}) %}
+        {% set creator_grouped = creator_grouped|merge({(creator.value): {'uris': [], 'role': ''}}) %}
       {% endif %}
       {% if creator.uri is defined and creator.uri|length > 2 %}
-        {% set creator_grouped = creator_grouped|merge({(creator.value): creator_grouped[creator.value]|merge([creator.uri])}) %}
+        {% set creator_grouped = creator_grouped|merge({(creator.value): {'uris': creator_grouped[creator.value]['uris']|merge([creator.uri]), 'role': creator_grouped[creator.value]['role']}}) %}
+      {% endif %}
+      {% if creator.role is defined and creator.role|length > 2 %}
+        {% set creator_grouped = creator_grouped|merge({(creator.value): {'uris': creator_grouped[creator.value]['uris'], 'role': creator.role }}) %}
       {% endif %}
     {% endfor %}
-    {% for label, uris in creator_grouped %}
-      <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
-        {% for uri in uris %}
-          <a href="{{ uri }}" target="_blank">🔗</a>
-        {% endfor %}
-      </li>
+   {% for label, grouped in creator_grouped %}
+    <li>
+      {% if grouped.role is defined and grouped.role|length > 2 %}
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a> ({{ grouped.role }})
+      {% else %}
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a> (creator)
+      {% endif %}
+      {% for uri in grouped.uris %}
+        <a href="{{ uri }}" target="_blank">🔗</a>
+      {% endfor %}
+    </li>
     {% endfor %}
   {% endif %}
   {% if data.contributor_linked_data|length > 0 %}
     {% set contributor_grouped = {} %}
     {% for contributor in data.contributor_linked_data %}
       {% if contributor_grouped[contributor.value] is not defined %}
-        {% set contributor_grouped = contributor_grouped|merge({(contributor.value): []}) %}
+        {% set contributor_grouped = contributor_grouped|merge({(contributor.value): {'uris': [], 'role': ''}}) %}
       {% endif %}
       {% if contributor.uri is defined and contributor.uri|length > 2 %}
-        {% set contributor_grouped = contributor_grouped|merge({(contributor.value): contributor_grouped[contributor.value]|merge([contributor.uri])}) %}
+        {% set contributor_grouped = contributor_grouped|merge({(contributor.value): {'uris': contributor_grouped[contributor.value]['uris']|merge([contributor.uri]), 'role': contributor_grouped[contributor.value]['role']}}) %}
+      {% endif %}
+      {% if contributor.role is defined and contributor.role|length > 2 %}
+        {% set contributor_grouped = contributor_grouped|merge({(contributor.value): {'uris': contributor_grouped[contributor.value]['uris'], 'role': contributor.role }}) %}
       {% endif %}
     {% endfor %}
-    {% for label, uris in contributor_grouped %}
-      <li>
-        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a>
-        {% for uri in uris %}
-          <a href="{{ uri }}" target="_blank">🔗</a>
-        {% endfor %}
-      </li>
+   {% for label, grouped in contributor_grouped %}
+    <li>
+      {% if grouped.role is defined and grouped.role|length > 2 %}
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a> ({{ grouped.role }})
+      {% else %}
+        <a href="/search?search_api_fulltext=&f%5B0%5D=descriptive_metadata_agent_labels%3A{{ label|url_encode }}" target="_blank">{{ label }}</a> (contributor)
+      {% endif %}
+      {% for uri in grouped.uris %}
+        <a href="{{ uri }}" target="_blank">🔗</a>
+      {% endfor %}
+    </li>
     {% endfor %}
   {% endif %}
 </ul></dd>
@@ -1006,8 +1020,16 @@ one macro for simple non-LoD elements; second for LoD elements with URI and labe
 {% endmacro %}
 
 {# Related resources #}
+{% if data.related_url is not empty %}
+{% set urls = data.related_url is iterable ? data.related_url : [data.related_url] %}
+<dt>Related URL</dt>
+  {% for url in urls %}
+    {% if url %}
+<dd><a href="{{ url }}" target="_blank">{{ url }}</a></dd>
+    {% endif %}
+  {% endfor %}
+{% endif %}
 {{ _self.html_output('Related Item', data.related_record) }}
-{{ _self.html_output('Related URL', data.related_url) }}
 {{ _self.html_output('Original Publication', data.original_publication) }}
 
 {# Notes and contents #}

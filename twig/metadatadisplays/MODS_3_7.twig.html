@@ -105,14 +105,14 @@
 {% if data.creator_linked_data %}
   {% set creators = data.creator_linked_data.value is defined ? [data.creator_linked_data] : data.creator_linked_data %}
   {% for creator in creators %}
-{{ m.name_with_role(creator, 'http://id.loc.gov/vocabulary/relators/cre', 'creator') }}
+    {{ m.name_with_role(creator, 'http://id.loc.gov/vocabulary/relators/cre', 'creator') }}
   {% endfor %}
 {% endif %}
 
 {% if data.contributor_linked_data %}
   {% set contributors = data.contributor_linked_data.value is defined ? [data.contributor_linked_data] : data.contributor_linked_data %}
   {% for contributor in contributors %}
-{{ m.name_with_role(contributor, 'http://id.loc.gov/vocabulary/relators/ctb', 'contributor') }}
+    {{ m.name_with_role(contributor, 'http://id.loc.gov/vocabulary/relators/ctb', 'contributor') }}
   {% endfor %}
 {% endif %}
 
